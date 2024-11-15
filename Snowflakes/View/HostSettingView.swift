@@ -21,22 +21,16 @@ struct HostSettingView: View {
     
     var body: some View {
         
-        ScrollView {
-            VStack(alignment: .leading) {
-                navBar
-                playground
-                duration
-                team
-                shop
-                buttons
-            }
-        }
-        .toolbar {
-            ToolbarItem(placement: .cancellationAction) {
-                Text("<")
-                    .onTapGesture {
-                        // go back to previous view
-                    }
+        VStack(alignment: .leading) {
+            navBar
+            ScrollView {
+                VStack(alignment: .leading) {
+                    playground
+                    duration
+                    team
+                    shop
+                    buttons
+                }
             }
         }
     }
@@ -45,7 +39,8 @@ struct HostSettingView: View {
     private var navBar: some View {
         HStack {
             Text("Settings")
-                .font(.system(size: 23))
+                .font(.custom("Montserrat-SemiBold", size: 23))
+                .foregroundStyle(AppColors.polarBlue)
             Spacer()
             Text("Room Code: \(formattedRoomCode)")
         }
@@ -63,12 +58,18 @@ struct HostSettingView: View {
         VStack(alignment: .leading) {
             
             HStack {
-                Image(systemName: "gamecontroller")
+                Image("gamecontroller")
+                    .resizable()
+                    .scaledToFit()
+                    .frame(height: 30)
                 Text("Playground")
+                    .font(.custom("Lato-Bold", size: 20))
+                    .foregroundStyle(AppColors.polarBlue)
             }
             
             HStack {
                 Text("Playground Round")
+                    .font(.custom("Lato-Bold", size: 20))
                 Spacer()
                 Button(action: {
                     if playgroundRound > 1 {
@@ -77,6 +78,7 @@ struct HostSettingView: View {
                     }
                 }) {
                     Image(systemName: "minus")
+                        .foregroundStyle(AppColors.glacialBlue)
                 }
                 TextField("", value: $playgroundRound, formatter: NumberFormatter())
                     .textFieldStyle(RoundedBorderTextFieldStyle())
@@ -88,6 +90,7 @@ struct HostSettingView: View {
                     roundDuration.append(240)
                 }) {
                     Image(systemName: "plus")
+                        .foregroundStyle(AppColors.glacialBlue)
                 }
             }
         }
@@ -98,8 +101,13 @@ struct HostSettingView: View {
     private var duration: some View {
         VStack(alignment: .leading) {
             HStack {
-                Image(systemName: "clock")
+                Image("durationclock")
+                    .resizable()
+                    .scaledToFit()
+                    .frame(height: 30)
                 Text("Duration")
+                    .font(.custom("Lato-Bold", size: 20))
+                    .foregroundStyle(AppColors.polarBlue)
             }
             ForEach(0..<playgroundRound, id: \.self) { roundNumber in
                 round(roundNumber: roundNumber + 1, duration: $roundDuration[roundNumber])
@@ -112,6 +120,7 @@ struct HostSettingView: View {
         
         HStack {
             Text("Round \(roundNumber)")
+                .font(.custom("Lato-Bold", size: 20))
             Spacer()
             Button(action: {
                 if duration.wrappedValue > 60 {
@@ -119,6 +128,7 @@ struct HostSettingView: View {
                 }
             }) {
                 Image(systemName: "minus")
+                    .foregroundStyle(AppColors.glacialBlue)
             }
             TextField("mm:ss", text: Binding(
                 get: {
@@ -138,6 +148,7 @@ struct HostSettingView: View {
                 duration.wrappedValue += 60
             }) {
                 Image(systemName: "plus")
+                    .foregroundStyle(AppColors.glacialBlue)
             }
         }
     }
@@ -163,11 +174,17 @@ struct HostSettingView: View {
     private var team: some View {
         VStack(alignment: .leading) {
             HStack {
-                Image(systemName: "person.2")
-                Text("Duration")
+                Image("teampeople")
+                    .resizable()
+                    .scaledToFit()
+                    .frame(height: 30)
+                Text("Team")
+                    .font(.custom("Lato-Bold", size: 20))
+                    .foregroundStyle(AppColors.polarBlue)
             }
             HStack {
                 Text("Team Number")
+                    .font(.custom("Lato-Bold", size: 20))
                 Spacer()
                 Button(action: {
                     if teamNumber > 1 {
@@ -175,6 +192,7 @@ struct HostSettingView: View {
                     }
                 }) {
                     Image(systemName: "minus")
+                        .foregroundStyle(AppColors.glacialBlue)
                 }
                 TextField("", value: $teamNumber, formatter: NumberFormatter())
                     .textFieldStyle(RoundedBorderTextFieldStyle())
@@ -185,10 +203,12 @@ struct HostSettingView: View {
                     teamNumber += 1
                 }) {
                     Image(systemName: "plus")
+                        .foregroundStyle(AppColors.glacialBlue)
                 }
             }
             HStack {
                 Text("Team Token")
+                    .font(.custom("Lato-Bold", size: 20))
                 Spacer()
                 Button(action: {
                     if teamToken > 1 {
@@ -196,6 +216,7 @@ struct HostSettingView: View {
                     }
                 }) {
                     Image(systemName: "minus")
+                        .foregroundStyle(AppColors.glacialBlue)
                 }
                 TextField("", value: $teamToken, formatter: NumberFormatter())
                     .textFieldStyle(RoundedBorderTextFieldStyle())
@@ -206,6 +227,7 @@ struct HostSettingView: View {
                     teamToken += 1
                 }) {
                     Image(systemName: "plus")
+                        .foregroundStyle(AppColors.glacialBlue)
                 }
             }
         }
@@ -216,12 +238,21 @@ struct HostSettingView: View {
     private var shop: some View {
         VStack(alignment: .leading) {
             HStack {
-                Image(systemName: "building")
+                Image("shop")
+                    .resizable()
+                    .scaledToFit()
+                    .frame(height: 30)
                 Text("Shop")
+                    .font(.custom("Lato-Bold", size: 20))
+                    .foregroundStyle(AppColors.polarBlue)
             }
             HStack {
-                Image(systemName: "scissors")
+                Image("scissors")
+                    .resizable()
+                    .scaledToFit()
+                    .frame(height: 30)
                 Text("Scissors")
+                    .font(.custom("Lato-Bold", size: 20))
                 Spacer()
                 Button(action: {
                     if scissors > 1 {
@@ -229,6 +260,7 @@ struct HostSettingView: View {
                     }
                 }) {
                     Image(systemName: "minus")
+                        .foregroundStyle(AppColors.glacialBlue)
                 }
                 TextField("", value: $scissors, formatter: NumberFormatter())
                     .textFieldStyle(RoundedBorderTextFieldStyle())
@@ -239,11 +271,16 @@ struct HostSettingView: View {
                     scissors += 1
                 }) {
                     Image(systemName: "plus")
+                        .foregroundStyle(AppColors.glacialBlue)
                 }
             }
             HStack {
-                Image(systemName: "paperclip")
+                Image("paper")
+                    .resizable()
+                    .scaledToFit()
+                    .frame(height: 30)
                 Text("Paper")
+                    .font(.custom("Lato-Bold", size: 20))
                 Spacer()
                 Button(action: {
                     if paper > 1 {
@@ -251,6 +288,7 @@ struct HostSettingView: View {
                     }
                 }) {
                     Image(systemName: "minus")
+                        .foregroundStyle(AppColors.glacialBlue)
                 }
                 TextField("", value: $paper, formatter: NumberFormatter())
                     .textFieldStyle(RoundedBorderTextFieldStyle())
@@ -261,11 +299,16 @@ struct HostSettingView: View {
                     paper += 1
                 }) {
                     Image(systemName: "plus")
+                        .foregroundStyle(AppColors.glacialBlue)
                 }
             }
             HStack {
-                Image(systemName: "pencil")
+                Image("pen")
+                    .resizable()
+                    .scaledToFit()
+                    .frame(height: 30)
                 Text("Pen")
+                    .font(.custom("Lato-Bold", size: 20))
                 Spacer()
                 Button(action: {
                     if pen > 1 {
@@ -273,6 +316,7 @@ struct HostSettingView: View {
                     }
                 }) {
                     Image(systemName: "minus")
+                        .foregroundStyle(AppColors.glacialBlue)
                 }
                 TextField("", value: $pen, formatter: NumberFormatter())
                     .textFieldStyle(RoundedBorderTextFieldStyle())
@@ -283,6 +327,7 @@ struct HostSettingView: View {
                     pen += 1
                 }) {
                     Image(systemName: "plus")
+                        .foregroundStyle(AppColors.glacialBlue)
                 }
             }
         }
@@ -297,6 +342,7 @@ struct HostSettingView: View {
                 print("Dismissed")
             }) {
                 Text("Back")
+                    .font(.custom("Lato-Bold", size: 20))
                     .frame(width: 144, height: 54)
                     .background(Color.clear)
                     .foregroundColor(.black)
@@ -312,9 +358,10 @@ struct HostSettingView: View {
                 print("Confirmed")
             }) {
                 Text("Confirm")
+                    .font(.custom("Lato-Bold", size: 20))
                     .frame(width: 144, height: 54)
-                    .background(Color.blue)
-                    .foregroundColor(.white)
+                    .background(AppColors.frostBlue)
+                    .foregroundColor(.black)
                     .cornerRadius(10)
             }
             Spacer()
