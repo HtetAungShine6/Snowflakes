@@ -14,6 +14,8 @@ struct AppColors {
     static let glacialBlue = Color(hex: "#4DB8E8")
     static let frozenDepth = Color(hex: "#297BA7")
     static let polarBlue = Color(hex: "#309CFF")
+    static let lightGray = Color(hex: "#FDFDFD")
+    static let FontColor = Color (hex: "#000000")
 }
 
 extension Color {

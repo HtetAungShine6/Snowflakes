@@ -11,7 +11,7 @@ import SwiftUI
 struct SnowflakesApp: App {
     var body: some Scene {
         WindowGroup {
-            HostSettingView()
+            HostScreenView()
         }
     }
 }

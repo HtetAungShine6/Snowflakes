@@ -7,6 +7,9 @@
 		<string>Montserrat-SemiBold.ttf</string>
 		<string>Lato-Regular.ttf</string>
 		<string>Lato-Bold.ttf</string>
+        <string>Manrope-Bold.ttf</string>
+        <string>Roboto-Medium.ttf</string>
+        <string>Futura-Medium.ttf</string>
 	</array>
 	<key>CFBundleURLTypes</key>
 	<array>
