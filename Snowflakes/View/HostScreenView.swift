@@ -34,7 +34,7 @@ struct HostScreenView: View {
             .foregroundColor(.clear)
             .frame(width: size, height: size)
             .background(
-                Image("snowflake_icon")  // Ensure you have this image in your assets
+                Image("snowflake_icon")  
                     .resizable()
                     .scaledToFit()
             )
@@ -59,7 +59,7 @@ struct HostScreenView: View {
                 Text("Create a room")
                     .font(Font.custom("Lato-Regular", size: 24))
                     .foregroundColor(Color(red: 0.15, green: 0.15, blue: 0.15))
-
+                
                 Spacer()
             }
             .frame(width: 246, height: 74)
@@ -68,7 +68,7 @@ struct HostScreenView: View {
             .shadow(color: Color.black.opacity(0.1), radius: 5, x: 0, y: 5)
         }
     }
-
+    
     // MARK: - Join Room Button
     private var joinRoomButton: some View {
         Button(action: { }) {
@@ -96,11 +96,10 @@ struct HostScreenView: View {
             .shadow(color: Color.black.opacity(0.1), radius: 5, x: 0, y: 5)
         }
     }
-    
-    // MARK: - Preview
-    struct HostScreenView_Previews: PreviewProvider {
+}
+// MARK: - Preview
+struct HostScreenView_Previews: PreviewProvider {
         static var previews: some View {
             HostScreenView()
         }
-    }
 }
