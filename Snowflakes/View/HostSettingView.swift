@@ -19,18 +19,24 @@ struct HostSettingView: View {
     @State private var paper: Int = 1
     @State private var pen: Int = 1
     
+    @State private var showTeamListView: Bool = false
+    
     var body: some View {
         
-        VStack(alignment: .leading) {
-            navBar
-            ScrollView {
-                VStack(alignment: .leading) {
-                    playground
-                    duration
-                    team
-                    shop
-                    buttons
+        if showTeamListView {
+            TeamListView(roomCode: roomCode)
+        } else {
+            VStack(alignment: .leading) {
+                navBar
+                ScrollView {
+                    VStack(alignment: .leading) {
+                        playground
+                        duration
+                        team
+                        shop
+                    }
                 }
+                buttons
             }
         }
     }
@@ -43,6 +49,7 @@ struct HostSettingView: View {
                 .foregroundStyle(AppColors.polarBlue)
             Spacer()
             Text("Room Code: \(formattedRoomCode)")
+                .font(.custom("Lato-Regular", size: 16))
         }
         .padding(.horizontal)
     }
@@ -356,6 +363,7 @@ struct HostSettingView: View {
             Button(action: {
                 // confirm
                 print("Confirmed")
+                showTeamListView = true
             }) {
                 Text("Confirm")
                     .font(.custom("Lato-Bold", size: 20))
