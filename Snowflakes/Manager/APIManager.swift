@@ -16,7 +16,7 @@ extension APIManager {
     
     // MARK: - Adding a route to a Default Main Route of an API
     var url: URL {
-        let urlString = "https://events-au-v2.vercel.app" + methodPath
+        let urlString = "https://localhost:7187/api" + methodPath
         guard let url = URL(string: urlString) else {
             fatalError("Invalid URL: \(urlString)")
         }

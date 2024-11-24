@@ -9,7 +9,12 @@ import SwiftUI
 
 struct HostSettingView: View {
     
-    private let roomCode: Int = Int.random(in: 00000...99999)
+    private let roomCode: String = {
+        let letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+        let digits = "0123456789"
+        let alphanumeric = letters + digits
+        return String((0..<6).map { _ in alphanumeric.randomElement()! })
+    }()
     
     @State private var playgroundRound: Int = 1
     @State private var roundDuration: [Int] = [240]
@@ -55,9 +60,7 @@ struct HostSettingView: View {
     }
     
     private var formattedRoomCode: String {
-        let formatter = NumberFormatter()
-        formatter.numberStyle = .none
-        return formatter.string(from: NSNumber(value: roomCode)) ?? "\(roomCode)"
+        return roomCode
     }
     
     //MARK: - Playground

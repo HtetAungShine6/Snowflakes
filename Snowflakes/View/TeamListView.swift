@@ -9,8 +9,8 @@ import SwiftUI
 
 struct TeamListView: View {
     
-    let roomCode: Int
-    let teams: [Team] = teamListMockUp
+    let roomCode: String
+    let teams: [TeamMockUp] = teamListMockUp
     
     var body: some View {
         VStack(alignment: .leading) {
@@ -42,7 +42,7 @@ struct TeamListView: View {
         .padding(.horizontal)
     }
     
-    private func teamCardView(team: Team) -> some View {
+    private func teamCardView(team: TeamMockUp) -> some View {
         VStack(alignment: .leading, spacing: 10) {
             HStack {
                 Text("Team: \(team.teamNumber)")
@@ -106,6 +106,6 @@ struct TeamListView: View {
 }
 
 #Preview {
-    TeamListView(roomCode: 10101)
+    TeamListView(roomCode: "ABC12")
 }
 
