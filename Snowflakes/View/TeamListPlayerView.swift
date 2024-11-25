@@ -13,7 +13,7 @@ struct TeamListPlayerView: View {
     let teams: [TeamMockUp] = teamListMockUp
     
     var body: some View {
-        VStack(alignment: .leading) {
+        VStack(alignment: .leading) {   
             navBar
             ScrollView {
                 VStack(alignment: .leading) {
@@ -100,7 +100,7 @@ struct TeamListPlayerView: View {
                     Image("tokenCoin")
                         .resizable()
                         .scaledToFit()
-                        .frame(height: 35)
+                        .frame(height: 30)
                     Text("\(team.tokens) tokens")
                         .font(.custom("Lato-Regular", size: 16))
                 }
