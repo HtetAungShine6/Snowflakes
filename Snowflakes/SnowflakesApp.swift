@@ -9,9 +9,11 @@ import SwiftUI
 
 @main
 struct SnowflakesApp: App {
+
     var body: some Scene {
         WindowGroup {
-                        HostTimerView(navBarTitle: "Snowflake", navBarSubtitle: "Round", image: Image("Snowman"))
+                SigninView()
+            }
         }
-    }
 }
+

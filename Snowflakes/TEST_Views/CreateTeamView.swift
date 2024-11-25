@@ -16,6 +16,8 @@ struct CreateTeamView: View {
     @State private var isLoading: Bool = false
     @State private var teamCreationSuccess: Bool = false
     
+    @ObservedObject var VM: CreateTeamViewModel
+    
     var body: some View {
         VStack(spacing: 16) {
             Text("Create Team")
@@ -44,7 +46,10 @@ struct CreateTeamView: View {
             
             Button(action: {
                 if isInputValid() {
-                    createTeam()
+                    VM.teamNumber = teamNumber
+                    VM.maxMembers = maxMembers
+                    VM.tokens = tokens
+                    VM.createTeam()
                 }
             }) {
                 Text("Create Team")
@@ -93,34 +98,34 @@ struct CreateTeamView: View {
         return true
     }
     
-    // MARK: - API Call
-    private func createTeam() {
-        isLoading = true
-        errorMessage = nil
-        
-        let newTeam = TeamDTO(
-            teamNumber: teamNumber,
-            maxMembers: maxMembers,
-            tokens: tokens
-        )
-        
-        let createTeamManager = CreateTeamUseCase()
-        createTeamManager.execute(data: newTeam, getMethod: "POST", token: nil) { result in
-            DispatchQueue.main.async {
-                self.isLoading = false
-                switch result {
-                case .success(_):
-                    self.teamCreationSuccess = true
-                case .failure(let error):
-                    self.errorMessage = "Failed to create team: \(error.localizedDescription)"
-                }
-            }
-        }
-    }
+//    // MARK: - API Call
+//    private func createTeam() {
+//        isLoading = true
+//        errorMessage = nil
+//        
+//        let newTeam = TeamDTO(
+//            teamNumber: teamNumber,
+//            maxMembers: maxMembers,
+//            tokens: tokens
+//        )
+//        
+//        let createTeamManager = CreateTeamUseCase()
+//        createTeamManager.execute(data: newTeam, getMethod: "POST", token: nil) { result in
+//            DispatchQueue.main.async {
+//                self.isLoading = false
+//                switch result {
+//                case .success(_):
+//                    self.teamCreationSuccess = true
+//                case .failure(let error):
+//                    self.errorMessage = "Failed to create team: \(error.localizedDescription)"
+//                }
+//            }
+//        }
+//    }
 }
 
-struct CreateTeamView_Previews: PreviewProvider {
-    static var previews: some View {
-        CreateTeamView()
-    }
-}
+//struct CreateTeamView_Previews: PreviewProvider {
+//    static var previews: some View {
+////        CreateTeamView()
+//    }
+//}

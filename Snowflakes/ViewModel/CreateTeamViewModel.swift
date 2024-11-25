@@ -9,6 +9,7 @@ import Foundation
 
 class CreateTeamViewModel: ObservableObject {
     
+//    @Published var roomCode: String
     @Published var teamNumber: Int
     @Published var maxMembers: Int
     @Published var tokens: Int
@@ -43,6 +44,7 @@ class CreateTeamViewModel: ObservableObject {
                     self.teamCreationSuccess = true
                 case .failure(let error):
                     self.errorMessage = "Failed to create team: \(error.localizedDescription)"
+                    print(error.localizedDescription)
                 }
             }
         }

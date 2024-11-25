@@ -16,7 +16,7 @@ extension APIManager {
     
     // MARK: - Adding a route to a Default Main Route of an API
     var url: URL {
-        let urlString = "https://localhost:7187/api" + methodPath
+        let urlString = "http://localhost:5254/api" + methodPath
         guard let url = URL(string: urlString) else {
             fatalError("Invalid URL: \(urlString)")
         }
@@ -65,10 +65,6 @@ extension APIManager {
                 completion(.failure(URLError(.badServerResponse)))
                 return
             }
-            
-//            if getMethod == "POST" || getMethod == "PUT" {
-//                return
-//            }
             
             //MARK: - Get and Delete
             if let responseData = data {
