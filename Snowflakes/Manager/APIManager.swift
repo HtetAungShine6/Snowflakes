@@ -66,9 +66,9 @@ extension APIManager {
                 return
             }
             
-            if getMethod == "POST" || getMethod == "PUT" {
-                return
-            }
+//            if getMethod == "POST" || getMethod == "PUT" {
+//                return
+//            }
             
             //MARK: - Get and Delete
             if let responseData = data {

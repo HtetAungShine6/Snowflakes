@@ -15,12 +15,14 @@
 	</array>
 	<key>UIAppFonts</key>
 	<array>
+		<string>Montserrat-VariableFont_wght.ttf</string>
 		<string>Montserrat-SemiBold.ttf</string>
 		<string>Lato-Regular.ttf</string>
 		<string>Lato-Bold.ttf</string>
-        <string>Manrope-Bold.ttf</string>
-        <string>Roboto-Medium.ttf</string>
-        <string>Futura-Medium.ttf</string>
+		<string>Manrope-Bold.ttf</string>
+		<string>Roboto-Medium.ttf</string>
+		<string>Futura-Medium.ttf</string>
+		<string>Montserrat-Medium.ttf</string>
 	</array>
 </dict>
 </plist>
