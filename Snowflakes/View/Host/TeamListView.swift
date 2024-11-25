@@ -24,7 +24,7 @@ struct TeamListView: View {
                 }
                 .padding()
             }
-            Spacer()
+//            Spacer() (optional)
             startPlaygroundButton
                 .padding()
         }
