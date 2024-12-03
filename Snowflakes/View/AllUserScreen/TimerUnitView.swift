@@ -12,13 +12,17 @@ struct TimerUnitView: View {
     let label: String
 
     var body: some View {
-        VStack {
+        VStack(alignment: .center) {
             Text(String(format: "%02d", value))
                 .font(.custom("Montserrat-Medium", size: 32))
                 .foregroundColor(.black)
             Text(label)
-                .font(.custom("Roboto-Medium", size: 28))
+                .font(.custom("Roboto-Light", size: 28))
                 .foregroundColor(.black.opacity(0.8))
         }
     }
+}
+
+#Preview {
+    TimerUnitView(value: 10, label: "hour")
 }

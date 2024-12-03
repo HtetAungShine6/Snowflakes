@@ -43,6 +43,7 @@ struct HostSettingView: View {
                 }
                 buttons
             }
+            .navigationBarBackButtonHidden()
         }
     }
     

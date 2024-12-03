@@ -13,13 +13,13 @@ struct TimerBackground<Content: View>: View {
     var navBarSubtitle: String
     var navBarButtonImageName: String
     var navBarButtonAction: () -> Void
-    let content: () -> Content 
+    let content: () -> Content
 
     @State private var minutes: Int = 0
     @State private var seconds: Int = 0
 
     var body: some View {
-        VStack(alignment: .center) {
+        VStack {
             // Navigation bar
             CustomNavBar(
                 title: navBarTitle,
@@ -29,27 +29,22 @@ struct TimerBackground<Content: View>: View {
             )
             
             // Timer display
-            HStack(spacing: 40) {
-                TimerUnitView(value: minutes, label: "Min")
-                TimerUnitView(value: seconds, label: "Sec")
+            VStack{
+                HStack(spacing: 40) {
+                    TimerUnitView(value: minutes, label: "Min")
+                    TimerUnitView(value: seconds, label: "Sec")
+                }
+                
+                // Main Image
+                image
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: 250, height: 226)
             }
-            
-            Spacer()
-                .frame(height: 70)
-            
-            // Main Image
-            image
-                .resizable()
-                .scaledToFit()
-                .frame(width: 235, height: 235)
-                .offset(y: -40)
-            
-            Spacer()
             
             // Additional content passed dynamically
             content()
         }
-        .padding(.horizontal)
         .background(
             Image("timerBackground")
                 .resizable()
@@ -59,61 +54,9 @@ struct TimerBackground<Content: View>: View {
     }
 }
 
-
-//struct TimerBackground: View {
-//    var image: Image
-//    var navBarTitle: String
-//    var navBarSubtitle: String
-//    var navBarButtonImageName: String
-//    var navBarButtonAction: () -> Void = {}
-//
-//    @State private var minutes: Int = 0
-//    @State private var seconds: Int = 0
-//
-//    var body: some View {
-//
-//        // Main content
-//        VStack(alignment: .center) {
-//            CustomNavBar(
-//                title: navBarTitle,
-//                subtitle: navBarSubtitle,
-//                buttonImageName: navBarButtonImageName,
-//                buttonAction: navBarButtonAction
-//            )
-//
-//            // Timer display
-//            HStack(spacing: 40) {
-//                TimerUnitView(value: minutes, label: "Min")
-//                TimerUnitView(value: seconds, label: "Sec")
-//            }
-//
-//            Spacer()
-//                .frame(height: 70)
-//
-//            // Image
-//            image
-//                .resizable()
-//                .scaledToFit()
-//                .frame(width: 235, height: 235)
-//                .offset(y: -40)
-//
-////            Spacer()
-//
-//        }
-//        .padding(.horizontal)
-//        .background(
-//            Image("timerBackground")
-//                .resizable()
-//                .scaledToFill()
-//                .ignoresSafeArea(.all)
-//        )
-//    }
-//}
-
-
 #Preview {
     TimerBackground(
-        image: Image("Snowman"),
+        image: Image("snowman1"),
         navBarTitle: "Snowflake",
         navBarSubtitle: "Round (1/5)",
         navBarButtonImageName: "shop2",

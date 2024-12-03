@@ -14,7 +14,7 @@ struct CustomNavBar: View {
     var buttonAction: () -> Void
 
     var body: some View {
-        HStack {
+        HStack() {
             VStack(alignment: .leading) {
                 Text(title)
                     .font(.custom("Montserrat-Medium", size: 32))
@@ -27,7 +27,7 @@ struct CustomNavBar: View {
                 Image(buttonImageName)
                     .resizable()
                     .scaledToFit()
-                    .frame(height: 40)
+                    .frame(height: 30)
             }
         }
         .padding(.horizontal)

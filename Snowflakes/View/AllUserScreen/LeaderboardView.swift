@@ -1,65 +1,51 @@
 //
-//  TeamListView.swift
+//  LeaderboardView.swift
 //  Snowflakes
 //
-//  Created by Htet Aung Shine on 18/11/2024.
+//  Created by Htet Aung Shine on 02/12/2024.
 //
 
 import SwiftUI
 
-struct TeamListView: View {
+struct LeaderboardView: View {
     
-    let roomCode: String
-    let teams: [TeamMockUp] = teamListMockUp
-    
-    @State private var startPlayground: Bool = false
+    let teams: [LeaderboardMockUp] = leaderboardMockUp.sorted { lhs, rhs in
+        // define with or without LeaderboardView (both works but how?)
+        LeaderboardView.rankOrder(lhs.rank) < LeaderboardView.rankOrder(rhs.rank)
+    }
     
     var body: some View {
-        if startPlayground {
-            HostTimerView(navBarTitle: "Snowflake", navBarSubtitle: "Round(1/5)", image: Image("snowman"))
-        } else {
-            VStack(alignment: .leading) {
-                navBar
-                totalNumberHostPlayer
-                ScrollView {
-                    VStack(alignment: .leading) {
-                        ForEach(teams, id: \.teamNumber) { team in
-                            teamCardView(team: team)
-                                .padding(.bottom, 8)
-                        }
+        VStack(alignment: .leading) {
+            navBar
+            ScrollView {
+                VStack(alignment: .leading) {
+                    ForEach(teams, id: \.teamNumber) { team in
+                        teamCardView(team: team)
+                            .padding(.bottom, 8)
                     }
-                    .padding()
                 }
-    //            Spacer() (optional)
-                startPlaygroundButton
-                    .padding()
+                .padding()
             }
         }
     }
     
     private var navBar: some View {
         HStack {
-            Text("Team List")
-                .font(.custom("Montserrat-SemiBold", size: 23))
-                .foregroundStyle(AppColors.polarBlue)
+            VStack(alignment: .leading) {
+                Text("Leaderboard")
+                    .font(.custom("Montserrat-SemiBold", size: 23))
+                    .foregroundStyle(AppColors.polarBlue)
+                Text("Tap Each team list to check gallery")
+                    .font(.custom("Poppins-Regular", size: 12))
+                    .foregroundStyle(Color.gray.opacity(0.8))
+            }
             Spacer()
-            Text("Room Code: \(roomCode)")
-                .font(.custom("Lato-Regular", size: 16))
+            Text("End Game Results")
         }
         .padding(.horizontal)
     }
     
-    private var totalNumberHostPlayer: some View{
-        HStack {
-            Text("Player: 9/30") //call api
-                .font(.custom("Lato-Medium", size: 15))
-            Text("Host: 2") //call api
-                .font(.custom("Lato-Medium", size: 15))
-        }
-        .padding(.horizontal)
-    }
-    
-    private func teamCardView(team: TeamMockUp) -> some View {
+    private func teamCardView(team: LeaderboardMockUp) -> some View {
         VStack(alignment: .leading, spacing: 10) {
             HStack {
                 Text("Team: \(team.teamNumber)")
@@ -67,6 +53,9 @@ struct TeamListView: View {
                 Text("(\(team.playersCount) Players)")
                     .font(.custom("Lato-Regular", size: 16))
                     .foregroundStyle(Color.gray)
+                Spacer()
+                Text("\(team.rank)")
+                    .font(.custom("Lato-Regular", size: 16))
             }
             
             HStack(spacing: 10) {
@@ -107,22 +96,16 @@ struct TeamListView: View {
         .background(RoundedRectangle(cornerRadius: 8).stroke(Color.black))
     }
     
-    private var startPlaygroundButton: some View {
-        Button(action: {
-            startPlayground = true
-        }) {
-            Text("Start a playground")
-                .font(.custom("Lato-Bold", size: 20))
-                .frame(maxWidth: .infinity)
-                .padding()
-                .background(AppColors.frostBlue)
-                .foregroundStyle(.black)
-                .cornerRadius(10)
+    private static func rankOrder(_ rank: String) -> Int {
+        switch rank {
+        case "1st": return 1
+        case "2nd": return 2
+        case "3rd": return 3
+        default: return Int.max
         }
     }
 }
 
 #Preview {
-    TeamListView(roomCode: "ABC12")
+    LeaderboardView()
 }
-
