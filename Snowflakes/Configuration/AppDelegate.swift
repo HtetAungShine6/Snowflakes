@@ -7,13 +7,13 @@
 
 import Foundation
 import GoogleSignIn
-import Firebase
+//import Firebase
 
 class AppDelegate: NSObject, UIApplicationDelegate {
     
     //MARK: - Initializing code for Firebase (App Configuration)
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey : Any]? = nil) -> Bool {
-        FirebaseApp.configure()
+//        FirebaseApp.configure()
         return true
     }
     
