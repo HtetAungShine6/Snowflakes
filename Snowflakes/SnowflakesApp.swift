@@ -9,11 +9,17 @@ import SwiftUI
 
 @main
 struct SnowflakesApp: App {
+    
+    @UIApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
+    @StateObject private var navigationManager = NavigationManager()
 
     var body: some Scene {
         WindowGroup {
-                SigninView()
-            }
+//            SigninView()
+            //            HostShopTimer(navBarTitle: "Snowflake", navBarSubtitle: "Round", image: Image("Snowman"))
+            //            .environmentObject(navigationManager)
+            RootView()
         }
+    }
 }
 

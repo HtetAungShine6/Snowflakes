@@ -1,13 +1,15 @@
 //
-//  HostTimerView.swift
+//  HostShopTimer.swift
 //  Snowflakes
 //
-//  Created by Htet Aung Shine on 24/11/2024.
+//  Created by Htet Aung Shine on 26/11/2024.
 //
 
 import SwiftUI
 
-struct HostTimerView: View {
+struct HostShopTimer: View {
+    
+    @EnvironmentObject var navigationManager: NavigationManager
     
     let navBarTitle: String
     let navBarSubtitle: String
@@ -37,11 +39,11 @@ struct HostTimerView: View {
             navBarSubtitle: currentSubtitle,
             navBarButtonImageName: "shop2",
             navBarButtonAction: {
-                print("NavBar button tapped")
+                navigationManager.path.append("HostShopView")
             }
         ) {
             
-            VStack(spacing: 15) {
+            VStack(spacing: 20) {
                 PauseButton {
                     // Action here
                 }
@@ -61,19 +63,12 @@ struct HostTimerView: View {
                         seconds = updatedSeconds
                     }
                 )
-                HStack {
-                    Text("Send a message")
-                        .font(.custom("Roboto-Regular", size: 24))
-                    Spacer()
-                }
-                .padding(.horizontal)
-                CustomTextFieldWithButton(
-                    placeholder: "Create a Snowflake",
-                    text: $inputText) {
-                        print("Message sent")
-                    }
-                    .padding(.horizontal)
                 
+                Text("It is time to sell a snow flake")
+                    .font(.custom("Roboto-Regular", size: 36))
+                    .lineLimit(2)
+                    .multilineTextAlignment(.leading)
+                    .fixedSize(horizontal: false, vertical: true)
                 Spacer()
                 
                 SwipeToConfirmButton {
@@ -87,13 +82,12 @@ struct HostTimerView: View {
     private func loadData() {
         DispatchQueue.main.async() {
             currentTitle = "Snowflake"
-            currentSubtitle = "Round (1/5)"
+            currentSubtitle = "Shop round"
             currentImage = Image("Snowman")
         }
     }
 }
 
 #Preview {
-    HostTimerView(navBarTitle: "Loading...", navBarSubtitle: "Please wait", image: Image(systemName: "hourglass"))
+    HostShopTimer(navBarTitle: "Loading...", navBarSubtitle: "Please wait", image: Image(systemName: "hourglass"))
 }
-

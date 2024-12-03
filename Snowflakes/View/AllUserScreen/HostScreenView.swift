@@ -1,6 +1,9 @@
 import SwiftUI
 
 struct HostScreenView: View {
+    
+    @EnvironmentObject var navigationManager: NavigationManager
+    
     var body: some View {
         GeometryReader { geometry in
             VStack(spacing: 20) {
@@ -43,7 +46,9 @@ struct HostScreenView: View {
     
     // MARK: - Create Room Button
     private var createRoomButton: some View {
-        Button(action: { }) {
+        Button(action: {
+            
+        }) {
             HStack {
                 Rectangle()
                     .foregroundColor(.clear)
@@ -71,7 +76,9 @@ struct HostScreenView: View {
     
     // MARK: - Join Room Button
     private var joinRoomButton: some View {
-        Button(action: { }) {
+        Button(action: {
+            navigationManager.navigateTo(Destination.hostSettingView)
+        }) {
             HStack {
                 Rectangle()
                     .foregroundColor(.clear)

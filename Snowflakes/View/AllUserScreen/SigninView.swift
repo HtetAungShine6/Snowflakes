@@ -1,7 +1,9 @@
 import SwiftUI
+import GoogleSignIn
 
 struct SigninView: View {
     @State private var rotationAngle: Double = 0
+    @StateObject private var googleService = GoogleService()
 
     var body: some View {
         GeometryReader { geometry in
@@ -57,7 +59,7 @@ struct SigninView: View {
     // MARK: - Sign-In Button
     private var signInButton: some View {
         Button(action: {
-            
+            googleService.signIn()
         }) {
             HStack(spacing: 10) {
                 Image("ios_light_rd_na")
