@@ -30,10 +30,12 @@
 - Manage teams, resources, and transactions in real time.
 - Control timers, send updates, and enable/disable shop items.
 - View post-game highlights in the Snowflake Gallery and Leaderboard.
+  
 🔷 For Players
 - Join teams, manage resources, and earn tokens by capturing Snowflake photos.
 - Shop for items and receive real-time updates from the host.
 - Celebrate achievements in the Snowflake Gallery and check team rankings on the Leaderboard.
+  
 🔷 Shared Features
 - Use session codes: Host Room Code for managing, Player Room Code for joining.
 - Enjoy real-time interaction and a gamified, visually engaging experience.
