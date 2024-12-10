@@ -39,7 +39,7 @@ struct HostShopTimer: View {
             navBarSubtitle: currentSubtitle,
             navBarButtonImageName: "shop2",
             navBarButtonAction: {
-                navigationManager.path.append("HostShopView")
+                navigationManager.navigateTo(Destination.hostShopView)
             }
         ) {
             

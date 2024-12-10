@@ -2,6 +2,8 @@ import SwiftUI
 
 struct ShopTimerPlayerView: View {
     
+//    @EnvironmentObject var navigationManager: NavigationManager
+    
     let navBarTitle: String
     let navBarSubtitle: String
     let image: Image

@@ -9,6 +9,8 @@ import SwiftUI
 
 struct HostTimerView: View {
     
+//    @EnvironmentObject var navigationManager: NavigationManager
+    
     let navBarTitle: String
     let navBarSubtitle: String
     let image: Image
@@ -82,6 +84,7 @@ struct HostTimerView: View {
             }
         }
         .onAppear(perform: loadData)
+//        .navigationBarBackButtonHidden()
     }
 
     private func loadData() {

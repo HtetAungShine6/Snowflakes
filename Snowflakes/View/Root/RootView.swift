@@ -18,12 +18,31 @@ struct RootView: View {
                     switch destination {
                     case .hostSettingView:
                         HostSettingView()
+                            .environmentObject(navigationManager)
                     case .teamListView(let roomCode):
                         TeamListView(roomCode: roomCode)
-                    case .hostTimerView(let title, let subtitle, let imageName):
-                        HostTimerView(navBarTitle: title, navBarSubtitle: subtitle, image: Image(imageName))
+                            .environmentObject(navigationManager)
+                        //                    case .hostTimerView(let title, let subtitle, let imageName):
+                        //                        HostTimerView(navBarTitle: title, navBarSubtitle: subtitle, image: Image(imageName))
+                        //                            .environmentObject(navigationManager)
+                    case .gameView:
+                        GameView()
+                            .environmentObject(navigationManager)
                     case .hostShopView:
                         HostShopView()
+                            .environmentObject(navigationManager)
+                    case .teamListPlayerView(let roomCode):
+                        TeamListPlayerView(roomCode: roomCode)
+                            .environmentObject(navigationManager)
+                    case .teamDetailsPlayerView(let teamNumber, let balance, let scissorsCount, let paperCount, let penCount):
+                        TeamDetailsPlayerView(
+                            teamNumber: teamNumber,
+                            balance: balance,
+                            scissorsCount: scissorsCount,
+                            paperCount: paperCount,
+                            penCount: penCount
+                        )
+                        .environmentObject(navigationManager)
                     }
                 }
         }

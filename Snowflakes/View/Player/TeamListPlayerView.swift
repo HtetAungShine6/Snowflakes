@@ -9,6 +9,8 @@ import SwiftUI
 
 struct TeamListPlayerView: View {
     
+    @EnvironmentObject var navigationManager: NavigationManager
+    
     let roomCode: String
     let teams: [TeamMockUp] = teamListMockUp
     
@@ -19,6 +21,15 @@ struct TeamListPlayerView: View {
                 VStack(alignment: .leading) {
                     ForEach(teams, id: \.teamNumber) { team in
                         teamCardView(team: team)
+                            .onTapGesture { 
+                                navigationManager.navigateTo(.teamDetailsPlayerView(
+                                    teamNumber: team.teamNumber,
+                                    balance: team.tokens,
+                                    scissorsCount: team.items["scissors"] ?? 0,
+                                    paperCount: team.items["paper"] ?? 0,
+                                    penCount: team.items["pen"] ?? 0
+                                ))
+                            }
                             .padding(.bottom, 8)
                     }
                 }

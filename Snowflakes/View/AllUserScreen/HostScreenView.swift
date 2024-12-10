@@ -47,7 +47,7 @@ struct HostScreenView: View {
     // MARK: - Create Room Button
     private var createRoomButton: some View {
         Button(action: {
-            
+            navigationManager.navigateTo(Destination.hostSettingView)
         }) {
             HStack {
                 Rectangle()
@@ -77,7 +77,7 @@ struct HostScreenView: View {
     // MARK: - Join Room Button
     private var joinRoomButton: some View {
         Button(action: {
-            navigationManager.navigateTo(Destination.hostSettingView)
+            navigationManager.navigateTo(Destination.teamListPlayerView(roomCode: "123456"))
         }) {
             HStack {
                 Rectangle()

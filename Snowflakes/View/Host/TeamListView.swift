@@ -9,32 +9,29 @@ import SwiftUI
 
 struct TeamListView: View {
     
+    @EnvironmentObject var navigationManager: NavigationManager
+    
     let roomCode: String
     let teams: [TeamMockUp] = teamListMockUp
     
-    @State private var startPlayground: Bool = false
-    
     var body: some View {
-        if startPlayground {
-            HostTimerView(navBarTitle: "Snowflake", navBarSubtitle: "Round(1/5)", image: Image("snowman"))
-        } else {
-            VStack(alignment: .leading) {
-                navBar
-                totalNumberHostPlayer
-                ScrollView {
-                    VStack(alignment: .leading) {
-                        ForEach(teams, id: \.teamNumber) { team in
-                            teamCardView(team: team)
-                                .padding(.bottom, 8)
-                        }
+
+        VStack(alignment: .leading) {
+            navBar
+            totalNumberHostPlayer
+            ScrollView {
+                VStack(alignment: .leading) {
+                    ForEach(teams, id: \.teamNumber) { team in
+                        teamCardView(team: team)
+                            .padding(.bottom, 8)
                     }
-                    .padding()
                 }
-    //            Spacer() (optional)
-                startPlaygroundButton
-                    .padding()
+                .padding()
             }
+            startPlaygroundButton
+                .padding()
         }
+        .navigationBarBackButtonHidden()
     }
     
     private var navBar: some View {
@@ -109,7 +106,8 @@ struct TeamListView: View {
     
     private var startPlaygroundButton: some View {
         Button(action: {
-            startPlayground = true
+//            navigationManager.navigateTo(Destination.hostTimerView(title: "Snowflake", subtitle: "Round", imageName: "Snowman"))
+            navigationManager.navigateTo(Destination.gameView)
         }) {
             Text("Start a playground")
                 .font(.custom("Lato-Bold", size: 20))
