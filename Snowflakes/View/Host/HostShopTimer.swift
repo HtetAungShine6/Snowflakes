@@ -83,7 +83,7 @@ struct HostShopTimer: View {
         DispatchQueue.main.async() {
             currentTitle = "Snowflake"
             currentSubtitle = "Shop round"
-            currentImage = Image("Snowman")
+            currentImage = Image("Shop 1")
         }
     }
 }

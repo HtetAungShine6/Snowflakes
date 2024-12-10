@@ -32,27 +32,25 @@ struct ShopTimerPlayerView: View {
             }
         ) {
             VStack {
-                Spacer() // Push everything down initially
+                Spacer()
                 
-                // The text to be moved to the top
                 Text("It is time to sell a snow flake.")
                     .font(Font.custom("Lato", size: 36).weight(.medium))
                     .foregroundColor(.black)
                     .multilineTextAlignment(.center)
                     .padding(.horizontal)
-                    .frame(maxWidth: .infinity, alignment: .top) // Full width and align to top
-                
-                Spacer() // Fill the remaining space
+                    .frame(maxWidth: .infinity, alignment: .top)
+                Spacer()
             }
-            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top) // Ensure it sticks to the top
+            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
         }
-        .onAppear(perform: loadData) // Correctly placed onAppear modifier
+        .onAppear(perform: loadData)
     }
     
     private var adjustTimeComponent: some View {
         VStack(alignment: .leading) {
             Text("Adjust Time")
-                .font(.headline) // Optional: Add a font style
+                .font(.headline)
         }
     }
 
