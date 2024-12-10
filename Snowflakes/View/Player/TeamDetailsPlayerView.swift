@@ -1,6 +1,9 @@
 import SwiftUI
 
 struct TeamDetailsPlayerView: View {
+    
+    @EnvironmentObject var navigationManager: NavigationManager
+    
     var teamNumber: Int
     var balance: Int
     var scissorsCount: Int
@@ -10,7 +13,7 @@ struct TeamDetailsPlayerView: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
             Button(action: {
-             
+                navigationManager.pop()
             }) {
                 HStack {
                     Image(systemName: "arrow.left")

@@ -9,6 +9,8 @@ import SwiftUI
 
 struct HostSettingView: View {
     
+    @EnvironmentObject var navigationManager: NavigationManager
+    
     private let roomCode: String = {
         let letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
         let digits = "0123456789"
@@ -24,27 +26,22 @@ struct HostSettingView: View {
     @State private var paper: Int = 1
     @State private var pen: Int = 1
     
-    @State private var showTeamListView: Bool = false
     
     var body: some View {
         
-        if showTeamListView {
-            TeamListView(roomCode: roomCode)
-        } else {
-            VStack(alignment: .leading) {
-                navBar
-                ScrollView {
-                    VStack(alignment: .leading) {
-                        playground
-                        duration
-                        team
-                        shop
-                    }
+        VStack(alignment: .leading) {
+            navBar
+            ScrollView {
+                VStack(alignment: .leading) {
+                    playground
+                    duration
+                    team
+                    shop
                 }
-                buttons
             }
-            .navigationBarBackButtonHidden()
+            buttons
         }
+        .navigationBarBackButtonHidden()
     }
     
     //MARK: - Setting Bar
@@ -350,7 +347,7 @@ struct HostSettingView: View {
             Spacer()
             Button(action: {
                 // dismiss
-                print("Dismissed")
+                navigationManager.pop()
             }) {
                 Text("Back")
                     .font(.custom("Lato-Bold", size: 20))
@@ -366,8 +363,7 @@ struct HostSettingView: View {
             .padding(.horizontal)
             Button(action: {
                 // confirm
-                print("Confirmed")
-                showTeamListView = true
+                navigationManager.navigateTo(Destination.teamListView(roomCode: roomCode))
             }) {
                 Text("Confirm")
                     .font(.custom("Lato-Bold", size: 20))
