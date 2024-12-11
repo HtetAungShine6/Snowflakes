@@ -3,20 +3,58 @@ import SwiftUI
 struct HostScreenView: View {
     
     @EnvironmentObject var navigationManager: NavigationManager
+    @EnvironmentObject var googleService: GoogleService
     
     var body: some View {
         GeometryReader { geometry in
             VStack(spacing: 20) {
+                // Top Bar with Email and Logout Button
+                HStack(spacing: 10) {
+                    // Email Rounded Rectangle
+                    Text("username@gmail.com")
+                        .font(Font.custom("Lato", size: 16).weight(.bold))
+                        .foregroundColor(Color(red: 0.27, green: 0.27, blue: 0.27))
+                        .frame(height: 40)
+                        .padding(.horizontal, 12)
+                        .background(Color.white)
+                        .cornerRadius(20)
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 20)
+                                .stroke(Color(red: 0.19, green: 0.61, blue: 1), lineWidth: 1)
+                        )
+                    
+                    Spacer()
+                    
+                    Button(action: {
+                        googleService.signOut() 
+                    }) {
+                        Image(systemName: "rectangle.portrait.and.arrow.right")
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: 24, height: 24)
+                            .foregroundColor(Color(red: 0.19, green: 0.61, blue: 1))
+                            .padding(10)
+                    }
+                    .background(Color.white)
+                    .clipShape(Circle())
+                    .shadow(color: Color.black.opacity(0.1), radius: 5, x: 0, y: 5)
+                }
+                .padding(.horizontal, 20)
+                .padding(.top, 10)
+                
                 Spacer()
                 
+                // Snowflake Icon
                 snowflakeIcon(size: min(geometry.size.width * 0.9, 290))
                     .padding(.bottom, -20)
                 
+                // Title
                 Text("Snowflake")
                     .font(Font.custom("Futura-Medium", size: 40).weight(.medium))
                     .foregroundColor(.black)
                     .padding(.top, -10)
                 
+                // Buttons
                 VStack(spacing: 20) {
                     createRoomButton
                     joinRoomButton
@@ -37,7 +75,7 @@ struct HostScreenView: View {
             .foregroundColor(.clear)
             .frame(width: size, height: size)
             .background(
-                Image("snowflake_icon")  
+                Image("snowflake_icon")
                     .resizable()
                     .scaledToFit()
             )
@@ -47,7 +85,7 @@ struct HostScreenView: View {
     // MARK: - Create Room Button
     private var createRoomButton: some View {
         Button(action: {
-            
+            // Create room action
         }) {
             HStack {
                 Rectangle()
@@ -104,9 +142,10 @@ struct HostScreenView: View {
         }
     }
 }
+
 // MARK: - Preview
 struct HostScreenView_Previews: PreviewProvider {
-        static var previews: some View {
-            HostScreenView()
-        }
+    static var previews: some View {
+        HostScreenView()
+    }
 }
