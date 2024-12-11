@@ -106,8 +106,8 @@ struct TeamListView: View {
     
     private var startPlaygroundButton: some View {
         Button(action: {
-//            navigationManager.navigateTo(Destination.hostTimerView(title: "Snowflake", subtitle: "Round", imageName: "Snowman"))
             navigationManager.navigateTo(Destination.gameView)
+            navigationManager.isShopTime = false
         }) {
             Text("Start a playground")
                 .font(.custom("Lato-Bold", size: 20))

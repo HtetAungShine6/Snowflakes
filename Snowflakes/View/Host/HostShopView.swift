@@ -31,10 +31,11 @@ struct HostShopView: View {
             }
             ToolbarItem(placement: .principal) {
                 Text("Shop")
-                    .font(.headline)
+                    .font(.custom("Montserrat-SemiBold", size: 24))
             }
         }
         .navigationBarBackButtonHidden()
+        .navigationBarTitleDisplayMode(.inline)
 //        .navigationDestination(for: TeamMockUp.self) { team in
 //            HostTeamDetailView(team: team)
 //        }

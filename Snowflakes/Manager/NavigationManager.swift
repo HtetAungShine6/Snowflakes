@@ -9,6 +9,7 @@ import SwiftUI
 
 class NavigationManager: ObservableObject {
     @Published var path = NavigationPath()
+    @Published var isShopTime: Bool = false
 
     func navigateTo(_ destination: Destination) {
         path.append(destination)
