@@ -50,6 +50,7 @@ struct TeamDetailsPlayerView: View {
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
         .background(Color.white)
+        .navigationBarBackButtonHidden()
     }
 
     private func toolWithCount(iconName: String, count: Int) -> some View {

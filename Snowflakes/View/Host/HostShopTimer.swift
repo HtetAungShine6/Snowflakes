@@ -64,8 +64,8 @@ struct HostShopTimer: View {
                     }
                 )
                 
-                Text("It is time to sell a snow flake")
-                    .font(.custom("Roboto-Regular", size: 36))
+                Text("It is time to sell a \n snow flake")
+                    .font(.custom("Roboto-Regular", size: 32))
                     .lineLimit(2)
                     .multilineTextAlignment(.leading)
                     .fixedSize(horizontal: false, vertical: true)
@@ -73,6 +73,7 @@ struct HostShopTimer: View {
                 
                 SwipeToConfirmButton {
                     print("OK")
+                    navigationManager.isShopTime.toggle()
                 }
             }
         }

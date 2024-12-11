@@ -29,7 +29,7 @@ struct TimerBackground<Content: View>: View {
             )
             
             // Timer display
-            VStack{
+//            VStack{
                 HStack(spacing: 40) {
                     TimerUnitView(value: minutes, label: "Min")
                     TimerUnitView(value: seconds, label: "Sec")
@@ -40,7 +40,7 @@ struct TimerBackground<Content: View>: View {
                     .resizable()
                     .scaledToFit()
                     .frame(width: 250, height: 226)
-            }
+//            }
             
             // Additional content passed dynamically
             content()

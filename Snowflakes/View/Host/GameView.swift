@@ -11,16 +11,17 @@ struct GameView: View {
     
     @EnvironmentObject var navigationManager: NavigationManager
     
-    @State private var isShopTime: Bool = true
+//    @State private var isShopTime: Bool = false
     
     var body: some View {
-        if !isShopTime {
-            HostTimerView(navBarTitle: "Snowflake", navBarSubtitle: "Round", image: Image("Snowman"))
-                .navigationBarBackButtonHidden()
-        } else {
-            HostShopTimer(navBarTitle: "Snowflake", navBarSubtitle: "Round", image: Image("Shop2"))
-                .navigationBarBackButtonHidden()
+        Group {
+            if navigationManager.isShopTime {
+                HostShopTimer(navBarTitle: "Snowflake", navBarSubtitle: "Round", image: Image("Shop 1"))
+            } else {
+                HostTimerView(navBarTitle: "Snowflake", navBarSubtitle: "Round", image: Image("Snowman"))
+            }
         }
+        .navigationBarBackButtonHidden()
     }
 }
 

@@ -41,6 +41,17 @@ struct HostSettingView: View {
             }
             buttons
         }
+        .toolbar {
+            ToolbarItem(placement: .navigationBarLeading) {
+                Button(action: {
+                    // Action for the back button
+                    navigationManager.pop()
+                }) {
+                    Image(systemName: "chevron.left")
+                        .foregroundColor(.black)
+                }
+            }
+        }
         .navigationBarBackButtonHidden()
     }
     

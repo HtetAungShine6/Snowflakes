@@ -9,7 +9,7 @@ import SwiftUI
 
 struct HostTimerView: View {
     
-//    @EnvironmentObject var navigationManager: NavigationManager
+    @EnvironmentObject var navigationManager: NavigationManager
     
     let navBarTitle: String
     let navBarSubtitle: String
@@ -80,6 +80,7 @@ struct HostTimerView: View {
                 
                 SwipeToConfirmButton {
                     print("OK")
+                    navigationManager.isShopTime.toggle()
                 }
             }
         }
