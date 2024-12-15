@@ -36,13 +36,18 @@ struct RootView: View {
                             .environmentObject(navigationManager)
                     case .teamDetailsPlayerView(let teamNumber, let balance, let scissorsCount, let paperCount, let penCount):
                         TeamDetailsPlayerView(
-                            teamNumber: teamNumber,
-                            balance: balance,
-                            scissorsCount: scissorsCount,
-                            paperCount: paperCount,
-                            penCount: penCount
+                            team: TeamMockUp(
+                                teamNumber: teamNumber,
+                                code: 1234, // You can replace this with the actual team code
+                                playersCount: 3,
+                                items: ["scissors": scissorsCount, "paper": paperCount, "pen": penCount],
+                                tokens: balance,
+                                members: ["Hein Thant", "Thu Yein", "Htet Aung Shine"] // Example members
+                            ),
+                            members: ["Hein Thant", "Thu Yein", "Htet Aung Shine"] // Example members
                         )
                         .environmentObject(navigationManager)
+
                     }
                 }
         }
