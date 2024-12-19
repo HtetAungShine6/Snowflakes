@@ -10,15 +10,14 @@ import SwiftUI
 @main
 struct SnowflakesApp: App {
     
-    @UIApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
     @StateObject private var navigationManager = NavigationManager()
+//    @StateObject var createPlaygroundVM = CreatePlaygroundViewModel()
 
     var body: some Scene {
         WindowGroup {
-//            SigninView()
-            //            HostShopTimer(navBarTitle: "Snowflake", navBarSubtitle: "Round", image: Image("Snowman"))
-            //            .environmentObject(navigationManager)
             RootView()
+//            TimerTestView()
+//            TimerViewHost()
         }
     }
 }

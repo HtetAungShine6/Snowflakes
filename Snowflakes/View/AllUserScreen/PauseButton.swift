@@ -8,11 +8,13 @@
 import SwiftUI
 
 struct PauseButton: View {
+    
+    var isPlaying: Bool
     var action: () -> Void = {}
 
     var body: some View {
         Button(action: action) {
-            Image(systemName: "pause.fill")
+            Image(systemName: isPlaying ? "pause.fill" : "play.fill")
                 .resizable()
                 .scaledToFit()
                 .frame(width: 25, height: 25)

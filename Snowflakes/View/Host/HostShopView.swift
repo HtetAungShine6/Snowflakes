@@ -69,8 +69,9 @@ struct HostShopView: View {
                         teamCardView(team: team)
                             .padding(.bottom, 8)
                             .onTapGesture {
-                                navigationManager.path.append("TeamDetail")
+//                                navigationManager.path.append("TeamDetail")
 //                                navigationManager.navigateTo(team)
+                                navigationManager.navigateTo(Destination.hostTeamDetailView(team: team))
                             }
                     }
                 }

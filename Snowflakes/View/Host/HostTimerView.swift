@@ -11,6 +11,8 @@ struct HostTimerView: View {
     
     @EnvironmentObject var navigationManager: NavigationManager
     
+    @StateObject private var webSocketManager = WebSocketManager()
+    
     let navBarTitle: String
     let navBarSubtitle: String
     let image: Image
@@ -40,16 +42,28 @@ struct HostTimerView: View {
             navBarButtonImageName: "shop2",
             navBarButtonAction: {
                 print("NavBar button tapped")
-            }
+            }, minutes: webSocketManager.countdown,
+            seconds: webSocketManager.countdown
         ) {
             
-            VStack(spacing: 15) {
-                PauseButton {
-                    // Action here
+            VStack(spacing: 12) {
+                PauseButton(isPlaying: webSocketManager.isConnected) {
+                    if webSocketManager.isConnected {
+                        webSocketManager.disconnect()
+                    } else {
+                        webSocketManager.connect()
+                        let message: [String: Any] = [
+                            "arguments": [11],
+                            "target": "StartTimer",
+                            "type": 1
+                        ]
+                        webSocketManager.sendMessage(message)
+                    }
                 }
                 HStack {
                     Text("Adjust Time")
                         .font(.custom("Roboto-Regular", size: 24))
+                        .foregroundStyle(Color.black)
                     Spacer()
                 }
                 .padding(.horizontal)
@@ -66,6 +80,7 @@ struct HostTimerView: View {
                 HStack {
                     Text("Send a message")
                         .font(.custom("Roboto-Regular", size: 24))
+                        .foregroundStyle(Color.black)
                     Spacer()
                 }
                 .padding(.horizontal)

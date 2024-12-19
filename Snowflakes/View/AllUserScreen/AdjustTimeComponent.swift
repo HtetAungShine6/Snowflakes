@@ -39,7 +39,8 @@ struct AdjustTimeComponent: View {
             // Display Minutes and Seconds
             Text(String(format: "%02d:%02d", minutes, seconds))
                 .font(.custom("Roboto-Regular", size: 32))
-                .frame(minWidth: 80) // To ensure consistent spacing
+                .foregroundStyle(Color.black)
+                .frame(minWidth: 80)
             
             // Increase Button
             Button(action: {

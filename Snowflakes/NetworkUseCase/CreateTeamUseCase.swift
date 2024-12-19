@@ -10,6 +10,6 @@ import Foundation
 class CreateTeamUseCase: APIManager {
     typealias ModelType = CreateTeamResponse
     var methodPath: String {
-        return "/Team"
+        return "/team"
     }
 }

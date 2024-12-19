@@ -16,7 +16,7 @@ extension APIManager {
     
     // MARK: - Adding a route to a Default Main Route of an API
     var url: URL {
-        let urlString = "http://localhost:5254/api" + methodPath
+        let urlString = "https://snowflakeapi-bkd0aygebke4fscg.southeastasia-01.azurewebsites.net/api" + methodPath
         guard let url = URL(string: urlString) else {
             fatalError("Invalid URL: \(urlString)")
         }

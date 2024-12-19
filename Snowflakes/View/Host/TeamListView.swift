@@ -11,7 +11,8 @@ struct TeamListView: View {
     
     @EnvironmentObject var navigationManager: NavigationManager
     
-    let roomCode: String
+    let hostRoomCode: String
+    let playerRoomCode: String
     let teams: [TeamMockUp] = teamListMockUp
     
     var body: some View {
@@ -40,8 +41,12 @@ struct TeamListView: View {
                 .font(.custom("Montserrat-SemiBold", size: 23))
                 .foregroundStyle(AppColors.polarBlue)
             Spacer()
-            Text("Room Code: \(roomCode)")
-                .font(.custom("Lato-Regular", size: 16))
+            VStack {
+                Text("Room Code: \(hostRoomCode)")
+                    .font(.custom("Lato-Regular", size: 16))
+                Text("Room Code: \(playerRoomCode)")
+                    .font(.custom("Lato-Regular", size: 16))
+            }
         }
         .padding(.horizontal)
     }
@@ -94,14 +99,14 @@ struct TeamListView: View {
                 Text("Members: ")
                     .font(.footnote)
                     .bold()
-                    .foregroundStyle(.black)
+                    .foregroundStyle(.secondary)
                 Text("\(team.members.joined(separator: ", "))")
                     .font(.footnote)
                     .foregroundStyle(.gray)
             }
         }
         .padding()
-        .background(RoundedRectangle(cornerRadius: 8).stroke(Color.black))
+        .background(RoundedRectangle(cornerRadius: 8).stroke(Color.secondary))
     }
     
     private var startPlaygroundButton: some View {
@@ -121,6 +126,6 @@ struct TeamListView: View {
 }
 
 #Preview {
-    TeamListView(roomCode: "ABC12")
+    TeamListView(hostRoomCode: "ABC12", playerRoomCode: "DFH123")
 }
 
