@@ -8,23 +8,24 @@
 import SwiftUI
 
 struct RootView: View {
+    
     @StateObject private var navigationManager = NavigationManager()
 
     var body: some View {
         NavigationStack(path: $navigationManager.path) {
             HostScreenView()
-                .environmentObject(navigationManager) 
+                .environmentObject(navigationManager)
                 .navigationDestination(for: Destination.self) { destination in
                     switch destination {
                     case .hostSettingView:
                         HostSettingView()
                             .environmentObject(navigationManager)
-                    case .teamListView(let roomCode):
-                        TeamListView(roomCode: roomCode)
+                    case .joinRoomView:
+                        JoinRoomView()
                             .environmentObject(navigationManager)
-                        //                    case .hostTimerView(let title, let subtitle, let imageName):
-                        //                        HostTimerView(navBarTitle: title, navBarSubtitle: subtitle, image: Image(imageName))
-                        //                            .environmentObject(navigationManager)
+                    case .teamListView(let hostRoomCode, let playerRoomCode):
+                        TeamListView(hostRoomCode: hostRoomCode, playerRoomCode: playerRoomCode)
+                            .environmentObject(navigationManager)
                     case .gameView:
                         GameView()
                             .environmentObject(navigationManager)
@@ -42,6 +43,9 @@ struct RootView: View {
                             paperCount: paperCount,
                             penCount: penCount
                         )
+                        .environmentObject(navigationManager)
+                    case .hostTeamDetailView(let team):
+                        HostTeamDetailView(team: team)
                         .environmentObject(navigationManager)
                     }
                 }

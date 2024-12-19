@@ -13,10 +13,9 @@ struct TimerBackground<Content: View>: View {
     var navBarSubtitle: String
     var navBarButtonImageName: String
     var navBarButtonAction: () -> Void
+    var minutes: Int = 0
+    var seconds: Int = 0
     let content: () -> Content
-
-    @State private var minutes: Int = 0
-    @State private var seconds: Int = 0
 
     var body: some View {
         VStack {

@@ -11,6 +11,8 @@ struct HostShopTimer: View {
     
     @EnvironmentObject var navigationManager: NavigationManager
     
+    @StateObject private var webSocketManager = WebSocketManager()
+    
     let navBarTitle: String
     let navBarSubtitle: String
     let image: Image
@@ -43,8 +45,8 @@ struct HostShopTimer: View {
             }
         ) {
             
-            VStack(spacing: 20) {
-                PauseButton {
+            VStack(spacing: 17) {
+                PauseButton(isPlaying: webSocketManager.isConnected) {
                     // Action here
                 }
                 HStack {

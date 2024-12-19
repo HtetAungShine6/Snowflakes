@@ -7,8 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		B3606BCC2CEBAB6100736416 /* GoogleSignIn in Frameworks */ = {isa = PBXBuildFile; productRef = B3606BCB2CEBAB6100736416 /* GoogleSignIn */; };
-		B3606BCE2CEBAB6100736416 /* GoogleSignInSwift in Frameworks */ = {isa = PBXBuildFile; productRef = B3606BCD2CEBAB6100736416 /* GoogleSignInSwift */; };
+		B3832B502D0EDDC70016154B /* Starscream in Frameworks */ = {isa = PBXBuildFile; productRef = B3832B4F2D0EDDC70016154B /* Starscream */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -41,8 +40,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				B3606BCC2CEBAB6100736416 /* GoogleSignIn in Frameworks */,
-				B3606BCE2CEBAB6100736416 /* GoogleSignInSwift in Frameworks */,
+				B3832B502D0EDDC70016154B /* Starscream in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -93,8 +91,7 @@
 			);
 			name = Snowflakes;
 			packageProductDependencies = (
-				B3606BCB2CEBAB6100736416 /* GoogleSignIn */,
-				B3606BCD2CEBAB6100736416 /* GoogleSignInSwift */,
+				B3832B4F2D0EDDC70016154B /* Starscream */,
 			);
 			productName = Snowflakes;
 			productReference = B3D468892CD899C9001F1147 /* Snowflakes.app */;
@@ -125,7 +122,7 @@
 			mainGroup = B3D468802CD899C9001F1147;
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
-				B3606BCA2CEBAB6100736416 /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */,
+				B3832B4E2D0EDDC70016154B /* XCRemoteSwiftPackageReference "Starscream" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = B3D4688A2CD899C9001F1147 /* Products */;
@@ -369,26 +366,21 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
-		B3606BCA2CEBAB6100736416 /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */ = {
+		B3832B4E2D0EDDC70016154B /* XCRemoteSwiftPackageReference "Starscream" */ = {
 			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/google/GoogleSignIn-iOS";
+			repositoryURL = "https://github.com/daltoniam/Starscream";
 			requirement = {
 				kind = upToNextMajorVersion;
-				minimumVersion = 8.0.0;
+				minimumVersion = 4.0.8;
 			};
 		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		B3606BCB2CEBAB6100736416 /* GoogleSignIn */ = {
+		B3832B4F2D0EDDC70016154B /* Starscream */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = B3606BCA2CEBAB6100736416 /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */;
-			productName = GoogleSignIn;
-		};
-		B3606BCD2CEBAB6100736416 /* GoogleSignInSwift */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = B3606BCA2CEBAB6100736416 /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */;
-			productName = GoogleSignInSwift;
+			package = B3832B4E2D0EDDC70016154B /* XCRemoteSwiftPackageReference "Starscream" */;
+			productName = Starscream;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

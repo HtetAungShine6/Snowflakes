@@ -11,7 +11,16 @@ struct HostSettingView: View {
     
     @EnvironmentObject var navigationManager: NavigationManager
     
-    private let roomCode: String = {
+    @StateObject private var createPlaygroundVM = CreatePlaygroundViewModel()
+    
+    private let hostRoomCode: String = {
+        let letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+        let digits = "0123456789"
+        let alphanumeric = letters + digits
+        return String((0..<6).map { _ in alphanumeric.randomElement()! })
+    }()
+    
+    private let playerRoomCode: String = {
         let letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
         let digits = "0123456789"
         let alphanumeric = letters + digits
@@ -26,33 +35,58 @@ struct HostSettingView: View {
     @State private var paper: Int = 1
     @State private var pen: Int = 1
     
+    @State private var showAlertView: Bool = false
     
     var body: some View {
         
-        VStack(alignment: .leading) {
-            navBar
-            ScrollView {
-                VStack(alignment: .leading) {
-                    playground
-                    duration
-                    team
-                    shop
+        VStack {
+            if showAlertView {
+                ZStack {
+                    AppColors.frostBlue.opacity(0.5)
+                        .edgesIgnoringSafeArea(.all)
+                    
+                    VStack(spacing: 16) {
+                        ProgressView()
+                            .progressViewStyle(CircularProgressViewStyle(tint: .white))
+                            .scaleEffect(2)
+                        Text("Creating your Playground...")
+                            .font(.custom("Lato-Bold", size: 20))
+                            .foregroundColor(.white)
+                        Text("This may take a few seconds.")
+                            .font(.custom("Lato-Regular", size: 16))
+                            .foregroundColor(.white.opacity(0.8))
+                    }
+                    .padding(40)
+                    .background(RoundedRectangle(cornerRadius: 16).fill(Color.black).opacity(0.5))
                 }
-            }
-            buttons
-        }
-        .toolbar {
-            ToolbarItem(placement: .navigationBarLeading) {
-                Button(action: {
-                    // Action for the back button
-                    navigationManager.pop()
-                }) {
-                    Image(systemName: "chevron.left")
-                        .foregroundColor(.black)
+            } else {
+                VStack(alignment: .leading) {
+                    navBar
+                    ScrollView {
+                        VStack(alignment: .leading) {
+                            playground
+                            duration
+                            team
+                            shop
+                        }
+                    }
+                    buttons
                 }
             }
         }
         .navigationBarBackButtonHidden()
+        .onChange(of: createPlaygroundVM.isLoading, { oldValue, newValue in
+            if newValue {
+                showAlertView = true
+            } else {
+                showAlertView = false
+            }
+        })
+        .onChange(of: createPlaygroundVM.isSuccess, { oldValue, newValue in
+            if newValue {
+                navigationManager.navigateTo(Destination.teamListView(hostRoomCode: hostRoomCode, playerRoomCode: playerRoomCode))
+            }
+        })
     }
     
     //MARK: - Setting Bar
@@ -62,14 +96,22 @@ struct HostSettingView: View {
                 .font(.custom("Montserrat-SemiBold", size: 23))
                 .foregroundStyle(AppColors.polarBlue)
             Spacer()
-            Text("Room Code: \(formattedRoomCode)")
-                .font(.custom("Lato-Regular", size: 16))
+            VStack {
+                Text("Host Room Code: \(formattedHostRoomCode)")
+                    .font(.custom("Lato-Regular", size: 16))
+                Text("Player Room Code: \(formattedPlayerRoomCode)")
+                    .font(.custom("Lato-Regular", size: 16))
+            }
         }
         .padding(.horizontal)
     }
     
-    private var formattedRoomCode: String {
-        return roomCode
+    private var formattedHostRoomCode: String {
+        return hostRoomCode
+    }
+    
+    private var formattedPlayerRoomCode: String {
+        return playerRoomCode
     }
     
     //MARK: - Playground
@@ -362,19 +404,37 @@ struct HostSettingView: View {
             }) {
                 Text("Back")
                     .font(.custom("Lato-Bold", size: 20))
+                    .foregroundStyle(Color.secondary)
                     .frame(width: 144, height: 54)
                     .background(Color.clear)
                     .foregroundColor(.black)
                     .cornerRadius(10)
                     .overlay(
                         RoundedRectangle(cornerRadius: 10)
-                            .stroke(Color.black, lineWidth: 1)
+                            .stroke(Color.secondary, lineWidth: 1)
                     )
             }
             .padding(.horizontal)
+            
             Button(action: {
                 // confirm
-                navigationManager.navigateTo(Destination.teamListView(roomCode: roomCode))
+                
+                var roundsData: [String: String] = [:]
+                for index in 0..<playgroundRound {
+                    let roundKey = "\(index + 1)"
+                    let roundDuration = formatDuration(roundDuration[index])
+                    roundsData[roundKey] = roundDuration
+                }
+                
+                createPlaygroundVM.hostRoomCode = hostRoomCode
+                createPlaygroundVM.playerRoomCode = playerRoomCode
+                createPlaygroundVM.hostId = "123ABC"
+                createPlaygroundVM.numberOfTeam = teamNumber
+                createPlaygroundVM.teamToken = teamToken
+                createPlaygroundVM.maxTeamMember = 5
+                createPlaygroundVM.rounds = roundsData
+                
+                createPlaygroundVM.createPlayground()
             }) {
                 Text("Confirm")
                     .font(.custom("Lato-Bold", size: 20))
@@ -389,6 +449,6 @@ struct HostSettingView: View {
     }
 }
 
-#Preview {
-    HostSettingView()
-}
+//#Preview {
+//    HostSettingView()
+//}
