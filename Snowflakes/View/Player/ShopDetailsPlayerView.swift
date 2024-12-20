@@ -17,10 +17,11 @@ struct ShopDetailsPlayerView: View {
         VStack(alignment: .leading, spacing: 20) {
             // Back button and Team label outside the ScrollView
             backButton
-            teamLabel
             
             ScrollView { // ScrollView wraps only the scrollable content
                 VStack(alignment: .leading, spacing: 20) {
+                    teamLabel
+                    
                     items
                     
                     notificationList
