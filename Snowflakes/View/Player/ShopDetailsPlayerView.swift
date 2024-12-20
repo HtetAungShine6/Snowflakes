@@ -15,10 +15,9 @@ struct ShopDetailsPlayerView: View {
     
     var body: some View {
         VStack(alignment: .leading, spacing: 20) {
-            // Back button and Team label outside the ScrollView
             backButton
             
-            ScrollView { // ScrollView wraps only the scrollable content
+            ScrollView {
                 VStack(alignment: .leading, spacing: 20) {
                     teamLabel
                     
@@ -26,9 +25,9 @@ struct ShopDetailsPlayerView: View {
                     
                     notificationList
                     
-                    uploadImageSection // Add Upload Image section here
+                    uploadImageSection
                     
-                    Spacer() // Push everything to the top
+                    Spacer()
                 }
                 .frame(maxWidth: .infinity, alignment: .top)
                 .background(Color.white)
@@ -95,14 +94,15 @@ struct ShopDetailsPlayerView: View {
             }
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack {
-                    ForEach(shopItems, id: \.title) { item in
-                        PlayerShopItemView(imageName: item.imageName, title: item.title)
+                    ForEach(team.items.keys.sorted(), id: \.self) { itemName in
+                        PlayerShopItemView(imageName: itemName, title: "\(itemName.capitalized) (\(team.items[itemName] ?? 0)x)")
                     }
                 }
             }
         }
         .padding(.horizontal)
     }
+
     
     // MARK: - Notification List
     private var notificationList: some View {
@@ -110,7 +110,7 @@ struct ShopDetailsPlayerView: View {
             Text("Notifications")
                 .font(Font.custom("Lato", size: 22).weight(.medium))
                 .foregroundColor(.black)
-                .padding(.bottom, 10) // Padding between title and notifications
+                .padding(.bottom, 10)
             
             ScrollView {
                 ForEach(notifications.indices, id: \.self) { index in
@@ -120,21 +120,19 @@ struct ShopDetailsPlayerView: View {
                             Text(notification.message)
                                 .font(Font.custom("Poppins", size: 13))
                                 .foregroundColor(.black)
-                                .lineLimit(2) // Ensures message doesn't overflow
+                                .lineLimit(2)
                             
                             Text("Total amount: \(notification.amount) tokens")
                                 .font(Font.custom("Poppins", size: 10))
                                 .tracking(1.5)
                                 .foregroundColor(.black)
-                                .opacity(0.65) // Slightly less opaque for less emphasis
+                                .opacity(0.65)
                         }
                         
                         Spacer()
                         
                         Button(action: {
-                            // Toggle the isChecked property to change the background color
                             notifications[index].isChecked.toggle()
-                            // Set the color based on the isChecked value
                             notifications[index].color = notifications[index].isChecked ? AppColors.frostBlue : Color.white
                         }) {
                             Image(systemName: notifications[index].isChecked ? "checkmark.circle.fill" : "checkmark.circle")
@@ -146,7 +144,7 @@ struct ShopDetailsPlayerView: View {
                     }
                     .padding(.vertical, 8)
                     .padding(.horizontal, 10)
-                    .background(notification.color) // Background color that changes based on isChecked
+                    .background(notification.color)
                     .cornerRadius(12)
                     .shadow(radius: 5, x: 0, y: 2)
                     .frame(height: 55)
@@ -162,34 +160,30 @@ struct ShopDetailsPlayerView: View {
             Text("Sell your Snowflake")
                 .font(Font.custom("Lato", size: 22).weight(.medium))
                 .foregroundColor(.black)
-            
-            // Horizontal Scroll View for Images
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(spacing: 15) {
-                    // Placeholder images or your own images
                     ForEach(0..<5, id: \.self) { _ in
                         ZStack {
-                            // Card style background with opacity
+                            
                             Rectangle()
                                 .foregroundColor(.clear)
                                 .frame(width: 199, height: 238)
-                                .background(Color.white.opacity(0.50)) // Adjust opacity for desired effect
+                                .background(Color.white.opacity(0.50))
                                 .cornerRadius(20)
                                 .overlay(
                                     RoundedRectangle(cornerRadius: 20)
-                                        .stroke(Color.black, lineWidth: 0.25) // Border for the card
+                                        .stroke(Color.black, lineWidth: 0.25)
                                 )
                             
-                            // Placeholder text for the image (replace with actual image later)
                             Text("Upload Pic")
                                 .font(Font.custom("Lato", size: 20).weight(.medium))
                                 .foregroundColor(.black)
                         }
-                        .padding(3) // Padding around each card
+                        .padding(3)
                     }
                 }
             }
-            .frame(height: 238) // Set height for the horizontal scroll view
+            .frame(height: 238)
         }
         .padding(.horizontal, 10)
     }
@@ -203,10 +197,10 @@ struct ShopDetailsPlayerView: View {
             code: 1234,
             playersCount: 4,
             items: ["scissors": 2, "paper": 1, "pen": 3],
-            tokens: 50,
+            tokens: 5,
             members: ["Hein Thant", "Thu Yein", "Htet Aung Shine"]
         ),
-        members: ["Hein Thant", "Thu Yein", "Htet Aung Shine"] // Example members
+        members: ["Hein Thant", "Thu Yein", "Htet Aung Shine"]
     )
     .environmentObject(NavigationManager())
 }
