@@ -10,13 +10,13 @@ import SwiftUI
 enum Destination: Hashable {
     case hostSettingView
     case joinRoomView
-    case teamListView(hostRoomCode: String, playerRoomCode: String)
+    case teamListView(team: [Team])
 //    case hostTimerView(title: String, subtitle: String, imageName: String)
     case gameView
     case hostShopView
     case teamListPlayerView(roomCode: String)
     case teamDetailsPlayerView(teamNumber: Int, balance: Int, scissorsCount: Int, paperCount: Int, penCount: Int)
-    case hostTeamDetailView(team: TeamMockUp)
+//    case hostTeamDetailView(team: [Team])
 //    case timerPlayerView
 //    case shopTimerPlayerView
 }

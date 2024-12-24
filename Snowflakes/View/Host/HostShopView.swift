@@ -71,7 +71,7 @@ struct HostShopView: View {
                             .onTapGesture {
 //                                navigationManager.path.append("TeamDetail")
 //                                navigationManager.navigateTo(team)
-                                navigationManager.navigateTo(Destination.hostTeamDetailView(team: team))
+//                                navigationManager.navigateTo(Destination.hostTeamDetailView(team: team))
                             }
                     }
                 }

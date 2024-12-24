@@ -13,8 +13,7 @@ struct TimerViewHost: View {
     
     @StateObject private var webSocketManager = WebSocketManager()
     
-    @State private var minutes: Int = 0
-    @State private var seconds: Int = 0
+    @State private var timerValueFromSocket: String = ""
     @State private var sendMessageText: String = ""
     @State private var isPlaying: Bool = false
     
@@ -43,9 +42,14 @@ struct TimerViewHost: View {
         .onAppear {
             webSocketManager.connect()
         }
+        .onChange(of: webSocketManager.isConnected) { _, isConnected in
+            if isConnected {
+                webSocketManager.socketMessage = "01:00"
+                webSocketManager.start()
+            }
+        }
         .onChange(of: webSocketManager.countdown) { _, newValue in
-            minutes = newValue
-            seconds = newValue
+            timerValueFromSocket = newValue
         }
     }
     
@@ -65,12 +69,11 @@ struct TimerViewHost: View {
     
     private var timer: some View {
         HStack {
-            Text("\(minutes)")
-                .font(.custom("Montserrat-Medium", size: 32))
+            Spacer()
+            Text("\(timerValueFromSocket)")
+                .font(.custom("Montserrat-Medium", size: 40))
                 .foregroundColor(.black)
-            Text("\(seconds)")
-                .font(.custom("Roboto-Light", size: 28))
-                .foregroundColor(.black.opacity(0.8))
+            Spacer()
         }
     }
     
@@ -85,14 +88,9 @@ struct TimerViewHost: View {
         Button{
             isPlaying.toggle()
             if isPlaying {
-                let message: [String: Any] = [
-                    "arguments": [11],
-                    "target": "StartTimer",
-                    "type": 1
-                ]
-                webSocketManager.sendMessage(message)
+                webSocketManager.resume()
             } else {
-                webSocketManager.disconnect()
+                webSocketManager.pause()
             }
         } label: {
             Image(systemName: isPlaying ? "pause.fill" : "play.fill")
@@ -118,13 +116,12 @@ struct TimerViewHost: View {
             }
             .padding(.horizontal)
             AdjustTimeComponent(
-                onDecrease: { updatedMinutes, updatedSeconds in
-                    minutes = updatedMinutes
-                    seconds = updatedSeconds
+                onDecrease: { time in
+//                    webSocketManager.addedTimer = time
                 },
-                onIncrease: { updatedMinutes, updatedSeconds in
-                    minutes = updatedMinutes
-                    seconds = updatedSeconds
+                onIncrease: { time in
+                    webSocketManager.addedTimer = time
+                    webSocketManager.add()
                 }
             )
         }

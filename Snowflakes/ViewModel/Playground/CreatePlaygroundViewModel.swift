@@ -11,23 +11,19 @@ class CreatePlaygroundViewModel: ObservableObject {
     
     @Published var hostRoomCode: String
     @Published var playerRoomCode: String
-    @Published var hostId: String
     @Published var rounds: [String: String]
     @Published var numberOfTeam: Int
-    @Published var maxTeamMember: Int
     @Published var teamToken: Int
     
     @Published var errorMessage: String? = nil
     @Published var isLoading: Bool = false
     @Published var isSuccess: Bool = false
     
-    init(hostRoomCode: String = "", playerRoomCode: String = "", hostId: String = "", rounds: [String : String] = [:], numberOfTeam: Int = 0, maxTeamMember: Int = 0, teamToken: Int = 0) {
+    init(hostRoomCode: String = "", playerRoomCode: String = "", rounds: [String : String] = [:], numberOfTeam: Int = 0, teamToken: Int = 0) {
         self.hostRoomCode = hostRoomCode
         self.playerRoomCode = playerRoomCode
-        self.hostId = hostId
         self.rounds = rounds
         self.numberOfTeam = numberOfTeam
-        self.maxTeamMember = maxTeamMember
         self.teamToken = teamToken
     }
     
@@ -35,10 +31,8 @@ class CreatePlaygroundViewModel: ObservableObject {
         let newPlayground = PlaygroundDTO(
             hostRoomCode: hostRoomCode,
             playerRoomCode: playerRoomCode,
-            hostId: hostId,
             rounds: rounds,
             numberOfTeam: numberOfTeam,
-            maxTeamMember: maxTeamMember,
             teamToken: teamToken
         )
         
@@ -58,6 +52,7 @@ class CreatePlaygroundViewModel: ObservableObject {
                 case .failure(let error):
                     self?.isSuccess = false
                     self?.errorMessage = "Failed to create team: \(error.localizedDescription)"
+                    print("\(error.localizedDescription )")
                 }
             }
         }

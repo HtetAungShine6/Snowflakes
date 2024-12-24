@@ -15,9 +15,7 @@ struct PlaygroundResponse: Codable {
 struct Message: Codable {
     let hostRoomCode: String
     let playerRoomCode: String
-    let hostId: String
     let numberOfTeam: Int
-    let maxTeamMember: Int
     let teamToken: Int
     let rounds: [Round]
     let id: String
