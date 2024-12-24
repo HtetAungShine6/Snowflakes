@@ -12,6 +12,7 @@ struct HostSettingView: View {
     @EnvironmentObject var navigationManager: NavigationManager
     
     @StateObject private var createPlaygroundVM = CreatePlaygroundViewModel()
+    @ObservedObject private var getTeamsByRoomCodeVM = GetTeamsByRoomCode()
     
     private let hostRoomCode: String = {
         let letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
@@ -82,11 +83,21 @@ struct HostSettingView: View {
                 showAlertView = false
             }
         })
-        .onChange(of: createPlaygroundVM.isSuccess, { oldValue, newValue in
-            if newValue {
-                navigationManager.navigateTo(Destination.teamListView(hostRoomCode: hostRoomCode, playerRoomCode: playerRoomCode))
+        .onReceive(getTeamsByRoomCodeVM.$teams) { teams in
+            if !teams.isEmpty {
+                navigationManager.navigateTo(Destination.teamListView(team: teams))
             }
-        })
+        }
+        .onReceive(getTeamsByRoomCodeVM.$errorMessage) { errorMessage in
+            if let errorMessage = errorMessage {
+                print("Error: \(errorMessage)")
+            }
+        }
+//        .onChange(of: createPlaygroundVM.isSuccess, { oldValue, newValue in
+//            if newValue {
+//                navigationManager.navigateTo(Destination.teamListView(team: <#T##[Team]#>))
+//            }
+//        })
     }
     
     //MARK: - Setting Bar
@@ -428,13 +439,12 @@ struct HostSettingView: View {
                 
                 createPlaygroundVM.hostRoomCode = hostRoomCode
                 createPlaygroundVM.playerRoomCode = playerRoomCode
-                createPlaygroundVM.hostId = "123ABC"
                 createPlaygroundVM.numberOfTeam = teamNumber
                 createPlaygroundVM.teamToken = teamToken
-                createPlaygroundVM.maxTeamMember = 5
                 createPlaygroundVM.rounds = roundsData
                 
                 createPlaygroundVM.createPlayground()
+                getTeamsByRoomCodeVM.fetchTeams(hostRoomCode: hostRoomCode)
             }) {
                 Text("Confirm")
                     .font(.custom("Lato-Bold", size: 20))

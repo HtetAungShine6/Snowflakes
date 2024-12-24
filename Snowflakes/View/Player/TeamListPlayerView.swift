@@ -15,13 +15,13 @@ struct TeamListPlayerView: View {
     let teams: [TeamMockUp] = teamListMockUp
     
     var body: some View {
-        VStack(alignment: .leading) {   
+        VStack(alignment: .leading) {
             navBar
             ScrollView {
                 VStack(alignment: .leading) {
                     ForEach(teams, id: \.teamNumber) { team in
                         teamCardView(team: team)
-                            .onTapGesture { 
+                            .onTapGesture {
                                 navigationManager.navigateTo(.teamDetailsPlayerView(
                                     teamNumber: team.teamNumber,
                                     balance: team.tokens,
@@ -68,7 +68,7 @@ struct TeamListPlayerView: View {
                     .font(.custom("Lato-Regular", size: 16))
                     .foregroundStyle(Color.gray)
                 Spacer()
-    
+                
                 Button(action: {
                     print("Join button tapped for team \(team.teamNumber)")
                 }) {

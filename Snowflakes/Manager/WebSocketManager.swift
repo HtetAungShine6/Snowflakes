@@ -13,7 +13,9 @@ class WebSocketManager: ObservableObject, WebSocketDelegate {
     private var socket: WebSocket!
     @Published var message: String = ""
     @Published var isConnected: Bool = false
-    @Published var countdown: Int = 0
+    @Published var countdown: String = ""
+    @Published var socketMessage: String = ""
+    @Published var addedTimer: String = ""
     
     var countdownTimer: Timer?
     
@@ -95,6 +97,53 @@ class WebSocketManager: ObservableObject, WebSocketDelegate {
         case .peerClosed:
             print("Peer closed due to an error.")
         }
+    }
+    
+    func start() {
+        let messageToSocket: [String: Any] = [
+            "arguments": [socketMessage],
+            "target": "StartTimer",
+            "type": 1
+        ]
+        sendMessage(messageToSocket)
+        pause()
+    }
+    
+    func add() {
+        let messageToSocket: [String: Any] = [
+            "arguments": [addedTimer],
+            "target": "AddTimer",
+            "type": 1
+        ]
+        sendMessage(messageToSocket)
+        addedTimer = ""
+    }
+    
+    func pause() {
+        let messageToSocket: [String: Any] = [
+            "arguments": [],
+            "target": "PauseTimer",
+            "type": 1
+        ]
+        sendMessage(messageToSocket)
+    }
+    
+    func resume() {
+        let messageToSocket: [String: Any] = [
+            "arguments": [],
+            "target": "ResumeTimer",
+            "type": 1
+        ]
+        sendMessage(messageToSocket)
+    }
+    
+    func stop() {
+        let messageToSocket: [String: Any] = [
+            "arguments": [],
+            "target": "StopTimer",
+            "type": 1
+        ]
+        sendMessage(messageToSocket)
     }
     
     // Handle incoming WebSocket response

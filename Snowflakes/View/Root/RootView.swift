@@ -23,8 +23,8 @@ struct RootView: View {
                     case .joinRoomView:
                         JoinRoomView()
                             .environmentObject(navigationManager)
-                    case .teamListView(let hostRoomCode, let playerRoomCode):
-                        TeamListView(hostRoomCode: hostRoomCode, playerRoomCode: playerRoomCode)
+                    case .teamListView(let teams):
+                        TeamListView(teams: teams)
                             .environmentObject(navigationManager)
                     case .gameView:
                         GameView()
@@ -48,9 +48,9 @@ struct RootView: View {
                             members: ["Hein Thant", "Thu Yein", "Htet Aung Shine"] // Example members
                         )
                         .environmentObject(navigationManager)
-                    case .hostTeamDetailView(let team):
-                        HostTeamDetailView(team: team)
-                        .environmentObject(navigationManager)
+//                    case .hostTeamDetailView(let team):
+//                        HostTeamDetailView(team: team)
+//                        .environmentObject(navigationManager)
                     }
                 }
         }
