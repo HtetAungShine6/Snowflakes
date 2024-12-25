@@ -1,21 +1,19 @@
 //
-//  TimerView.swift
+//  ShopTimerViewHost.swift
 //  Snowflakes
 //
-//  Created by Htet Aung Shine on 18/12/2024.
+//  Created by Htet Aung Shine on 25/12/2024.
 //
 
 import SwiftUI
 
-struct TimerViewHost: View {
+struct ShopTimerViewHost: View {
     
     @EnvironmentObject var navigationManager: NavigationManager
     
     @StateObject private var webSocketManager = WebSocketManager()
-//    @StateObject private var timerModel = TimerModel()
     
     @State private var timerValueFromSocket: String = ""
-    @State private var sendMessageText: String = ""
     @State private var isPlaying: Bool = false
     
     var body: some View {
@@ -28,7 +26,7 @@ struct TimerViewHost: View {
             }
             .frame(maxWidth: .infinity, alignment: .top)
             adjustTimeField
-            sendMessageField
+            shopLabel
             VStack {
                 nextRoundButton
             }
@@ -60,10 +58,18 @@ struct TimerViewHost: View {
                 Text("Snowflake")
                     .font(.custom("Montserrat-Medium", size: 32))
                     .foregroundStyle(Color.black)
-                Text("Round (1/5)")
+                Text("Shop Round")
                     .foregroundStyle(Color.gray)
             }
             Spacer()
+            Button {
+                print("Shop Button tapped!")
+            }label: {
+                Image("shop2")
+                    .resizable()
+                    .scaledToFit()
+                    .frame(height: 30)
+            }
         }
         .padding(.horizontal)
     }
@@ -79,7 +85,7 @@ struct TimerViewHost: View {
     }
     
     private var timerImage: some View {
-        Image("Snowman")
+        Image("Shop 1")
             .resizable()
             .scaledToFit()
             .frame(width: 250, height: 226)
@@ -128,38 +134,22 @@ struct TimerViewHost: View {
         }
     }
     
-    private var sendMessageField: some View {
+    private var shopLabel: some View {
         VStack {
-            HStack {
-                Text("Send a message")
-                    .font(.custom("Roboto-Regular", size: 24))
-                    .foregroundStyle(Color.black)
-                Spacer()
-            }
-            .padding(.horizontal)
-            HStack {
-                TextField("Create a snowflake", text: $sendMessageText)
-                    .padding(.leading, 10)
-                    .frame(height: 80)
-
-                Button(action: {
-                    print("Send a message text field is tapped.")
-                }) {
-                    Image(systemName: "chevron.right")
-                        .resizable()
-                        .scaledToFit()
-                        .frame(width: 15, height: 15)
-                        .foregroundColor(.black)
-                        .padding(.trailing, 10)
-                }
-            }
-            .overlay(
-                RoundedRectangle(cornerRadius: 8)
-                    .stroke(Color.black, lineWidth: 1)
-            )
-            .frame(height: 80)
-            .padding(.horizontal)
+            (Text("It is time to ")
+                .font(.custom("Roboto-Regular", size: 32))
+                .foregroundColor(.primary) +
+             Text("sell")
+                .font(.custom("Roboto-Regular", size: 32))
+                .foregroundColor(.red) +
+             Text(" a \n snow flake")
+                .font(.custom("Roboto-Regular", size: 32))
+                .foregroundColor(.primary))
+            .lineLimit(2)
+            .multilineTextAlignment(.leading)
+            .fixedSize(horizontal: false, vertical: true)
         }
+        .frame(maxWidth: .infinity)
     }
     
     private var nextRoundButton: some View {

@@ -18,6 +18,8 @@ struct SnowflakesApp: App {
             RootView()
 //            TimerTestView()
 //            TimerViewHost()
+//            ShopTimerViewHost()
+//            PlayerTimerView(navBarTitle: "Snowflake", navBarSubtitle: "player", image: Image("Snowman"))
         }
     }
 }

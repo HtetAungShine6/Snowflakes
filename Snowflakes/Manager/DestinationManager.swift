@@ -19,4 +19,5 @@ enum Destination: Hashable {
 //    case hostTeamDetailView(team: [Team])
 //    case timerPlayerView
 //    case shopTimerPlayerView
+    case gameViewPlayer
 }

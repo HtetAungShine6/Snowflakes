@@ -48,6 +48,9 @@ struct RootView: View {
                             members: ["Hein Thant", "Thu Yein", "Htet Aung Shine"] // Example members
                         )
                         .environmentObject(navigationManager)
+                    case .gameViewPlayer:
+                        GameViewPlayer()
+                            .environmentObject(navigationManager)
 //                    case .hostTeamDetailView(let team):
 //                        HostTeamDetailView(team: team)
 //                        .environmentObject(navigationManager)

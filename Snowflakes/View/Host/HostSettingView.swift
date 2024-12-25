@@ -93,11 +93,6 @@ struct HostSettingView: View {
                 print("Error: \(errorMessage)")
             }
         }
-//        .onChange(of: createPlaygroundVM.isSuccess, { oldValue, newValue in
-//            if newValue {
-//                navigationManager.navigateTo(Destination.teamListView(team: <#T##[Team]#>))
-//            }
-//        })
     }
     
     //MARK: - Setting Bar
@@ -318,92 +313,21 @@ struct HostSettingView: View {
                     .font(.custom("Lato-Bold", size: 20))
                     .foregroundStyle(AppColors.polarBlue)
             }
-            HStack {
-                Image("scissors")
-                    .resizable()
-                    .scaledToFit()
-                    .frame(height: 30)
-                Text("Scissors")
-                    .font(.custom("Lato-Bold", size: 20))
-                Spacer()
-                Button(action: {
-                    if scissors > 1 {
-                        scissors -= 1
-                    }
-                }) {
-                    Image(systemName: "minus")
-                        .foregroundStyle(AppColors.glacialBlue)
-                }
-                TextField("", value: $scissors, formatter: NumberFormatter())
-                    .textFieldStyle(RoundedBorderTextFieldStyle())
-                    .frame(width: 50)
-                    .multilineTextAlignment(.center)
-                    .keyboardType(.numberPad)
-                Button(action: {
-                    scissors += 1
-                }) {
-                    Image(systemName: "plus")
-                        .foregroundStyle(AppColors.glacialBlue)
-                }
-            }
-            HStack {
-                Image("paper")
-                    .resizable()
-                    .scaledToFit()
-                    .frame(height: 30)
-                Text("Paper")
-                    .font(.custom("Lato-Bold", size: 20))
-                Spacer()
-                Button(action: {
-                    if paper > 1 {
-                        paper -= 1
-                    }
-                }) {
-                    Image(systemName: "minus")
-                        .foregroundStyle(AppColors.glacialBlue)
-                }
-                TextField("", value: $paper, formatter: NumberFormatter())
-                    .textFieldStyle(RoundedBorderTextFieldStyle())
-                    .frame(width: 50)
-                    .multilineTextAlignment(.center)
-                    .keyboardType(.numberPad)
-                Button(action: {
-                    paper += 1
-                }) {
-                    Image(systemName: "plus")
-                        .foregroundStyle(AppColors.glacialBlue)
-                }
-            }
-            HStack {
-                Image("pen")
-                    .resizable()
-                    .scaledToFit()
-                    .frame(height: 30)
-                Text("Pen")
-                    .font(.custom("Lato-Bold", size: 20))
-                Spacer()
-                Button(action: {
-                    if pen > 1 {
-                        pen -= 1
-                    }
-                }) {
-                    Image(systemName: "minus")
-                        .foregroundStyle(AppColors.glacialBlue)
-                }
-                TextField("", value: $pen, formatter: NumberFormatter())
-                    .textFieldStyle(RoundedBorderTextFieldStyle())
-                    .frame(width: 50)
-                    .multilineTextAlignment(.center)
-                    .keyboardType(.numberPad)
-                Button(action: {
-                    pen += 1
-                }) {
-                    Image(systemName: "plus")
-                        .foregroundStyle(AppColors.glacialBlue)
-                }
+            
+            // Dynamically create shop items
+            ForEach(createShopItems(), id: \.productName) { item in
+                ShopItemRow(item: item)
             }
         }
         .padding()
+    }
+    
+    private func createShopItems() -> [ShopItemViewModel] {
+        return [
+            ShopItemViewModel(productName: "Scissors", price: 5, remainingStock: scissors),
+            ShopItemViewModel(productName: "Paper", price: 2, remainingStock: paper),
+            ShopItemViewModel(productName: "Pen", price: 7, remainingStock: pen)
+        ]
     }
     
     private var buttons: some View {
@@ -442,6 +366,8 @@ struct HostSettingView: View {
                 createPlaygroundVM.numberOfTeam = teamNumber
                 createPlaygroundVM.teamToken = teamToken
                 createPlaygroundVM.rounds = roundsData
+                createPlaygroundVM.shopToken = 0
+                createPlaygroundVM.shop = createShopItems()
                 
                 createPlaygroundVM.createPlayground()
                 getTeamsByRoomCodeVM.fetchTeams(hostRoomCode: hostRoomCode)
@@ -459,6 +385,141 @@ struct HostSettingView: View {
     }
 }
 
+struct ShopItemRow: View {
+    @ObservedObject var item: ShopItemViewModel
+    
+    var body: some View {
+        HStack {
+            Image(item.productName.lowercased())
+                .resizable()
+                .scaledToFit()
+                .frame(height: 30)
+            Text(item.productName)
+                .font(.custom("Lato-Bold", size: 20))
+            Spacer()
+            Button(action: {
+                if item.remainingStock > 1 {
+                    item.remainingStock -= 1
+                }
+            }) {
+                Image(systemName: "minus")
+                    .foregroundStyle(AppColors.glacialBlue)
+            }
+            TextField("", value: $item.remainingStock, formatter: NumberFormatter())
+                .textFieldStyle(RoundedBorderTextFieldStyle())
+                .frame(width: 50)
+                .multilineTextAlignment(.center)
+                .keyboardType(.numberPad)
+            Button(action: {
+                item.remainingStock += 1
+            }) {
+                Image(systemName: "plus")
+                    .foregroundStyle(AppColors.glacialBlue)
+            }
+        }
+    }
+}
+
+
 //#Preview {
 //    HostSettingView()
 //}
+
+//    private var shop: some View {
+//        VStack(alignment: .leading) {
+//            HStack {
+//                Image("shop")
+//                    .resizable()
+//                    .scaledToFit()
+//                    .frame(height: 30)
+//                Text("Shop")
+//                    .font(.custom("Lato-Bold", size: 20))
+//                    .foregroundStyle(AppColors.polarBlue)
+//            }
+//            HStack {
+//                Image("scissors")
+//                    .resizable()
+//                    .scaledToFit()
+//                    .frame(height: 30)
+//                Text("Scissors")
+//                    .font(.custom("Lato-Bold", size: 20))
+//                Spacer()
+//                Button(action: {
+//                    if scissors > 1 {
+//                        scissors -= 1
+//                    }
+//                }) {
+//                    Image(systemName: "minus")
+//                        .foregroundStyle(AppColors.glacialBlue)
+//                }
+//                TextField("", value: $scissors, formatter: NumberFormatter())
+//                    .textFieldStyle(RoundedBorderTextFieldStyle())
+//                    .frame(width: 50)
+//                    .multilineTextAlignment(.center)
+//                    .keyboardType(.numberPad)
+//                Button(action: {
+//                    scissors += 1
+//                }) {
+//                    Image(systemName: "plus")
+//                        .foregroundStyle(AppColors.glacialBlue)
+//                }
+//            }
+//            HStack {
+//                Image("paper")
+//                    .resizable()
+//                    .scaledToFit()
+//                    .frame(height: 30)
+//                Text("Paper")
+//                    .font(.custom("Lato-Bold", size: 20))
+//                Spacer()
+//                Button(action: {
+//                    if paper > 1 {
+//                        paper -= 1
+//                    }
+//                }) {
+//                    Image(systemName: "minus")
+//                        .foregroundStyle(AppColors.glacialBlue)
+//                }
+//                TextField("", value: $paper, formatter: NumberFormatter())
+//                    .textFieldStyle(RoundedBorderTextFieldStyle())
+//                    .frame(width: 50)
+//                    .multilineTextAlignment(.center)
+//                    .keyboardType(.numberPad)
+//                Button(action: {
+//                    paper += 1
+//                }) {
+//                    Image(systemName: "plus")
+//                        .foregroundStyle(AppColors.glacialBlue)
+//                }
+//            }
+//            HStack {
+//                Image("pen")
+//                    .resizable()
+//                    .scaledToFit()
+//                    .frame(height: 30)
+//                Text("Pen")
+//                    .font(.custom("Lato-Bold", size: 20))
+//                Spacer()
+//                Button(action: {
+//                    if pen > 1 {
+//                        pen -= 1
+//                    }
+//                }) {
+//                    Image(systemName: "minus")
+//                        .foregroundStyle(AppColors.glacialBlue)
+//                }
+//                TextField("", value: $pen, formatter: NumberFormatter())
+//                    .textFieldStyle(RoundedBorderTextFieldStyle())
+//                    .frame(width: 50)
+//                    .multilineTextAlignment(.center)
+//                    .keyboardType(.numberPad)
+//                Button(action: {
+//                    pen += 1
+//                }) {
+//                    Image(systemName: "plus")
+//                        .foregroundStyle(AppColors.glacialBlue)
+//                }
+//            }
+//        }
+//        .padding()
+//    }

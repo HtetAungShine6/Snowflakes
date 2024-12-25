@@ -179,9 +179,13 @@ struct JoinRoomView: View {
                 switch selectedRole {
                 case .host:
                     navigationManager.navigateTo(Destination.teamListView(team: teams))
+//                    UserDefaults.standard.set(roomCode, forKey: "hostRoomCode")
                 case .player:
-//                    navigationManager.navigateTo(Destination.)
+//                    navigationManager.navigateTo(Destination.p)
+                    navigationManager.navigateTo(Destination.gameViewPlayer)
+                    navigationManager.isShopTime = false
                     print("Player Team List View")
+//                    UserDefaults.standard.set(roomCode, forKey: "playerRoomCode")
                 case nil:
                     break
                 }
