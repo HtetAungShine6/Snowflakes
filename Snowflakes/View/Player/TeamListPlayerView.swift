@@ -11,40 +11,37 @@ struct TeamListPlayerView: View {
     
     @EnvironmentObject var navigationManager: NavigationManager
     
-    let roomCode: String
-    let teams: [TeamMockUp] = teamListMockUp
+    let teams: [Team]
     
     var body: some View {
+
         VStack(alignment: .leading) {
             navBar
+            totalNumberPlayers
             ScrollView {
                 VStack(alignment: .leading) {
                     ForEach(teams, id: \.teamNumber) { team in
                         teamCardView(team: team)
-                            .onTapGesture {
-                                navigationManager.navigateTo(.teamDetailsPlayerView(
-                                    teamNumber: team.teamNumber,
-                                    balance: team.tokens,
-                                    scissorsCount: team.items["scissors"] ?? 0,
-                                    paperCount: team.items["paper"] ?? 0,
-                                    penCount: team.items["pen"] ?? 0
-                                ))
-                            }
                             .padding(.bottom, 8)
                     }
                 }
                 .padding()
             }
-            Spacer()
-            HStack {
-                Spacer()
-                Text("Waiting for host to start..")
-                    .font(Font.custom("Lato-Regular", size: 20).weight(.medium))
-                    .foregroundColor(.black)
-                Spacer()
-            }
-            .padding()
+            waitingForHostButton
+                .padding()
         }
+        .toolbar {
+            ToolbarItem(placement: .navigationBarLeading) {
+                Button(action: {
+                    navigationManager.pop()
+                }) {
+                    Image(systemName: "chevron.left")
+                        .foregroundColor(.black)
+                }
+            }
+        }
+        .navigationBarBackButtonHidden()
+        .navigationBarTitleDisplayMode(.inline)
     }
     
     private var navBar: some View {
@@ -53,57 +50,47 @@ struct TeamListPlayerView: View {
                 .font(.custom("Montserrat-SemiBold", size: 23))
                 .foregroundStyle(AppColors.polarBlue)
             Spacer()
-            Text("Room Code: \(roomCode)")
-                .font(.custom("Lato-Regular", size: 16))
+            if let roomCode = teams.first?.playerRoomCode {
+                Text("Room Code: \(roomCode)")
+                    .font(.custom("Lato-Regular", size: 16))
+            }
         }
         .padding(.horizontal)
     }
     
-    private func teamCardView(team: TeamMockUp) -> some View {
+    private var totalPlayerCount: Int {
+        teams.reduce(0) { total, team in
+            total + (team.members?.count ?? 0)
+        }
+    }
+    
+    private var totalNumberPlayers: some View {
+        HStack {
+            Text("Player: \(totalPlayerCount)") // Call API or use local data
+                .font(.custom("Lato-Medium", size: 15))
+        }
+        .padding(.horizontal)
+    }
+    
+    private func teamCardView(team: Team) -> some View {
         VStack(alignment: .leading, spacing: 10) {
             HStack {
                 Text("Team: \(team.teamNumber)")
                     .font(.custom("Lato-Regular", size: 20))
-                Text("(\(team.playersCount) Players)")
+                Text("(\(team.members?.count ?? 0) Players)")
                     .font(.custom("Lato-Regular", size: 16))
                     .foregroundStyle(Color.gray)
-                Spacer()
-                
-                Button(action: {
-                    print("Join button tapped for team \(team.teamNumber)")
-                }) {
-                    ZStack {
-                        Rectangle()
-                            .foregroundColor(.clear)
-                            .frame(width: 53, height: 22)
-                            .background(.white)
-                            .cornerRadius(20)
-                            .overlay(
-                                RoundedRectangle(cornerRadius: 20)
-                                    .inset(by: 0.50)
-                                    .stroke(
-                                        Color(red: 0, green: 0, blue: 0).opacity(0.50),
-                                        lineWidth: 0.50
-                                    )
-                            )
-                        Text("Join")
-                            .font(Font.custom("Lato", size: 16).weight(.medium))
-                            .foregroundColor(Color(red: 0, green: 1, blue: 0.38))
-                    }
-                }
             }
             
             HStack(spacing: 10) {
-                ForEach(["scissors", "paper", "pen"], id: \.self) { itemName in
-                    if let count = team.items[itemName] {
-                        VStack {
-                            Image(itemName)
-                                .resizable()
-                                .frame(width: 40, height: 40)
-                            Text("\(count)x")
-                                .font(.custom("Lato-Regular", size: 16))
-                                .foregroundStyle(Color.gray)
-                        }
+                ForEach(team.teamStocks, id: \.self) { stock in
+                    VStack {
+                        Image(stock.productName)
+                            .resizable()
+                            .frame(width: 40, height: 40)
+                        Text("\(stock.remainingStock)x")
+                            .font(.custom("Lato-Regular", size: 16))
+                            .foregroundStyle(Color.gray)
                     }
                 }
                 Spacer()
@@ -111,7 +98,7 @@ struct TeamListPlayerView: View {
                     Image("tokenCoin")
                         .resizable()
                         .scaledToFit()
-                        .frame(height: 30)
+                        .frame(height: 35)
                     Text("\(team.tokens) tokens")
                         .font(.custom("Lato-Regular", size: 16))
                 }
@@ -121,17 +108,38 @@ struct TeamListPlayerView: View {
                 Text("Members: ")
                     .font(.footnote)
                     .bold()
-                    .foregroundStyle(.black)
-                Text("\(team.members.joined(separator: ", "))")
-                    .font(.footnote)
-                    .foregroundStyle(.gray)
+                    .foregroundStyle(.secondary)
+                if let members = team.members {
+                    Text("\(members.joined(separator: ", "))")
+                        .font(.footnote)
+                        .foregroundStyle(.gray)
+                } else {
+                    Text("No Member Here")
+                        .font(.footnote)
+                        .foregroundStyle(.gray)
+                }
             }
         }
         .padding()
-        .background(RoundedRectangle(cornerRadius: 8).stroke(Color.black))
+        .background(RoundedRectangle(cornerRadius: 8).stroke(Color.secondary))
+    }
+    
+    private var waitingForHostButton: some View {
+        HStack {
+            Spacer()
+            Text("Waiting for host to start..")
+                .font(Font.custom("Lato-Regular", size: 20).weight(.medium))
+                .foregroundColor(.black)
+            Spacer()
+        }
     }
 }
 
 #Preview {
-    TeamListPlayerView(roomCode: "ABC12")
+    TeamListPlayerView(teams: [])
+        .environmentObject(NavigationManager())
 }
+//#Preview {
+//    TeamListView(hostRoomCode: "ABC12", playerRoomCode: "DFH123")
+//}
+//

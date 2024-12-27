@@ -32,8 +32,8 @@ struct RootView: View {
                     case .hostShopView:
                         HostShopView()
                             .environmentObject(navigationManager)
-                    case .teamListPlayerView(let roomCode):
-                        TeamListPlayerView(roomCode: roomCode)
+                    case .teamListPlayerView(let teams):
+                        TeamListPlayerView(teams: teams) 
                             .environmentObject(navigationManager)
                     case .teamDetailsPlayerView(let teamNumber, let balance, let scissorsCount, let paperCount, let penCount):
                         TeamDetailsPlayerView(
