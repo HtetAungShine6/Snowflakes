@@ -13,6 +13,11 @@ struct HostSettingView: View {
     
     @StateObject private var createPlaygroundVM = CreatePlaygroundViewModel()
     @ObservedObject private var getTeamsByRoomCodeVM = GetTeamsByRoomCode()
+    @StateObject private var createGameStateVM = CreateGameStateViewModel()
+    
+    @StateObject private var scissorsVM = ShopItemViewModel(productName: "Scissor", price: 5, remainingStock: 1)
+    @StateObject private var paperVM = ShopItemViewModel(productName: "Paper", price: 2, remainingStock: 1)
+    @StateObject private var penVM = ShopItemViewModel(productName: "Pen", price: 7, remainingStock: 1)
     
     private let hostRoomCode: String = {
         let letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
@@ -76,11 +81,33 @@ struct HostSettingView: View {
             }
         }
         .navigationBarBackButtonHidden()
-        .onChange(of: createPlaygroundVM.isLoading, { oldValue, newValue in
+        .onChange(of: createPlaygroundVM.isLoading, { _, newValue in
             if newValue {
                 showAlertView = true
             } else {
                 showAlertView = false
+            }
+        })
+        .onChange(of: createPlaygroundVM.isSuccess, { _, newValue in
+//            if newValue {
+//                getTeamsByRoomCodeVM.fetchTeams(hostRoomCode: hostRoomCode)
+//            } else {
+//                print("Need to handle isSuccess false error.")
+//            }
+            if newValue {
+                createGameStateVM.hostRoomCode = hostRoomCode
+                createGameStateVM.playerRoomCode = playerRoomCode
+                createGameStateVM.currentGameState = .TeamCreation
+                createGameStateVM.createGameState()
+            } else {
+                print("Need to handle isSuccess false error.")
+            }
+        })
+        .onChange(of: createGameStateVM.isSuccess, { _, newValue in
+            if newValue {
+                getTeamsByRoomCodeVM.fetchTeams(hostRoomCode: hostRoomCode)
+            } else {
+                print("Need to handle isSuccess false error.")
             }
         })
         .onReceive(getTeamsByRoomCodeVM.$teams) { teams in
@@ -102,7 +129,7 @@ struct HostSettingView: View {
                 .font(.custom("Montserrat-SemiBold", size: 23))
                 .foregroundStyle(AppColors.polarBlue)
             Spacer()
-            VStack {
+            VStack(alignment: .leading) {
                 Text("Host Room Code: \(formattedHostRoomCode)")
                     .font(.custom("Lato-Regular", size: 16))
                 Text("Player Room Code: \(formattedPlayerRoomCode)")
@@ -152,6 +179,7 @@ struct HostSettingView: View {
                     .frame(width: 50)
                     .multilineTextAlignment(.center)
                     .keyboardType(.numberPad)
+                    .disabled(true)
                 Button(action: {
                     playgroundRound += 1
                     roundDuration.append(240)
@@ -211,6 +239,7 @@ struct HostSettingView: View {
             .frame(width: 70)
             .multilineTextAlignment(.center)
             .keyboardType(.numbersAndPunctuation)
+            .disabled(true)
             Button(action: {
                 duration.wrappedValue += 60
             }) {
@@ -266,6 +295,7 @@ struct HostSettingView: View {
                     .frame(width: 50)
                     .multilineTextAlignment(.center)
                     .keyboardType(.numberPad)
+                    .disabled(true)
                 Button(action: {
                     teamNumber += 1
                 }) {
@@ -290,6 +320,7 @@ struct HostSettingView: View {
                     .frame(width: 50)
                     .multilineTextAlignment(.center)
                     .keyboardType(.numberPad)
+                    .disabled(true)
                 Button(action: {
                     teamToken += 1
                 }) {
@@ -314,20 +345,13 @@ struct HostSettingView: View {
                     .foregroundStyle(AppColors.polarBlue)
             }
             
-            // Dynamically create shop items
-            ForEach(createShopItems(), id: \.productName) { item in
-                ShopItemRow(item: item)
+            VStack {
+                ShopItemRow(item: scissorsVM)
+                ShopItemRow(item: paperVM)
+                ShopItemRow(item: penVM)
             }
         }
         .padding()
-    }
-    
-    private func createShopItems() -> [ShopItemViewModel] {
-        return [
-            ShopItemViewModel(productName: "Scissors", price: 5, remainingStock: scissors),
-            ShopItemViewModel(productName: "Paper", price: 2, remainingStock: paper),
-            ShopItemViewModel(productName: "Pen", price: 7, remainingStock: pen)
-        ]
     }
     
     private var buttons: some View {
@@ -352,7 +376,6 @@ struct HostSettingView: View {
             .padding(.horizontal)
             
             Button(action: {
-                // confirm
                 
                 var roundsData: [String: String] = [:]
                 for index in 0..<playgroundRound {
@@ -361,16 +384,21 @@ struct HostSettingView: View {
                     roundsData[roundKey] = roundDuration
                 }
                 
+                let shopData: [ShopItemViewModel] = [
+                    ShopItemViewModel(productName: "Scissor", price: 10, remainingStock: scissorsVM.remainingStock),
+                    ShopItemViewModel(productName: "Paper", price: 5, remainingStock: paperVM.remainingStock),
+                    ShopItemViewModel(productName: "Pen", price: 15, remainingStock: penVM.remainingStock)
+                ]
+                
                 createPlaygroundVM.hostRoomCode = hostRoomCode
                 createPlaygroundVM.playerRoomCode = playerRoomCode
                 createPlaygroundVM.numberOfTeam = teamNumber
                 createPlaygroundVM.teamToken = teamToken
                 createPlaygroundVM.rounds = roundsData
                 createPlaygroundVM.shopToken = 0
-                createPlaygroundVM.shop = createShopItems()
-                
+                createPlaygroundVM.shop = shopData
                 createPlaygroundVM.createPlayground()
-                getTeamsByRoomCodeVM.fetchTeams(hostRoomCode: hostRoomCode)
+                
             }) {
                 Text("Confirm")
                     .font(.custom("Lato-Bold", size: 20))
@@ -384,142 +412,3 @@ struct HostSettingView: View {
         .padding()
     }
 }
-
-struct ShopItemRow: View {
-    @ObservedObject var item: ShopItemViewModel
-    
-    var body: some View {
-        HStack {
-            Image(item.productName.lowercased())
-                .resizable()
-                .scaledToFit()
-                .frame(height: 30)
-            Text(item.productName)
-                .font(.custom("Lato-Bold", size: 20))
-            Spacer()
-            Button(action: {
-                if item.remainingStock > 1 {
-                    item.remainingStock -= 1
-                }
-            }) {
-                Image(systemName: "minus")
-                    .foregroundStyle(AppColors.glacialBlue)
-            }
-            TextField("", value: $item.remainingStock, formatter: NumberFormatter())
-                .textFieldStyle(RoundedBorderTextFieldStyle())
-                .frame(width: 50)
-                .multilineTextAlignment(.center)
-                .keyboardType(.numberPad)
-            Button(action: {
-                item.remainingStock += 1
-            }) {
-                Image(systemName: "plus")
-                    .foregroundStyle(AppColors.glacialBlue)
-            }
-        }
-    }
-}
-
-
-//#Preview {
-//    HostSettingView()
-//}
-
-//    private var shop: some View {
-//        VStack(alignment: .leading) {
-//            HStack {
-//                Image("shop")
-//                    .resizable()
-//                    .scaledToFit()
-//                    .frame(height: 30)
-//                Text("Shop")
-//                    .font(.custom("Lato-Bold", size: 20))
-//                    .foregroundStyle(AppColors.polarBlue)
-//            }
-//            HStack {
-//                Image("scissors")
-//                    .resizable()
-//                    .scaledToFit()
-//                    .frame(height: 30)
-//                Text("Scissors")
-//                    .font(.custom("Lato-Bold", size: 20))
-//                Spacer()
-//                Button(action: {
-//                    if scissors > 1 {
-//                        scissors -= 1
-//                    }
-//                }) {
-//                    Image(systemName: "minus")
-//                        .foregroundStyle(AppColors.glacialBlue)
-//                }
-//                TextField("", value: $scissors, formatter: NumberFormatter())
-//                    .textFieldStyle(RoundedBorderTextFieldStyle())
-//                    .frame(width: 50)
-//                    .multilineTextAlignment(.center)
-//                    .keyboardType(.numberPad)
-//                Button(action: {
-//                    scissors += 1
-//                }) {
-//                    Image(systemName: "plus")
-//                        .foregroundStyle(AppColors.glacialBlue)
-//                }
-//            }
-//            HStack {
-//                Image("paper")
-//                    .resizable()
-//                    .scaledToFit()
-//                    .frame(height: 30)
-//                Text("Paper")
-//                    .font(.custom("Lato-Bold", size: 20))
-//                Spacer()
-//                Button(action: {
-//                    if paper > 1 {
-//                        paper -= 1
-//                    }
-//                }) {
-//                    Image(systemName: "minus")
-//                        .foregroundStyle(AppColors.glacialBlue)
-//                }
-//                TextField("", value: $paper, formatter: NumberFormatter())
-//                    .textFieldStyle(RoundedBorderTextFieldStyle())
-//                    .frame(width: 50)
-//                    .multilineTextAlignment(.center)
-//                    .keyboardType(.numberPad)
-//                Button(action: {
-//                    paper += 1
-//                }) {
-//                    Image(systemName: "plus")
-//                        .foregroundStyle(AppColors.glacialBlue)
-//                }
-//            }
-//            HStack {
-//                Image("pen")
-//                    .resizable()
-//                    .scaledToFit()
-//                    .frame(height: 30)
-//                Text("Pen")
-//                    .font(.custom("Lato-Bold", size: 20))
-//                Spacer()
-//                Button(action: {
-//                    if pen > 1 {
-//                        pen -= 1
-//                    }
-//                }) {
-//                    Image(systemName: "minus")
-//                        .foregroundStyle(AppColors.glacialBlue)
-//                }
-//                TextField("", value: $pen, formatter: NumberFormatter())
-//                    .textFieldStyle(RoundedBorderTextFieldStyle())
-//                    .frame(width: 50)
-//                    .multilineTextAlignment(.center)
-//                    .keyboardType(.numberPad)
-//                Button(action: {
-//                    pen += 1
-//                }) {
-//                    Image(systemName: "plus")
-//                        .foregroundStyle(AppColors.glacialBlue)
-//                }
-//            }
-//        }
-//        .padding()
-//    }

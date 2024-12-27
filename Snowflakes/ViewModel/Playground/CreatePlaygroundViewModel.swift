@@ -65,15 +65,3 @@ class CreatePlaygroundViewModel: ObservableObject {
         }
     }
 }
-
-class ShopItemViewModel: ObservableObject, Identifiable {
-    @Published var productName: String
-    @Published var price: Int
-    @Published var remainingStock: Int
-
-    init(productName: String = "", price: Int = 0, remainingStock: Int = 0) {
-        self.productName = productName
-        self.price = price
-        self.remainingStock = remainingStock
-    }
-}

@@ -19,8 +19,6 @@ struct Message: Codable {
     let teamToken: Int
     let rounds: [Round]
     let id: String
-    let shopToken: Int
-    let shop: [ShopItem]
 }
 
 struct Round: Codable {
@@ -29,7 +27,7 @@ struct Round: Codable {
     let progress: String
 }
 
-struct ShopItem: Codable {
+struct ShopItem: Codable, Hashable {
     let productName: String
     let price: Int
     let remainingStock: Int
