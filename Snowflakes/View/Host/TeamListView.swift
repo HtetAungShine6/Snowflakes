@@ -11,9 +11,6 @@ struct TeamListView: View {
     
     @EnvironmentObject var navigationManager: NavigationManager
     
-//    let hostRoomCode: String?
-//    let playerRoomCode: String?
-//    let teamsMockUp: [TeamMockUp] = teamListMockUp
     let teams: [Team]
     
     var body: some View {
@@ -78,8 +75,8 @@ struct TeamListView: View {
         HStack {
             Text("Player: \(totalPlayerCount)") //call api
                 .font(.custom("Lato-Medium", size: 15))
-            Text("Host: 2") //call api
-                .font(.custom("Lato-Medium", size: 15))
+//            Text("Host: 2") //call api
+//                .font(.custom("Lato-Medium", size: 15))
         }
         .padding(.horizontal)
     }
@@ -95,18 +92,16 @@ struct TeamListView: View {
             }
             
             HStack(spacing: 10) {
-//                ForEach(["scissors", "paper", "pen"], id: \.self) { itemName in
-//                    if let count = team.items[itemName] {
-//                        VStack {
-//                            Image(itemName)
-//                                .resizable()
-//                                .frame(width: 40, height: 40)
-//                            Text("\(count)x")
-//                                .font(.custom("Lato-Regular", size: 16))
-//                                .foregroundStyle(Color.gray)
-//                        }
-//                    }
-//                }
+                ForEach(team.teamStocks, id: \.self) { itemName in
+                    VStack {
+                        Image("\(itemName.productName)")
+                            .resizable()
+                            .frame(width: 40, height: 40)
+                        Text("\(itemName.remainingStock)")
+                            .font(.custom("Lato-Regular", size: 16))
+                            .foregroundStyle(Color.gray)
+                    }
+                }
                 Spacer()
                 HStack {
                     Image("tokenCoin")

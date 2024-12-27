@@ -12,6 +12,7 @@ class GetTeamsByRoomCode: ObservableObject {
     @Published var teams: [Team] = []
     @Published var isLoading: Bool = false
     @Published var errorMessage: String? = ""
+    @Published var isSuccess: Bool = false
     
     //    private let getTeamsByRoomCode = GetTeamByRoomCodeUseCase()
     
@@ -31,6 +32,7 @@ class GetTeamsByRoomCode: ObservableObject {
                 switch result {
                 case .success(let teamSearchResponse):
                     self?.teams = teamSearchResponse.message
+                    self?.isSuccess = true
                     print("\(teamSearchResponse.message)")
                 case .failure(let error):
                     self?.errorMessage = "Failed to fetch teams: \(error.localizedDescription)"

@@ -16,4 +16,5 @@ struct Team: Codable, Hashable {
     let playerRoomCode: String
     let tokens: Int
     let members: [String]?
+    let teamStocks: [ShopItem]
 }
