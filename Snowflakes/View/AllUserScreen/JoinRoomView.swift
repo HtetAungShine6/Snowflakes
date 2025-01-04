@@ -19,6 +19,7 @@ struct JoinRoomView: View {
     @State private var userName: String = ""
     @State private var selectedRole: Role? = nil
     @State private var teams: [Team] = []
+    @State private var showAlertView: Bool = false
     
     enum Role {
         case host
@@ -26,31 +27,38 @@ struct JoinRoomView: View {
     }
     
     var body: some View {
+        
         GeometryReader { geometry in
             VStack(spacing: 20) {
-                Spacer()
-                
-                rotatingSnowflakeIcon(size: min(geometry.size.width * 0.9, 290))
-                    .padding(.bottom, -20)
-                
-                Text("Snowflake")
-                    .font(Font.custom("Futura-Medium", size: 40).weight(.medium))
-                    .foregroundColor(.black)
-                    .padding(.top, -10)
-                
-                VStack(spacing: 20) {
-                    roleSelectionView
-                    if selectedRole != nil {
-                        roomCodeTextField
-                        userNameTextField
-                        confirmButton
+                if showAlertView {
+                    LoadingScreen(loadingText1: "Joining Playground...", loadingText2: "This may take a few seconds.")
+                } else {
+                    VStack(spacing: 20) {
+                        Spacer()
+                        
+                        rotatingSnowflakeIcon(size: min(geometry.size.width * 0.9, 290))
+                            .padding(.bottom, -20)
+                        
+                        Text("Snowflake")
+                            .font(Font.custom("Futura-Medium", size: 40).weight(.medium))
+                            .foregroundColor(.black)
+                            .padding(.top, -10)
+                        
+                        VStack(spacing: 20) {
+                            roleSelectionView
+                            if selectedRole != nil {
+                                roomCodeTextField
+                                userNameTextField
+                                confirmButton
+                            }
+                        }
+                        .padding(.top, 10)
+                        
+                        Spacer()
                     }
+                    .padding(.horizontal, 30)
                 }
-                .padding(.top, 10)
-                
-                Spacer()
             }
-            .padding(.horizontal, 30)
             .background(Color(UIColor.systemBackground))
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .toolbar {
@@ -66,25 +74,56 @@ struct JoinRoomView: View {
             .navigationBarBackButtonHidden()
             .onChange(of: getTeamsByRoomCodeVM.isLoading) { _, newValue in
                 if newValue {
-                    // show progress view something
+                    showAlertView = true
                 } else {
-                    
+                    showAlertView = false
+                }
+            }
+            .onChange(of: getGameStateVM.isLoading) { _, newValue in
+                if newValue {
+                    showAlertView = true
+                } else {
+                    showAlertView = false
+                }
+            }
+            .onReceive(getTeamsByRoomCodeVM.$teams) { teams in
+                if !teams.isEmpty {
+                    switch selectedRole {
+                    case .host:
+                        self.teams = teams
+                    case .player:
+                        self.teams = teams
+                    case nil:
+                        break
+                    }
+                }
+            }
+            .onReceive(getGameStateVM.$gameState) { gameState in
+                if let currentState = gameState?.currentGameState, currentState == "TeamCreation" {
+                    getTeamsByRoomCodeVM.fetchTeams(hostRoomCode: roomCode)
+                }
+            }
+            .onReceive(getTeamsByRoomCodeVM.$errorMessage) { errorMessage in
+                if let errorMessage = errorMessage {
+                    print("Error: \(errorMessage)")
                 }
             }
             .onChange(of: getTeamsByRoomCodeVM.isSuccess, { _, newValue in
                 if newValue {
-                    navigationManager.navigateTo(Destination.teamListView(team: self.teams))
-                } else {
-                    print("This state is forbidden")
+                    switch selectedRole {
+                    case .host:
+                        if !teams.isEmpty {
+                            navigationManager.navigateTo(Destination.teamListView(team: self.teams))
+                        }
+                    case .player:
+                        if !teams.isEmpty {
+                            navigationManager.navigateTo(Destination.teamListPlayerView(team: self.teams))
+                        }
+                    case nil:
+                        break
+                    }
                 }
             })
-            .onChange(of: getGameStateVM.isLoading) { _, newValue in
-                if newValue {
-                    // progress view
-                } else {
-                    
-                }
-            }
         }
     }
     
@@ -196,28 +235,6 @@ struct JoinRoomView: View {
             .background(Color(red: 0.69, green: 0.89, blue: 0.96))
             .cornerRadius(20)
             .shadow(color: Color.black.opacity(0.1), radius: 5, x: 0, y: 5)
-        }
-        .onReceive(getTeamsByRoomCodeVM.$teams) { teams in
-            if !teams.isEmpty {
-                switch selectedRole {
-                case .host:
-                    self.teams = teams
-                case .player:
-                    self.teams = teams
-                case nil:
-                    break
-                }
-            }
-        }
-        .onReceive(getGameStateVM.$gameState) { gameState in
-            if let currentState = gameState?.currentGameState, currentState == "TeamCreation" {
-                getTeamsByRoomCodeVM.fetchTeams(hostRoomCode: roomCode)
-            }
-        }
-        .onReceive(getTeamsByRoomCodeVM.$errorMessage) { errorMessage in
-            if let errorMessage = errorMessage {
-                print("Error: \(errorMessage)")
-            }
         }
     }
 }
