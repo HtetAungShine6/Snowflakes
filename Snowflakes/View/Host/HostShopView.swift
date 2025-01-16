@@ -22,7 +22,6 @@ struct HostShopView: View {
         .toolbar {
             ToolbarItem(placement: .navigationBarLeading) {
                 Button(action: {
-                    // Action for the back button
                     navigationManager.pop()
                 }) {
                     Image(systemName: "chevron.left")
