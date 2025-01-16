@@ -55,16 +55,6 @@ struct HostShopTimer: View {
                     Spacer()
                 }
                 .padding(.horizontal)
-//                AdjustTimeComponent(
-//                    onDecrease: { time in
-//                        minutes = time
-//                        seconds = time
-//                    },
-//                    onIncrease: { time in
-//                        minutes = time
-//                        seconds = time
-//                    }
-//                )
                 
                 Text("It is time to sell a \n snow flake")
                     .font(.custom("Roboto-Regular", size: 32))

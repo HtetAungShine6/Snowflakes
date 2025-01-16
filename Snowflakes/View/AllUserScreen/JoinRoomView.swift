@@ -99,8 +99,25 @@ struct JoinRoomView: View {
                 }
             }
             .onReceive(getGameStateVM.$gameState) { gameState in
-                if let currentState = gameState?.currentGameState, currentState == "TeamCreation" {
-                    getTeamsByRoomCodeVM.fetchTeams(hostRoomCode: roomCode)
+                //                if let currentState = gameState?.currentGameState, currentState == "TeamCreation" {
+                //                    getTeamsByRoomCodeVM.fetchTeams(hostRoomCode: roomCode)
+                //                }
+                if let currentState = gameState?.currentGameState {
+                    switch currentState {
+                    case "TeamCreation":
+                        getTeamsByRoomCodeVM.fetchTeams(hostRoomCode: roomCode)
+                    case "SnowFlakeCreation":
+                        switch selectedRole {
+                        case .host:
+                            navigationManager.navigateTo(Destination.gameView)
+                        case .player:
+                            navigationManager.navigateTo(Destination.gameViewPlayer)
+                        case nil:
+                            break
+                        }
+                    default:
+                        break
+                    }
                 }
             }
             .onReceive(getTeamsByRoomCodeVM.$errorMessage) { errorMessage in

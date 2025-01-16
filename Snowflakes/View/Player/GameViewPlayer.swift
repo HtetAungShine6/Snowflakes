@@ -18,7 +18,7 @@ struct GameViewPlayer: View {
             if navigationManager.isShopTime {
 //                HostShopTimer(navBarTitle: "Snowflake", navBarSubtitle: "Round", image: Image("Shop 1"))
             } else {
-                PlayerTimerView(navBarTitle: "Snowflakes", navBarSubtitle: "Shop Round", image: Image("Snowman"))
+                PlayerTimerView(navBarTitle: "Snowflakes", navBarSubtitle: "Shop Round", image: Image("Snowman")) // Wrong View called
             }
         }
         .navigationBarBackButtonHidden()

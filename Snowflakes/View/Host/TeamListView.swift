@@ -10,39 +10,78 @@ import SwiftUI
 struct TeamListView: View {
     
     @EnvironmentObject var navigationManager: NavigationManager
+    @StateObject private var updateGameStateViewModel = UpdateGameStateViewModel()
+    
+    @State private var showAlertView: Bool = false
     
     let teams: [Team]
     
     var body: some View {
 
-        VStack(alignment: .leading) {
-            navBar
-            totalNumberHostPlayer
-            ScrollView {
+        VStack {
+            if showAlertView {
+                ZStack {
+                    AppColors.frostBlue.opacity(0.5)
+                        .edgesIgnoringSafeArea(.all)
+                    
+                    VStack(spacing: 16) {
+                        ProgressView()
+                            .progressViewStyle(CircularProgressViewStyle(tint: .white))
+                            .scaleEffect(2)
+                        Text("Updating your Playground...")
+                            .font(.custom("Lato-Bold", size: 20))
+                            .foregroundColor(.white)
+                        Text("This may take a few seconds.")
+                            .font(.custom("Lato-Regular", size: 16))
+                            .foregroundColor(.white.opacity(0.8))
+                    }
+                    .padding(40)
+                    .background(RoundedRectangle(cornerRadius: 16).fill(Color.black).opacity(0.5))
+                }
+            } else {
                 VStack(alignment: .leading) {
-                    ForEach(teams, id: \.teamNumber) { team in
-                        teamCardView(team: team)
-                            .padding(.bottom, 8)
+                    navBar
+                    totalNumberHostPlayer
+                    ScrollView {
+                        VStack(alignment: .leading) {
+                            ForEach(teams, id: \.teamNumber) { team in
+                                teamCardView(team: team)
+                                    .padding(.bottom, 8)
+                            }
+                        }
+                        .padding()
+                    }
+                    startPlaygroundButton
+                        .padding()
+                }
+                .toolbar {
+                    ToolbarItem(placement: .navigationBarLeading) {
+                        Button(action: {
+                            // Action for the back button
+                            navigationManager.pop()
+                        }) {
+                            Image(systemName: "chevron.left")
+                                .foregroundColor(.black)
+                        }
                     }
                 }
-                .padding()
-            }
-            startPlaygroundButton
-                .padding()
-        }
-        .toolbar {
-            ToolbarItem(placement: .navigationBarLeading) {
-                Button(action: {
-                    // Action for the back button
-                    navigationManager.pop()
-                }) {
-                    Image(systemName: "chevron.left")
-                        .foregroundColor(.black)
-                }
+                .navigationBarBackButtonHidden()
+                .navigationBarTitleDisplayMode(.inline)
             }
         }
-        .navigationBarBackButtonHidden()
-        .navigationBarTitleDisplayMode(.inline)
+        .onChange(of: updateGameStateViewModel.isLoading) { _, newValue in
+            if newValue {
+                showAlertView = true
+            } else {
+                showAlertView = false
+            }
+        }
+        .onChange(of: updateGameStateViewModel.isSuccess) { _, newValue in
+            if newValue {
+                navigationManager.navigateTo(Destination.gameView)
+                navigationManager.isShopTime = false
+            }
+        }
     }
     
     private var navBar: some View {
@@ -135,8 +174,11 @@ struct TeamListView: View {
     
     private var startPlaygroundButton: some View {
         Button(action: {
-            navigationManager.navigateTo(Destination.gameView)
-            navigationManager.isShopTime = false
+            if let hostRoomCode = teams.first?.hostRoomCode {
+                updateGameStateViewModel.hostRoomCode = hostRoomCode
+                updateGameStateViewModel.currentGameState = .SnowFlakeCreation
+                updateGameStateViewModel.updateGameState()
+            }
         }) {
             Text("Start a playground")
                 .font(.custom("Lato-Bold", size: 20))

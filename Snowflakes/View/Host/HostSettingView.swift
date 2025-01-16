@@ -358,7 +358,6 @@ struct HostSettingView: View {
         HStack() {
             Spacer()
             Button(action: {
-                // dismiss
                 navigationManager.pop()
             }) {
                 Text("Back")
