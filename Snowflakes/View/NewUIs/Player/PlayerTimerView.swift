@@ -3,6 +3,10 @@ import SwiftUI
 struct PlayerTimerView: View {
     
     @EnvironmentObject var navigationManager: NavigationManager
+    @StateObject private var webSocketManager = WebSocketManager()
+
+    @State private var timerValueFromSocket: String = ""
+
     
     let navBarTitle: String
     let navBarSubtitle: String
@@ -35,15 +39,15 @@ struct PlayerTimerView: View {
                         .padding(.top, geometry.safeAreaInsets.top)
                     
                     VStack(spacing: 15) {
-                        //                        timerCountdown
-//                        timer
+//                        timerCountdown
+                        timerCountdown
                         timerImage
                     }
                     .frame(maxWidth: .infinity, alignment: .top)
                     
                     descriptionText
                         .frame(maxWidth: .infinity, alignment: .top)
-                        .padding(.top, 40)
+                        .padding(.top, 150)
                 }
                 .padding(.top, -geometry.safeAreaInsets.top)
                 
@@ -82,19 +86,27 @@ struct PlayerTimerView: View {
     }
     
     private var timerCountdown: some View {
-        HStack {
-            Text("\(minutes)")
-                .font(.custom("Montserrat-Medium", size: 32))
+        ZStack {
+            Text("Min")
+                .font(Font.custom("Roboto", size: 28).weight(.thin))
                 .foregroundColor(.black)
-            Text(":")
-                .font(.custom("Montserrat-Medium", size: 32))
+                .offset(x: -44.50, y: 22.50)
+            Text("Sec")
+                .font(Font.custom("Roboto", size: 28).weight(.thin))
                 .foregroundColor(.black)
-            Text("\(seconds < 10 ? "0\(seconds)" : "\(seconds)")")
-                .font(.custom("Montserrat-Medium", size: 32))
-                .foregroundColor(.black.opacity(0.8))
+                .offset(x: 44.50, y: 22.50)
+            Text("\(minutes < 10 ? "0\(minutes)" : "\(minutes)")") // Ensure formatting with leading zero
+                .font(Font.custom("Montserrat", size: 32).weight(.medium))
+                .foregroundColor(.black)
+                .offset(x: -44.50, y: -19.50)
+            Text("\(seconds < 10 ? "0\(seconds)" : "\(seconds)")") // Ensure formatting with leading zero
+                .font(Font.custom("Montserrat", size: 32).weight(.medium))
+                .foregroundColor(.black)
+                .offset(x: 44.50, y: -19.50)
         }
-        .padding(.vertical, 10)
+        .frame(width: 135, height: 78)
     }
+
     
 //    private var timer: some View {
 //        HStack {
@@ -106,6 +118,15 @@ struct PlayerTimerView: View {
 //        }
 //    }
     
+//    private var timer: some View {
+//        HStack {
+//            Spacer()
+//            Text("\(timerValueFromSocket)")
+//                .font(.custom("Montserrat-Medium", size: 40))
+//                .foregroundColor(.black)
+//            Spacer()
+//        }
+//    }
     private var timerImage: some View {
         currentImage
             .resizable()
@@ -132,6 +153,6 @@ struct PlayerTimerView: View {
     }
 }
 
-//#Preview {
-//    PlayerTimerView(navBarTitle: "Loading...", navBarSubtitle: "Please wait", image: Image(systemName: "hourglass"))
-//}
+#Preview {
+    PlayerTimerView(navBarTitle: "Loading...", navBarSubtitle: "Please wait", image: Image(systemName: "hourglass"))
+}

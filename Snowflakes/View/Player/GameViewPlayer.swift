@@ -1,24 +1,23 @@
-//
-//  GameViewPlayer.swift
-//  Snowflakes
-//
-//  Created by Htet Aung Shine on 25/12/2024.
-//
-
 import SwiftUI
 
 struct GameViewPlayer: View {
     
     @EnvironmentObject var navigationManager: NavigationManager
     
-//    @State private var isShopTime: Bool = false
-    
     var body: some View {
         Group {
             if navigationManager.isShopTime {
-//                HostShopTimer(navBarTitle: "Snowflake", navBarSubtitle: "Round", image: Image("Shop 1"))
+                ShopTimerPlayerView(
+                    navBarTitle: "Snowflake",
+                    navBarSubtitle: "Shop Round",
+                    image: Image("Shop 1")
+                )
             } else {
-                PlayerTimerView(navBarTitle: "Snowflakes", navBarSubtitle: "Shop Round", image: Image("Snowman")) // Wrong View called
+                PlayerTimerView(
+                    navBarTitle: "Snowflake",
+                    navBarSubtitle: "Player Round",
+                    image: Image("Snowman")
+                )
             }
         }
         .navigationBarBackButtonHidden()
@@ -26,5 +25,9 @@ struct GameViewPlayer: View {
 }
 
 #Preview {
-    GameViewPlayer()
+    let navigationManager = NavigationManager()
+    navigationManager.isShopTime = false // Toggle this to true for testing the shop view
+    
+    return GameViewPlayer()
+        .environmentObject(navigationManager)
 }
