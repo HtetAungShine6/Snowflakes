@@ -86,27 +86,29 @@ struct JoinRoomView: View {
                     showAlertView = false
                 }
             }
-            .onReceive(getTeamsByRoomCodeVM.$teams) { teams in
-                if !teams.isEmpty {
+            .onChange(of: getGameStateVM.isSuccess, { _, newValue in
+                if newValue {
                     switch selectedRole {
                     case .host:
-                        self.teams = teams
+                        getTeamsByRoomCodeVM.fetchTeams(hostRoomCode: roomCode)
                     case .player:
-                        self.teams = teams
+                        getTeamsByRoomCodeVM.fetchTeams(playerRoomCode: roomCode)
                     case nil:
                         break
                     }
                 }
+            })
+            .onReceive(getTeamsByRoomCodeVM.$teams) { teams in
+                print("On Receive Teams")
+                if !teams.isEmpty {
+                    self.teams = teams
+                } else {
+                    print("Empty Teams")
+                }
             }
             .onReceive(getGameStateVM.$gameState) { gameState in
-                //                if let currentState = gameState?.currentGameState, currentState == "TeamCreation" {
-                //                    getTeamsByRoomCodeVM.fetchTeams(hostRoomCode: roomCode)
-                //                }
                 if let currentState = gameState?.currentGameState {
-                    switch currentState {
-                    case "TeamCreation":
-                        getTeamsByRoomCodeVM.fetchTeams(hostRoomCode: roomCode)
-                    case "SnowFlakeCreation":
+                    if currentState == "SnowFlakeCreation" && selectedRole != nil {
                         switch selectedRole {
                         case .host:
                             navigationManager.navigateTo(Destination.gameView)
@@ -115,14 +117,12 @@ struct JoinRoomView: View {
                         case nil:
                             break
                         }
-                    default:
-                        break
                     }
                 }
             }
             .onReceive(getTeamsByRoomCodeVM.$errorMessage) { errorMessage in
                 if let errorMessage = errorMessage {
-                    print("Error: \(errorMessage)")
+                    print("Error: \(errorMessage)") 
                 }
             }
             .onChange(of: getTeamsByRoomCodeVM.isSuccess, { _, newValue in

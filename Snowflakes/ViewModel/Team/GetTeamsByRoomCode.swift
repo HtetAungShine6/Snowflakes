@@ -33,7 +33,7 @@ class GetTeamsByRoomCode: ObservableObject {
                 case .success(let teamSearchResponse):
                     self?.teams = teamSearchResponse.message
                     self?.isSuccess = true
-                    print("\(teamSearchResponse.message)")
+                    print("Get Teams By RoomCode:\(teamSearchResponse.message)")
                 case .failure(let error):
                     self?.errorMessage = "Failed to fetch teams: \(error.localizedDescription)"
                 }
