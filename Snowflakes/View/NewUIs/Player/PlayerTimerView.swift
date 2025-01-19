@@ -107,26 +107,6 @@ struct PlayerTimerView: View {
         .frame(width: 135, height: 78)
     }
 
-    
-//    private var timer: some View {
-//        HStack {
-//            Spacer()
-//            Text(timerModel.timerValue.isEmpty ? "Loading..." : timerModel.timerValue)
-//                .font(.custom("Montserrat-Medium", size: 40))
-//                .foregroundColor(.black)
-//            Spacer()
-//        }
-//    }
-    
-//    private var timer: some View {
-//        HStack {
-//            Spacer()
-//            Text("\(timerValueFromSocket)")
-//                .font(.custom("Montserrat-Medium", size: 40))
-//                .foregroundColor(.black)
-//            Spacer()
-//        }
-//    }
     private var timerImage: some View {
         currentImage
             .resizable()

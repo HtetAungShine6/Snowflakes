@@ -122,7 +122,7 @@ struct JoinRoomView: View {
             }
             .onReceive(getTeamsByRoomCodeVM.$errorMessage) { errorMessage in
                 if let errorMessage = errorMessage {
-                    print("Error: \(errorMessage)") // have to add error alert view
+                    print("Error: \(errorMessage)") 
                 }
             }
             .onChange(of: getTeamsByRoomCodeVM.isSuccess, { _, newValue in

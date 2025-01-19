@@ -13,6 +13,8 @@ struct TeamListPlayerView: View {
     
     @State private var updateGameStateViewModel = UpdateGameStateViewModel()
     
+    @State private var isJoined: Bool = false
+    
     let teams: [Team]
     
     var body: some View {
@@ -74,6 +76,19 @@ struct TeamListPlayerView: View {
         .padding(.horizontal)
     }
     
+    
+    private var buttonText: String {
+        isJoined ? "Leave" : "Join"
+    }
+
+    private var buttonBackgroundColor: Color {
+        isJoined ? .red : .green
+    }
+
+    private func toggleJoinLeave() {
+        isJoined.toggle()
+    }
+    
     private func teamCardView(team: Team) -> some View {
         VStack(alignment: .leading, spacing: 10) {
             HStack {
@@ -82,6 +97,23 @@ struct TeamListPlayerView: View {
                 Text("(\(team.members?.count ?? 0) Players)")
                     .font(.custom("Lato-Regular", size: 16))
                     .foregroundStyle(Color.gray)
+                Spacer()
+                Button(action: {
+                    withAnimation {
+                        toggleJoinLeave()
+                    }
+                }) {
+                    Text(buttonText)
+                        .font(.custom("Lato-Regular", size: 16))
+                        .padding(.horizontal)
+                        .padding(.vertical, 4)
+                        .background(.white)
+                        .foregroundColor(buttonBackgroundColor)
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 15)
+                                .stroke(Color.black, lineWidth: 1)
+                        )
+                }
             }
             
             HStack(spacing: 10) {
