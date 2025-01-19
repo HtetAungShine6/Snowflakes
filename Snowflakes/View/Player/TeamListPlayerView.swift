@@ -11,10 +11,12 @@ struct TeamListPlayerView: View {
     
     @EnvironmentObject var navigationManager: NavigationManager
     
+    @State private var updateGameStateViewModel = UpdateGameStateViewModel()
+    
     let teams: [Team]
     
     var body: some View {
-
+        
         VStack(alignment: .leading) {
             navBar
             totalNumberPlayers
