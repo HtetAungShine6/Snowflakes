@@ -135,10 +135,10 @@ struct TeamListPlayerView: View {
     }
 }
 
-#Preview {
-    TeamListPlayerView(teams: [])
-        .environmentObject(NavigationManager())
-}
+//#Preview {
+//    TeamListPlayerView(teams: [])
+//        .environmentObject(NavigationManager())
+//}
 //#Preview {
 //    TeamListView(hostRoomCode: "ABC12", playerRoomCode: "DFH123")
 //}
