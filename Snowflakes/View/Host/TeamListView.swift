@@ -10,6 +10,8 @@ import SwiftUI
 struct TeamListView: View {
     
     @EnvironmentObject var navigationManager: NavigationManager
+    @EnvironmentObject private var webSocketManager: WebSocketManager
+    
     @StateObject private var updateGameStateViewModel = UpdateGameStateViewModel()
     
     @State private var showAlertView: Bool = false
@@ -59,6 +61,7 @@ struct TeamListView: View {
                         Button(action: {
                             // Action for the back button
                             navigationManager.pop()
+                            webSocketManager.disconnect()
                         }) {
                             Image(systemName: "chevron.left")
                                 .foregroundColor(.black)
@@ -67,21 +70,30 @@ struct TeamListView: View {
                 }
                 .navigationBarBackButtonHidden()
                 .navigationBarTitleDisplayMode(.inline)
+                .onAppear {
+                    webSocketManager.connect()
+                }
+                .onChange(of: webSocketManager.isConnected) { _, isConnected in
+                    if isConnected {
+                        // join
+                        webSocketManager.joinGroup(roomCode: hostRoomCode)
+                    }
+                }
             }
         }
-        .onChange(of: updateGameStateViewModel.isLoading) { _, newValue in
-            if newValue {
-                showAlertView = true
-            } else {
-                showAlertView = false
-            }
-        }
-        .onChange(of: updateGameStateViewModel.isSuccess) { _, newValue in
-            if newValue {
-                navigationManager.navigateTo(Destination.gameView)
-                navigationManager.isShopTime = false
-            }
-        }
+//        .onChange(of: updateGameStateViewModel.isLoading) { _, newValue in
+//            if newValue {
+//                showAlertView = true
+//            } else {
+//                showAlertView = false
+//            }
+//        }
+//        .onChange(of: updateGameStateViewModel.isSuccess) { _, newValue in
+//            if newValue {
+//                navigationManager.navigateTo(Destination.gameView)
+//                navigationManager.isShopTime = false
+//            }
+//        }
     }
     
     private var navBar: some View {
@@ -91,17 +103,21 @@ struct TeamListView: View {
                 .foregroundStyle(AppColors.polarBlue)
             Spacer()
             VStack(alignment: .leading) {
-                if let hostRoomCode = teams.first?.hostRoomCode {
-                    Text("Host Room Code: \(hostRoomCode)")
-                        .font(.custom("Lato-Regular", size: 16))
-                }
-                if let playerRoomCode = teams.first?.playerRoomCode {
-                    Text("Player Room Code: \(playerRoomCode)")
-                        .font(.custom("Lato-Regular", size: 16))
-                }
+                Text("Host Room Code: \(hostRoomCode)")
+                    .font(.custom("Lato-Regular", size: 16))
+                Text("Player Room Code: \(playerRoomCode)")
+                    .font(.custom("Lato-Regular", size: 16))
             }
         }
         .padding(.horizontal)
+    }
+    
+    private var hostRoomCode: String {
+        teams.first?.hostRoomCode ?? "N/A"
+    }
+    
+    private var playerRoomCode: String {
+        teams.first?.playerRoomCode ?? "N/A"
     }
     
     private var totalPlayerCount: Int {
@@ -174,11 +190,16 @@ struct TeamListView: View {
     
     private var startPlaygroundButton: some View {
         Button(action: {
+            //            if let hostRoomCode = teams.first?.hostRoomCode {
+            //                updateGameStateViewModel.hostRoomCode = hostRoomCode
+            //                updateGameStateViewModel.currentGameState = .SnowFlakeCreation
+            //                updateGameStateViewModel.updateGameState()
+            //            }
             if let hostRoomCode = teams.first?.hostRoomCode {
-                updateGameStateViewModel.hostRoomCode = hostRoomCode
-                updateGameStateViewModel.currentGameState = .SnowFlakeCreation
-                updateGameStateViewModel.updateGameState()
+                navigationManager.roomCode = hostRoomCode
+                navigationManager.navigateTo(Destination.gameView, roomCode: hostRoomCode)
             }
+            navigationManager.isShopTime = false
         }) {
             Text("Start a playground")
                 .font(.custom("Lato-Bold", size: 20))

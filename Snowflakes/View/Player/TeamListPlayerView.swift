@@ -10,6 +10,7 @@ import SwiftUI
 struct TeamListPlayerView: View {
     
     @EnvironmentObject var navigationManager: NavigationManager
+    @EnvironmentObject var webSocketManager: WebSocketManager
     
     @State private var updateGameStateViewModel = UpdateGameStateViewModel()
     
@@ -46,6 +47,24 @@ struct TeamListPlayerView: View {
         }
         .navigationBarBackButtonHidden()
         .navigationBarTitleDisplayMode(.inline)
+        .onAppear {
+            webSocketManager.connect()
+        }
+        .onChange(of: webSocketManager.isConnected) { _, isConnected in
+            if isConnected {
+                webSocketManager.joinGroup(roomCode: hostRoomCode)
+            }
+        }
+        .onChange(of: webSocketManager.timerStarted) { _, newValue in
+            if newValue {
+                navigationManager.isShopTime = false
+                navigationManager.navigateTo(Destination.gameViewPlayer)
+            }
+        }
+    }
+    
+    private var hostRoomCode: String {
+        teams.first?.hostRoomCode ?? "N/A"
     }
     
     private var navBar: some View {

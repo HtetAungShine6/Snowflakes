@@ -24,10 +24,10 @@ struct GameViewPlayer: View {
     }
 }
 
-#Preview {
-    let navigationManager = NavigationManager()
-    navigationManager.isShopTime = false // Toggle this to true for testing the shop view
-    
-    return GameViewPlayer()
-        .environmentObject(navigationManager)
-}
+//#Preview {
+//    let navigationManager = NavigationManager()
+//    navigationManager.isShopTime = false // Toggle this to true for testing the shop view
+//    
+//    return GameViewPlayer()
+//        .environmentObject(navigationManager)
+//}

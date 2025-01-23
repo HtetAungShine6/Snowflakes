@@ -10,8 +10,7 @@ import SwiftUI
 struct ShopTimerViewHost: View {
     
     @EnvironmentObject var navigationManager: NavigationManager
-    
-    @StateObject private var webSocketManager = WebSocketManager()
+    @EnvironmentObject var webSocketManager: WebSocketManager
     
     @State private var timerValueFromSocket: String = ""
     @State private var isPlaying: Bool = false
@@ -39,16 +38,17 @@ struct ShopTimerViewHost: View {
                 .ignoresSafeArea(.all)
         )
         .onAppear {
-            webSocketManager.connect()
+            webSocketManager.createTimer(roomCode: webSocketManager.roomCode, socketMessage: "2:00")
         }
-        .onChange(of: webSocketManager.isConnected) { _, isConnected in
-            if isConnected {
-                webSocketManager.socketMessage = "01:00"
-                webSocketManager.start()
+        .onChange(of: webSocketManager.timerCreated) { _, newValue in
+            if newValue {
+                webSocketManager.startCountdown(roomCode: webSocketManager.roomCode)
             }
         }
-        .onChange(of: webSocketManager.countdown) { _, newValue in
-            timerValueFromSocket = newValue
+        .onChange(of: webSocketManager.timerStarted) { _, newValue in
+            if newValue {
+                webSocketManager.pauseCountdown(roomCode: webSocketManager.roomCode)
+            }
         }
     }
     
@@ -95,9 +95,9 @@ struct ShopTimerViewHost: View {
         Button{
             isPlaying.toggle()
             if isPlaying {
-                webSocketManager.resume()
+                webSocketManager.resumeCountdown(roomCode: webSocketManager.roomCode)
             } else {
-                webSocketManager.pause()
+                webSocketManager.pauseCountdown(roomCode: webSocketManager.roomCode)
             }
         } label: {
             Image(systemName: isPlaying ? "pause.fill" : "play.fill")
@@ -124,11 +124,10 @@ struct ShopTimerViewHost: View {
             .padding(.horizontal)
             AdjustTimeComponent(
                 onDecrease: { time in
-//                    webSocketManager.addedTimer = time
+                    webSocketManager.minusCountdown(roomCode: webSocketManager.roomCode, socketMessage: "01:00")
                 },
                 onIncrease: { time in
-                    webSocketManager.addedTimer = time
-                    webSocketManager.add()
+                    webSocketManager.addCountdown(roomCode: webSocketManager.roomCode, socketMessage: "01:00")
                 }
             )
         }
@@ -154,6 +153,7 @@ struct ShopTimerViewHost: View {
     
     private var nextRoundButton: some View {
         SwipeToConfirmButton {
+            webSocketManager.stopCountdown(roomCode: webSocketManager.roomCode)
             navigationManager.isShopTime.toggle()
         }
     }

@@ -10,13 +10,20 @@ import SwiftUI
 struct TimerViewHost: View {
     
     @EnvironmentObject var navigationManager: NavigationManager
+    @EnvironmentObject private var webSocketManager: WebSocketManager
     
-    @StateObject private var webSocketManager = WebSocketManager()
-//    @StateObject private var timerModel = TimerModel()
+    @StateObject private var getPlaygroundVM = GetPlaygroundViewModel()
+    //    @StateObject private var timerModel = TimerModel()
     
     @State private var timerValueFromSocket: String = ""
     @State private var sendMessageText: String = ""
     @State private var isPlaying: Bool = false
+    @State private var isButtonDisabled = false
+    
+    @State private var currentRound: Int = 0
+    @State private var totalRounds: Int = 0
+    
+    let roomCode: String
     
     var body: some View {
         VStack(alignment: .leading) {
@@ -41,16 +48,39 @@ struct TimerViewHost: View {
                 .ignoresSafeArea(.all)
         )
         .onAppear {
-            webSocketManager.connect()
+            getPlaygroundVM.fetchPlayground(hostRoomCode: roomCode)
+            navigationManager.currentRound = currentRound + 1
+        }
+        .onReceive(getPlaygroundVM.$playgroundInfo) { playgroundInfo in
+            if let rounds = playgroundInfo?.rounds, !rounds.isEmpty {
+                totalRounds = rounds.count
+            }
         }
         .onChange(of: webSocketManager.isConnected) { _, isConnected in
             if isConnected {
-                webSocketManager.socketMessage = "01:00"
-                webSocketManager.start()
+                // join
+                webSocketManager.joinGroup(roomCode: roomCode)
             }
         }
-        .onChange(of: webSocketManager.countdown) { _, newValue in
-            timerValueFromSocket = newValue
+        .onChange(of: getPlaygroundVM.isLoading, { _, newValue in
+            if newValue {
+                // show alert
+            } else {
+                // hide alert
+            }
+        })
+        .onChange(of: getPlaygroundVM.isSuccess, { _, newValue in
+            if newValue, let rounds = getPlaygroundVM.playgroundInfo?.rounds {
+                let currentRoundDuration = rounds.first { $0.roundNumber == navigationManager.currentRound }?.duration ?? "0"
+                webSocketManager.createTimer(roomCode: roomCode, socketMessage: currentRoundDuration)
+                webSocketManager.startCountdown(roomCode: roomCode)
+            }
+        })
+        .onChange(of: webSocketManager.timerStarted) { _, newValue in
+            if newValue {
+                webSocketManager.pauseCountdown(roomCode: roomCode)
+                webSocketManager.timerStarted = false
+            }
         }
     }
     
@@ -60,7 +90,8 @@ struct TimerViewHost: View {
                 Text("Snowflake")
                     .font(.custom("Montserrat-Medium", size: 32))
                     .foregroundStyle(Color.black)
-                Text("Round (1/5)")
+                
+                Text("Round (\(navigationManager.currentRound)/\(totalRounds))")
                     .foregroundStyle(Color.gray)
             }
             Spacer()
@@ -71,7 +102,7 @@ struct TimerViewHost: View {
     private var timer: some View {
         HStack {
             Spacer()
-            Text("\(timerValueFromSocket)")
+            Text("\(webSocketManager.countdown)")
                 .font(.custom("Montserrat-Medium", size: 40))
                 .foregroundColor(.black)
             Spacer()
@@ -89,9 +120,13 @@ struct TimerViewHost: View {
         Button{
             isPlaying.toggle()
             if isPlaying {
-                webSocketManager.resume()
+                webSocketManager.resumeCountdown(roomCode: roomCode)
             } else {
-                webSocketManager.pause()
+                webSocketManager.pauseCountdown(roomCode: roomCode)
+            }
+            isButtonDisabled = true
+            DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+                isButtonDisabled = false
             }
         } label: {
             Image(systemName: isPlaying ? "pause.fill" : "play.fill")
@@ -99,6 +134,7 @@ struct TimerViewHost: View {
                 .scaledToFit()
                 .frame(width: 25, height: 25)
         }
+        .disabled(isButtonDisabled)
         .frame(width: 40, height: 40)
         .foregroundColor(.white)
         .padding()
@@ -118,11 +154,10 @@ struct TimerViewHost: View {
             .padding(.horizontal)
             AdjustTimeComponent(
                 onDecrease: { time in
-//                    webSocketManager.addedTimer = time
+                    webSocketManager.minusCountdown(roomCode: roomCode, socketMessage: "01:00")
                 },
                 onIncrease: { time in
-                    webSocketManager.addedTimer = time
-                    webSocketManager.add()
+                    webSocketManager.addCountdown(roomCode: roomCode, socketMessage: "01:00")
                 }
             )
         }
@@ -164,7 +199,14 @@ struct TimerViewHost: View {
     
     private var nextRoundButton: some View {
         SwipeToConfirmButton {
-            navigationManager.isShopTime.toggle()
+            if currentRound < totalRounds {
+                currentRound += 1
+                // Optionally, notify the server or WebSocket about the round change
+            } else {
+                // Handle when all rounds are completed
+                webSocketManager.stopCountdown(roomCode: roomCode)
+                navigationManager.isShopTime.toggle()
+            }
         }
     }
 }

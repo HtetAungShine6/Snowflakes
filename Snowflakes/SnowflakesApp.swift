@@ -16,6 +16,8 @@ struct SnowflakesApp: App {
     var body: some Scene {
         WindowGroup {
             RootView()
+                .environmentObject(WebSocketManager.shared)
+//                .environmentObject(navigationManager)
 //            TimerTestView()
 //            TimerViewHost()
 //            ShopTimerViewHost()

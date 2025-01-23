@@ -10,18 +10,26 @@ import SwiftUI
 import Starscream
 
 class WebSocketManager: ObservableObject, WebSocketDelegate {
+    
     private var socket: WebSocket!
+    
     @Published var message: String = ""
     @Published var isConnected: Bool = false
     @Published var countdown: String = ""
+    @Published var timerCreated: Bool = false
+    @Published var timerStarted: Bool = false
+    @Published var targetValue: String = ""
     @Published var socketMessage: String = ""
     @Published var addedTimer: String = ""
+    @Published var roomCode: String = ""
     
     var countdownTimer: Timer?
     
+    static let shared = WebSocketManager()
+    
     init() {
         // Ensure you use the correct URL for your SignalR hub
-        var request = URLRequest(url: URL(string: "wss://snowflakeapi-bkd0aygebke4fscg.southeastasia-01.azurewebsites.net/timer-hub?negotiateVersion=1")!)
+        var request = URLRequest(url: URL(string: "wss://snowflakeapi-bkd0aygebke4fscg.southeastasia-01.azurewebsites.net/timer-hub")!)
         request.timeoutInterval = 5
         socket = WebSocket(request: request)
         socket.delegate = self
@@ -66,7 +74,6 @@ class WebSocketManager: ObservableObject, WebSocketDelegate {
             isConnected = false
             
         case .text(let text):
-            print("Text message received: \(text)")
             handleWebSocketResponse(text: text)
             
         case .binary(let data):
@@ -99,48 +106,74 @@ class WebSocketManager: ObservableObject, WebSocketDelegate {
         }
     }
     
-    func start() {
+    // modified version
+    func joinGroup(roomCode: String) {
         let messageToSocket: [String: Any] = [
-            "arguments": [socketMessage],
-            "target": "StartTimer",
-            "type": 1
-        ]
-        sendMessage(messageToSocket)
-        pause()
-    }
-    
-    func add() {
-        let messageToSocket: [String: Any] = [
-            "arguments": [addedTimer],
-            "target": "AddTimer",
-            "type": 1
-        ]
-        sendMessage(messageToSocket)
-        addedTimer = ""
-    }
-    
-    func pause() {
-        let messageToSocket: [String: Any] = [
-            "arguments": [],
-            "target": "PauseTimer",
+            "arguments": [roomCode],
+            "target": "JoinGroup",
             "type": 1
         ]
         sendMessage(messageToSocket)
     }
     
-    func resume() {
+    func createTimer(roomCode: String, socketMessage: String) {
         let messageToSocket: [String: Any] = [
-            "arguments": [],
-            "target": "ResumeTimer",
+            "arguments": [roomCode, socketMessage],
+            "target": "CreateTimer",
             "type": 1
         ]
         sendMessage(messageToSocket)
     }
     
-    func stop() {
+    func startCountdown(roomCode: String) {
         let messageToSocket: [String: Any] = [
-            "arguments": [],
-            "target": "StopTimer",
+            "arguments": [roomCode],
+            "target": "StartCountdown",
+            "type": 1
+        ]
+        sendMessage(messageToSocket)
+    }
+    
+    func pauseCountdown(roomCode: String) {
+        let messageToSocket: [String: Any] = [
+            "arguments": [roomCode],
+            "target": "PauseCountdown",
+            "type": 1
+        ]
+        sendMessage(messageToSocket)
+    }
+    
+    func resumeCountdown(roomCode: String) {
+        let messageToSocket: [String: Any] = [
+            "arguments": [roomCode],
+            "target": "ResumeCountdown",
+            "type": 1
+        ]
+        sendMessage(messageToSocket)
+    }
+    
+    func addCountdown(roomCode: String, socketMessage: String) {
+        let messageToSocket: [String: Any] = [
+            "arguments": [roomCode, socketMessage],
+            "target": "AddCountdown",
+            "type": 1
+        ]
+        sendMessage(messageToSocket)
+    }
+    
+    func minusCountdown(roomCode: String, socketMessage: String) {
+        let messageToSocket: [String: Any] = [
+            "arguments": [roomCode, socketMessage],
+            "target": "MinusCountdown",
+            "type": 1
+        ]
+        sendMessage(messageToSocket)
+    }
+    
+    func stopCountdown(roomCode: String) {
+        let messageToSocket: [String: Any] = [
+            "arguments": [roomCode],
+            "target": "StopCountdown",
             "type": 1
         ]
         sendMessage(messageToSocket)
@@ -150,14 +183,39 @@ class WebSocketManager: ObservableObject, WebSocketDelegate {
     private func handleWebSocketResponse(text: String) {
         // Remove the SignalR message delimiter \u{1E} from the end of the message
         let cleanedText = text.trimmingCharacters(in: .controlCharacters)
-        print("Cleaned response: \(cleanedText)")
         
         if let data = cleanedText.data(using: .utf8) {
             do {
                 let response = try JSONDecoder().decode(WebSocketResponse.self, from: data)
-                if let countdownValue = response.arguments.first {
-                    DispatchQueue.main.async{
-                        self.countdown = countdownValue
+                
+                if let target = response.target {
+                    switch target {
+                    case "ReceivedMessage":
+                        print("ReceivedMessage passed✅")
+                    case "JoinUserGroup":
+                        print("JoinUserGroup passed✅")
+                    case "CreateTimer":
+                        print("CreateTimer passed✅")
+                    case "TimerStarted":
+                        self.timerStarted = true
+                    case "TimerUpdate":
+                        print("TimerUpdate passed✅")
+                        if let countdownValue = response.arguments?.first {
+                            DispatchQueue.main.async {
+                                self.countdown = countdownValue
+                                print("Countdown updated to: \(self.countdown)")
+                            }
+                        }
+                    case "TimerPaused":
+                        print("TimerPaused passed✅")
+                    case "TimerModify":
+                        print("TimerModify passed✅")
+                    case "TimerResume":
+                        print("TimerResume passed✅")
+                    case "TimerStopped":
+                        print("TimerStopped passed✅")
+                    default:
+                        print("Unhandled target❌: \(target)")
                     }
                 }
             } catch {

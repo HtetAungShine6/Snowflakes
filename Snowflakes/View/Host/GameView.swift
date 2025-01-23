@@ -11,14 +11,12 @@ struct GameView: View {
     
     @EnvironmentObject var navigationManager: NavigationManager
     
-//    @State private var isShopTime: Bool = false
-    
     var body: some View {
         Group {
             if navigationManager.isShopTime {
                 HostShopTimer(navBarTitle: "Snowflake", navBarSubtitle: "Round", image: Image("Shop 1"))
-            } else {
-                TimerViewHost()
+            } else if let roomCode = navigationManager.roomCode {
+                TimerViewHost(roomCode: roomCode)
             }
         }
         .navigationBarBackButtonHidden()

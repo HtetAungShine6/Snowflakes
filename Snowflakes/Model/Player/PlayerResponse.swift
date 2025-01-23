@@ -11,7 +11,8 @@ struct PlayerResponse: Codable {
 }
 
 struct PlayerResponseMessage: Codable {
-    let name: String
+    let playerName: String
     let roomCode: String
     let id: String
+    let teamNumber: Int?
 }

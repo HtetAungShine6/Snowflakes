@@ -9,12 +9,15 @@ import SwiftUI
 
 struct JoinRoomView: View {
     
-    @State private var rotationAngle: Double = 0
     @EnvironmentObject var navigationManager: NavigationManager
+    @EnvironmentObject var websocketManager: WebSocketManager
     
     @ObservedObject private var getTeamsByRoomCodeVM = GetTeamsByRoomCode()
     @ObservedObject private var getGameStateVM = GetGameStateViewModel()
+    @ObservedObject private var getPlayerVM = GetPlayerViewModel()
+    @ObservedObject private var createPlayerVM = CreatePlayerViewModel()
     
+    @State private var rotationAngle: Double = 0
     @State private var roomCode: String = ""
     @State private var userName: String = ""
     @State private var selectedRole: Role? = nil
@@ -109,6 +112,10 @@ struct JoinRoomView: View {
             .onReceive(getGameStateVM.$gameState) { gameState in
                 if let currentState = gameState?.currentGameState {
                     if currentState == "SnowFlakeCreation" && selectedRole != nil {
+//                        if !websocketManager.isConnected {
+//                            websocketManager.connect()
+//                        }
+//                        websocketManager.joinGroup(roomCode: roomCode)
                         switch selectedRole {
                         case .host:
                             navigationManager.navigateTo(Destination.gameView)
@@ -120,6 +127,17 @@ struct JoinRoomView: View {
                     }
                 }
             }
+//            .onReceive(getPlayerVM.$playerInfo, perform: { playerInfo in
+//                guard let playerInfo = playerInfo else { return }
+//                let playerData: [String: Any] = [
+//                    "playerName": playerInfo.playerName,
+//                    "roomCode": playerInfo.roomCode,
+//                    "teamNumber": playerInfo.teamNumber,
+//                    "id": playerInfo.id
+//                ]
+//                UserDefaults.standard.setValue(playerData, forKey: "playerInfo")
+//                print("Stored player info: \(playerData)")
+//            })
             .onReceive(getTeamsByRoomCodeVM.$errorMessage) { errorMessage in
                 if let errorMessage = errorMessage {
                     print("Error: \(errorMessage)") 
@@ -227,6 +245,31 @@ struct JoinRoomView: View {
             case .host:
                 getGameStateVM.fetchGameState(hostRoomCode: roomCode)
             case .player:
+//                if let playerData = UserDefaults.standard.dictionary(forKey: "playerInfo") as? [String: String], let storedPlayerName = playerData["playerName"], let storedRoomCode = playerData["roomCode"], let storedId = playerData["id"], let storedTeamNumber = playerData["teamNumber"] {
+//                    // old user case
+//                    // if old user, check username, id, and roomcode from text and UD same or not
+//                    // if same, getGameStateVM.fetchGameState(playerRoomCode: roomCode), else error
+//                    
+//                    if storedPlayerName == userName && storedRoomCode == roomCode {
+//                        // old player
+//                        print("\(storedPlayerName) and \(storedRoomCode)")
+//                    } else {
+//                        // new player
+//                        print("There is a new user!!!")
+//                        createPlayerVM.name = userName
+//                        createPlayerVM.roomCode = roomCode
+//                        createPlayerVM.createPlayer()
+//                        getPlayerVM.fetchPlayer(playerName: userName, roomCode: roomCode)
+//                        getGameStateVM.fetchGameState(playerRoomCode: roomCode)
+//                    }
+//                } else {
+//                    print("There is a new user!!!")
+//                    createPlayerVM.name = userName
+//                    createPlayerVM.roomCode = roomCode
+//                    createPlayerVM.createPlayer()
+//                    getPlayerVM.fetchPlayer(playerName: userName, roomCode: roomCode)
+//                    getGameStateVM.fetchGameState(playerRoomCode: roomCode)
+//                }
                 getGameStateVM.fetchGameState(playerRoomCode: roomCode)
             }
         } label: {
