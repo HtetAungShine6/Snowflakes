@@ -31,7 +31,7 @@ struct TimerPlayerView: View {
         ) {
             VStack {
                 Spacer()
-                Text("It is time to sell a snow flake.")
+                Text("It is time to create snow flakes.")
                     .font(Font.custom("Lato", size: 36).weight(.medium))
                     .foregroundColor(.black)
                     .multilineTextAlignment(.center)

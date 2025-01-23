@@ -3,7 +3,7 @@ import SwiftUI
 struct PlayerTimerView: View {
     
     @EnvironmentObject var navigationManager: NavigationManager
-    @StateObject private var webSocketManager = WebSocketManager()
+    @EnvironmentObject var webSocketManager: WebSocketManager
 
     @State private var timerValueFromSocket: String = ""
 
@@ -40,7 +40,7 @@ struct PlayerTimerView: View {
                     
                     VStack(spacing: 15) {
 //                        timerCountdown
-                        timerCountdown
+                        timer
                         timerImage
                     }
                     .frame(maxWidth: .infinity, alignment: .top)
@@ -85,27 +85,37 @@ struct PlayerTimerView: View {
         }
     }
     
-    private var timerCountdown: some View {
-        ZStack {
-            Text("Min")
-                .font(Font.custom("Roboto", size: 28).weight(.thin))
+    private var timer: some View {
+        HStack {
+            Spacer()
+            Text("\(webSocketManager.countdown)")
+                .font(.custom("Montserrat-Medium", size: 40))
                 .foregroundColor(.black)
-                .offset(x: -44.50, y: 22.50)
-            Text("Sec")
-                .font(Font.custom("Roboto", size: 28).weight(.thin))
-                .foregroundColor(.black)
-                .offset(x: 44.50, y: 22.50)
-            Text("\(minutes < 10 ? "0\(minutes)" : "\(minutes)")") // Ensure formatting with leading zero
-                .font(Font.custom("Montserrat", size: 32).weight(.medium))
-                .foregroundColor(.black)
-                .offset(x: -44.50, y: -19.50)
-            Text("\(seconds < 10 ? "0\(seconds)" : "\(seconds)")") // Ensure formatting with leading zero
-                .font(Font.custom("Montserrat", size: 32).weight(.medium))
-                .foregroundColor(.black)
-                .offset(x: 44.50, y: -19.50)
+            Spacer()
         }
-        .frame(width: 135, height: 78)
     }
+    
+//    private var timerCountdown: some View {
+//        ZStack {
+//            Text("Min")
+//                .font(Font.custom("Roboto", size: 28).weight(.thin))
+//                .foregroundColor(.black)
+//                .offset(x: -44.50, y: 22.50)
+//            Text("Sec")
+//                .font(Font.custom("Roboto", size: 28).weight(.thin))
+//                .foregroundColor(.black)
+//                .offset(x: 44.50, y: 22.50)
+//            Text("\(minutes < 10 ? "0\(minutes)" : "\(minutes)")") // Ensure formatting with leading zero
+//                .font(Font.custom("Montserrat", size: 32).weight(.medium))
+//                .foregroundColor(.black)
+//                .offset(x: -44.50, y: -19.50)
+//            Text("\(seconds < 10 ? "0\(seconds)" : "\(seconds)")") // Ensure formatting with leading zero
+//                .font(Font.custom("Montserrat", size: 32).weight(.medium))
+//                .foregroundColor(.black)
+//                .offset(x: 44.50, y: -19.50)
+//        }
+//        .frame(width: 135, height: 78)
+//    }
 
     
 //    private var timer: some View {
@@ -136,7 +146,7 @@ struct PlayerTimerView: View {
     }
     
     private var descriptionText: some View {
-        Text("It is time to sell a snowflake.")
+        Text("It is time to create snowflakes.")
             .font(.custom("Lato", size: 36).weight(.medium))
             .foregroundColor(.black)
             .multilineTextAlignment(.center)

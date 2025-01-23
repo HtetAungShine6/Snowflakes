@@ -7,16 +7,28 @@
 
 import Foundation
 
-class GetPlayerUseCase: APIManager{
+class GetPlayerUseCase: APIManager {
+    
+    let playerName: String?
+    let roomCode: String?
+    let teamNumber: String?
+    
+    init(playerName: String? = nil, roomCode: String? = nil, teamNumber: String? = nil) {
+        self.playerName = playerName
+        self.roomCode = roomCode
+        self.teamNumber = teamNumber
+    }
+    
     typealias ModelType = PlayerResponse
     
-    var id: String
-    
-    init(id: String){
-        self.id = id
-    }
-    
-    var methodPath: String{
-        return "/player/\(id)"
+    var methodPath: String {
+        if let playerName = playerName, let roomCode = roomCode, let teamNumber = teamNumber {
+            return "/team/search?playerName=\(playerName)&roomCode=\(roomCode)&teamNumber=\(teamNumber)"
+        } else if let playerName = playerName, let roomCode = roomCode {
+            return "/team/search?playerName=\(playerName)&roomCode=\(roomCode)"
+        } else {
+            return "/team/search"
+        }
     }
 }
+

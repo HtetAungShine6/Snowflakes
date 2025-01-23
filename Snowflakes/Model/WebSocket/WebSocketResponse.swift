@@ -7,6 +7,6 @@
 
 struct WebSocketResponse: Codable {
     let type: Int
-    let target: String
-    let arguments: [String]
+    let target: String?
+    let arguments: [String]?
 }
