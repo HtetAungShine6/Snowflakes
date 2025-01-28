@@ -7,7 +7,7 @@ struct GameViewPlayer: View {
     var body: some View {
         Group {
             if navigationManager.isShopTime {
-                ShopTimerPlayerView(
+                PlayerShopTimerView(
                     navBarTitle: "Snowflake",
                     navBarSubtitle: "Shop Round",
                     image: Image("Shop 1")
