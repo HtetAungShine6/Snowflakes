@@ -22,7 +22,7 @@ struct TimerViewHost: View {
     
     @State private var currentRound: Int = 0
     @State private var totalRounds: Int = 0
-    
+
     let roomCode: String
     
     var body: some View {
@@ -95,6 +95,19 @@ struct TimerViewHost: View {
                     .foregroundStyle(Color.gray)
             }
             Spacer()
+            VStack(alignment: .trailing, spacing: 2) {
+                Text("Host Room Code: \(navigationManager.roomCode ?? "N/A")")
+                    .font(.custom("Lato-Regular", size: 14))
+                    .foregroundColor(.black)
+                    .lineLimit(1)
+
+                Text("Player Room Code: \(navigationManager.playerRoomCode ?? "N/A")")
+                    .font(.custom("Lato-Regular", size: 14))
+                    .foregroundColor(.black)
+                    .lineLimit(1)
+            }
+
+            
         }
         .padding(.horizontal)
     }

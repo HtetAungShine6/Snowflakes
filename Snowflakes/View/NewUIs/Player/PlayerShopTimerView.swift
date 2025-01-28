@@ -1,6 +1,13 @@
+//
+//  PlayerShopTimerView.swift
+//  Snowflakes
+//
+//  Created by Hein Thant on 26/1/2568 BE.
+//
+
 import SwiftUI
 
-struct PlayerTimerView: View {
+struct PlayerShopTimerView: View {
     
     @EnvironmentObject var navigationManager: NavigationManager
     @EnvironmentObject var webSocketManager: WebSocketManager
@@ -74,11 +81,13 @@ struct PlayerTimerView: View {
                     .foregroundColor(.gray)
             }
             Spacer()
-            VStack(alignment: .trailing, spacing: 2) {
-                Text("Player Room Code: \(navigationManager.playerRoomCode ?? "N/A")")
-                    .font(.custom("Lato-Regular", size: 14))
-                    .foregroundColor(.black)
-                    .lineLimit(1)
+            Button(action: {
+                print("NavBar button tapped")
+            }) {
+                Image(systemName: "shop2")
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: 24, height: 24)
             }
         }
     }
@@ -92,49 +101,7 @@ struct PlayerTimerView: View {
             Spacer()
         }
     }
-    
-//    private var timerCountdown: some View {
-//        ZStack {
-//            Text("Min")
-//                .font(Font.custom("Roboto", size: 28).weight(.thin))
-//                .foregroundColor(.black)
-//                .offset(x: -44.50, y: 22.50)
-//            Text("Sec")
-//                .font(Font.custom("Roboto", size: 28).weight(.thin))
-//                .foregroundColor(.black)
-//                .offset(x: 44.50, y: 22.50)
-//            Text("\(minutes < 10 ? "0\(minutes)" : "\(minutes)")") // Ensure formatting with leading zero
-//                .font(Font.custom("Montserrat", size: 32).weight(.medium))
-//                .foregroundColor(.black)
-//                .offset(x: -44.50, y: -19.50)
-//            Text("\(seconds < 10 ? "0\(seconds)" : "\(seconds)")") // Ensure formatting with leading zero
-//                .font(Font.custom("Montserrat", size: 32).weight(.medium))
-//                .foregroundColor(.black)
-//                .offset(x: 44.50, y: -19.50)
-//        }
-//        .frame(width: 135, height: 78)
-//    }
 
-    
-//    private var timer: some View {
-//        HStack {
-//            Spacer()
-//            Text(timerModel.timerValue.isEmpty ? "Loading..." : timerModel.timerValue)
-//                .font(.custom("Montserrat-Medium", size: 40))
-//                .foregroundColor(.black)
-//            Spacer()
-//        }
-//    }
-    
-//    private var timer: some View {
-//        HStack {
-//            Spacer()
-//            Text("\(timerValueFromSocket)")
-//                .font(.custom("Montserrat-Medium", size: 40))
-//                .foregroundColor(.black)
-//            Spacer()
-//        }
-//    }
     private var timerImage: some View {
         currentImage
             .resizable()
@@ -144,7 +111,7 @@ struct PlayerTimerView: View {
     }
     
     private var descriptionText: some View {
-        Text("It is time to create snowflakes.")
+        Text("It is time to sell snowflakes.")
             .font(.custom("Lato", size: 36).weight(.medium))
             .foregroundColor(.black)
             .multilineTextAlignment(.center)
@@ -155,12 +122,12 @@ struct PlayerTimerView: View {
     private func loadData() {
         DispatchQueue.main.async {
             currentTitle = "Snowflake"
-            currentSubtitle = "Round (1/5)"
-            currentImage = Image("Snowman")
+            currentSubtitle = "Shop round"
+            currentImage = Image("Shop 1")
         }
     }
 }
 
 #Preview {
-    PlayerTimerView(navBarTitle: "Loading...", navBarSubtitle: "Please wait", image: Image(systemName: "hourglass"))
+    PlayerShopTimerView(navBarTitle: "Loading...", navBarSubtitle: "Please wait", image: Image(systemName: "hourglass"))
 }

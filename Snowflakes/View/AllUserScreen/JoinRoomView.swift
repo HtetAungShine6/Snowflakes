@@ -190,8 +190,8 @@ struct JoinRoomView: View {
                     .font(Font.custom("Roboto-Regular", size: 18))
                     .frame(maxWidth: .infinity)
                     .padding()
-                    .background(selectedRole == .host ? Color.blue : Color.gray.opacity(0.3))
-                    .foregroundColor(.white)
+                    .background(selectedRole == .host ? Color(red: 0.69, green: 0.89, blue: 0.96) : Color.gray.opacity(0.3))
+                    .foregroundColor(.black)
                     .cornerRadius(10)
             }
             
@@ -202,8 +202,8 @@ struct JoinRoomView: View {
                     .font(Font.custom("Roboto-Regular", size: 18))
                     .frame(maxWidth: .infinity)
                     .padding()
-                    .background(selectedRole == .player ? Color.blue : Color.gray.opacity(0.3))
-                    .foregroundColor(.white)
+                    .background(selectedRole == .player ? Color(red: 0.69, green: 0.89, blue: 0.96) : Color.gray.opacity(0.3))
+                    .foregroundColor(.black)
                     .cornerRadius(10)
             }
         }
@@ -285,7 +285,7 @@ struct JoinRoomView: View {
                     )
                     .padding(EdgeInsets(top: 6, leading: 9.5, bottom: 6, trailing: 9.5))
                 
-                Text("Join")
+                Text("Join a room")
                     .font(Font.custom("Lato-Regular", size: 24))
                     .foregroundColor(Color(red: 0.15, green: 0.15, blue: 0.15))
                 
