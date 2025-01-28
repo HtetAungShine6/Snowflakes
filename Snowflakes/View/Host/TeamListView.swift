@@ -197,7 +197,8 @@ struct TeamListView: View {
             //            }
             if let hostRoomCode = teams.first?.hostRoomCode {
                 navigationManager.roomCode = hostRoomCode
-                navigationManager.navigateTo(Destination.gameView, roomCode: hostRoomCode)
+                navigationManager.playerRoomCode = playerRoomCode
+                navigationManager.navigateTo(Destination.gameView, roomCode: hostRoomCode, playerRoomCode: playerRoomCode)
             }
             navigationManager.isShopTime = false
         }) {
@@ -209,8 +210,11 @@ struct TeamListView: View {
                 .foregroundStyle(.black)
                 .cornerRadius(10)
         }
+       
     }
 }
+
+
 
 //#Preview {
 //    TeamListView(hostRoomCode: "ABC12", playerRoomCode: "DFH123")

@@ -74,6 +74,7 @@ struct ShopTimerViewHost: View {
         .padding(.horizontal)
     }
     
+    
     private var timer: some View {
         HStack {
             Spacer()
