@@ -24,9 +24,7 @@ struct JoinRoomView: View {
     @State private var teams: [Team] = []
     @State private var showAlertView: Bool = false
     
-    @State private var snowflakeCreationState: Bool = false
     @State private var shopPeriod: Bool = false
-    @State private var hostRoomCode: String = ""
     @State private var isSuccess: Bool = false
     
     enum Role {
@@ -84,92 +82,73 @@ struct JoinRoomView: View {
                 if newValue {
                     showAlertView = true
                 } else {
-                    showAlertView = false
+//                    showAlertView = false
                 }
             }
             .onChange(of: getGameStateVM.isLoading) { _, newValue in
                 if newValue {
                     showAlertView = true
                 } else {
-                    showAlertView = false
+//                    showAlertView = false
                 }
             }
-            .onChange(of: getGameStateVM.isSuccess, { _, newValue in
-                if newValue {
-                    switch selectedRole {
-                    case .host:
-                        getTeamsByRoomCodeVM.fetchTeams(hostRoomCode: roomCode)
-                    case .player:
-                        getTeamsByRoomCodeVM.fetchTeams(playerRoomCode: roomCode)
-                    case nil:
-                        break
-                    }
-                }
-            })
-            .onChange(of: getTeamsByRoomCodeVM.isSuccess, { _, newValue in
-                if newValue {
-                    if let selectedRole = selectedRole {
-                        switch selectedRole {
-                        case .host:
-                            navigationManager.navigateTo(Destination.teamListView(team: self.teams))
-                        case .player:
-                            navigationManager.navigateTo(Destination.teamListPlayerView(team: self.teams))
-                        }
-                    }
-                }
-            })
             .onReceive(getTeamsByRoomCodeVM.$teams) { teams in
                 print("On Receive Teams")
                 if !teams.isEmpty {
                     self.teams = teams
+                    if let selectedRole = selectedRole {
+                        switch selectedRole {
+                        case .host:
+                            navigationManager.navigateTo(Destination.teamListView(team: teams))
+                        case .player:
+                            navigationManager.navigateTo(Destination.teamListPlayerView(team: teams))
+                        }
+                    }
                 } else {
                     print("Empty Teams")
                 }
             }
             .onReceive(getGameStateVM.$gameState) { gameState in
                 if let currentState = gameState?.currentGameState {
-                    switch currentState {
-                    case "TeamCreation":
-                        if let selectedRole = selectedRole {
-                            switch selectedRole {
-                            case .host:
-                                websocketManager.connect()
-                            case .player:
-                                websocketManager.connect()
+                    if let hostRoomCode = gameState?.hostRoomCode {
+                        websocketManager.joinGroup(roomCode: hostRoomCode)
+                        switch currentState {
+                        case "TeamCreation":
+                            if let selectedRole = selectedRole {
+                                switch selectedRole {
+                                case .host:
+                                    getTeamsByRoomCodeVM.fetchTeams(hostRoomCode: roomCode)
+                                case .player:
+                                    getTeamsByRoomCodeVM.fetchTeams(playerRoomCode: roomCode)
+                                }
                             }
-                        }
-                    case "SnowFlakeCreation":
-                        if let selectedRole = selectedRole {
-                            switch selectedRole {
-                            case .host, .player:
-                                snowflakeCreationState = true
-                                websocketManager.connect()
+                        case "SnowFlakeCreation":
+                            if let selectedRole = selectedRole {
+                                switch selectedRole {
+                                case .host:
+                                    navigationManager.navigateTo(Destination.hostTimerView(roomCode: hostRoomCode))
+                                case .player:
+                                    navigationManager.navigateTo(Destination.hostTimerView(roomCode: hostRoomCode))
+                                }
                             }
+                        case "ShopPeriod":
+                            if let selectedRole = selectedRole {
+                                switch selectedRole {
+                                case .host:
+                                    navigationManager.navigateTo(Destination.hostShopTimerView(roomCode: hostRoomCode))
+                                case .player:
+                                    navigationManager.navigateTo(Destination.hostTimerView(roomCode: hostRoomCode))
+                                }
+                            }
+                        default:
+                            print("Unhandled game state: \(currentState)")
                         }
-                    case "ShopPeriod":
-                        print("Handling ShopPeriod")
-                    default:
-                        print("Unhandled game state: \(currentState)")
                     }
                 }
             }
             .onReceive(getTeamsByRoomCodeVM.$errorMessage) { errorMessage in
                 if let errorMessage = errorMessage {
-                    print("Error: \(errorMessage)") 
-                }
-            }
-            .onChange(of: websocketManager.isConnected) { _, isConnected in
-                if isConnected {
-                    switch selectedRole {
-                    case .host:
-                        websocketManager.joinGroup(roomCode: roomCode)
-                    case .player:
-                        if !teams.isEmpty {
-                            websocketManager.joinGroup(roomCode: teams.first?.hostRoomCode ?? "")
-                        }
-                    case nil:
-                        break
-                    }
+                    print("Error: \(errorMessage)")
                 }
             }
         }
@@ -203,8 +182,8 @@ struct JoinRoomView: View {
                     .font(Font.custom("Roboto-Regular", size: 18))
                     .frame(maxWidth: .infinity)
                     .padding()
-                    .background(selectedRole == .host ? Color(red: 0.69, green: 0.89, blue: 0.96) : Color.gray.opacity(0.3))
-                    .foregroundColor(.black)
+                    .background(selectedRole == .host ? Color.blue : Color.gray.opacity(0.3))
+                    .foregroundColor(.white)
                     .cornerRadius(10)
             }
             
@@ -215,8 +194,8 @@ struct JoinRoomView: View {
                     .font(Font.custom("Roboto-Regular", size: 18))
                     .frame(maxWidth: .infinity)
                     .padding()
-                    .background(selectedRole == .player ? Color(red: 0.69, green: 0.89, blue: 0.96) : Color.gray.opacity(0.3))
-                    .foregroundColor(.black)
+                    .background(selectedRole == .player ? Color.blue : Color.gray.opacity(0.3))
+                    .foregroundColor(.white)
                     .cornerRadius(10)
             }
         }
@@ -258,31 +237,6 @@ struct JoinRoomView: View {
             case .host:
                 getGameStateVM.fetchGameState(hostRoomCode: roomCode)
             case .player:
-//                if let playerData = UserDefaults.standard.dictionary(forKey: "playerInfo") as? [String: String], let storedPlayerName = playerData["playerName"], let storedRoomCode = playerData["roomCode"], let storedId = playerData["id"], let storedTeamNumber = playerData["teamNumber"] {
-//                    // old user case
-//                    // if old user, check username, id, and roomcode from text and UD same or not
-//                    // if same, getGameStateVM.fetchGameState(playerRoomCode: roomCode), else error
-//                    
-//                    if storedPlayerName == userName && storedRoomCode == roomCode {
-//                        // old player
-//                        print("\(storedPlayerName) and \(storedRoomCode)")
-//                    } else {
-//                        // new player
-//                        print("There is a new user!!!")
-//                        createPlayerVM.name = userName
-//                        createPlayerVM.roomCode = roomCode
-//                        createPlayerVM.createPlayer()
-//                        getPlayerVM.fetchPlayer(playerName: userName, roomCode: roomCode)
-//                        getGameStateVM.fetchGameState(playerRoomCode: roomCode)
-//                    }
-//                } else {
-//                    print("There is a new user!!!")
-//                    createPlayerVM.name = userName
-//                    createPlayerVM.roomCode = roomCode
-//                    createPlayerVM.createPlayer()
-//                    getPlayerVM.fetchPlayer(playerName: userName, roomCode: roomCode)
-//                    getGameStateVM.fetchGameState(playerRoomCode: roomCode)
-//                }
                 getGameStateVM.fetchGameState(playerRoomCode: roomCode)
             }
         } label: {
@@ -298,7 +252,7 @@ struct JoinRoomView: View {
                     )
                     .padding(EdgeInsets(top: 6, leading: 9.5, bottom: 6, trailing: 9.5))
                 
-                Text("Join a room")
+                Text("Join")
                     .font(Font.custom("Lato-Regular", size: 24))
                     .foregroundColor(Color(red: 0.15, green: 0.15, blue: 0.15))
                 
@@ -323,3 +277,31 @@ struct JoinRoomView: View {
 //                UserDefaults.standard.setValue(playerData, forKey: "playerInfo")
 //                print("Stored player info: \(playerData)")
 //            })
+
+
+
+//                if let playerData = UserDefaults.standard.dictionary(forKey: "playerInfo") as? [String: String], let storedPlayerName = playerData["playerName"], let storedRoomCode = playerData["roomCode"], let storedId = playerData["id"], let storedTeamNumber = playerData["teamNumber"] {
+//                    // old user case
+//                    // if old user, check username, id, and roomcode from text and UD same or not
+//                    // if same, getGameStateVM.fetchGameState(playerRoomCode: roomCode), else error
+//
+//                    if storedPlayerName == userName && storedRoomCode == roomCode {
+//                        // old player
+//                        print("\(storedPlayerName) and \(storedRoomCode)")
+//                    } else {
+//                        // new player
+//                        print("There is a new user!!!")
+//                        createPlayerVM.name = userName
+//                        createPlayerVM.roomCode = roomCode
+//                        createPlayerVM.createPlayer()
+//                        getPlayerVM.fetchPlayer(playerName: userName, roomCode: roomCode)
+//                        getGameStateVM.fetchGameState(playerRoomCode: roomCode)
+//                    }
+//                } else {
+//                    print("There is a new user!!!")
+//                    createPlayerVM.name = userName
+//                    createPlayerVM.roomCode = roomCode
+//                    createPlayerVM.createPlayer()
+//                    getPlayerVM.fetchPlayer(playerName: userName, roomCode: roomCode)
+//                    getGameStateVM.fetchGameState(playerRoomCode: roomCode)
+//                }

@@ -21,4 +21,5 @@ enum Destination: Hashable {
 //    case timerPlayerView
 //    case shopTimerPlayerView
     case gameViewPlayer
+    case leaderboard
 }

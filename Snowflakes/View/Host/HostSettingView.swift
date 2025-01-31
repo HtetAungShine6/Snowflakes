@@ -90,11 +90,6 @@ struct HostSettingView: View {
             }
         })
         .onChange(of: createPlaygroundVM.isSuccess, { _, newValue in
-//            if newValue {
-//                getTeamsByRoomCodeVM.fetchTeams(hostRoomCode: hostRoomCode)
-//            } else {
-//                print("Need to handle isSuccess false error.")
-//            }
             if newValue {
                 createGameStateVM.hostRoomCode = hostRoomCode
                 createGameStateVM.playerRoomCode = playerRoomCode

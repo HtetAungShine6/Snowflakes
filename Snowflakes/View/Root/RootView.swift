@@ -60,6 +60,9 @@ struct RootView: View {
 //                    case .hostTeamDetailView(let team):
 //                        HostTeamDetailView(team: team)
 //                        .environmentObject(navigationManager)
+                    case .leaderboard:
+                        LeaderboardView()
+                            .environmentObject(navigationManager)
                     }
                 }
         }

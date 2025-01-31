@@ -13,9 +13,11 @@ struct ShopTimerViewHost: View {
     @EnvironmentObject var webSocketManager: WebSocketManager
     
     @StateObject private var getPlaygroundVM = GetPlaygroundViewModel()
+    @StateObject private var updateGameStateViewModel = UpdateGameStateViewModel()
     
     @State private var timerValueFromSocket: String = ""
     @State private var isPlaying: Bool = false
+    @State private var hasNavigated: Bool = false
     
     let roomCode: String
     
@@ -48,17 +50,17 @@ struct ShopTimerViewHost: View {
         .navigationBarBackButtonHidden()
         .onAppear {
             getPlaygroundVM.fetchPlayground(hostRoomCode: roomCode)
+            hasNavigated = false
         }
-        .onChange(of: webSocketManager.timerStarted) { _, newValue in
-            if newValue {
-                webSocketManager.pauseCountdown(roomCode: roomCode)
+        .onReceive(webSocketManager.$currentGameState) { currentGameState in
+            if currentGameState == "SnowFlakeCreation" && !hasNavigated {
                 if navigationManager.currentRound == navigationManager.totalRound {
-                    // leaderboard view
+                    navigationManager.navigateTo(Destination.leaderboard)
                 } else {
                     navigationManager.currentRound += 1
                     navigationManager.navigateTo(Destination.hostTimerView(roomCode: roomCode))
+                    hasNavigated = true
                 }
-                webSocketManager.timerStarted = false
             }
         }
     }
@@ -84,7 +86,6 @@ struct ShopTimerViewHost: View {
         }
         .padding(.horizontal)
     }
-    
     
     private var timer: some View {
         HStack {
@@ -165,8 +166,40 @@ struct ShopTimerViewHost: View {
     
     private var nextRoundButton: some View {
         SwipeToConfirmButton {
-            webSocketManager.createTimer(roomCode: roomCode, socketMessage: "01:00", gameState: "SnowFlakeCreation")
-            webSocketManager.startCountdown(roomCode: roomCode)
+            if let rounds = getPlaygroundVM.playgroundInfo?.rounds.sorted(by: { $0.duration < $1.duration }),
+               navigationManager.currentRound < rounds.count + 1 {
+                
+                let adjustedRoundIndex = min(navigationManager.currentRound, rounds.count - 1)
+                
+                if adjustedRoundIndex > 0 {
+                    let currentRoundInfo = rounds[adjustedRoundIndex]
+                    let duration = currentRoundInfo.duration
+                    
+                    webSocketManager.stopCountdown(roomCode: roomCode)
+                    
+                    if navigationManager.currentRound != navigationManager.totalRound {
+                        webSocketManager.createTimer(roomCode: roomCode, socketMessage: duration, gameState: "SnowFlakeCreation")
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                            webSocketManager.startCountdown(roomCode: roomCode)
+                            webSocketManager.pauseCountdown(roomCode: roomCode)
+                        }
+                    } else {
+                        webSocketManager.createTimer(roomCode: roomCode, socketMessage: "01:00", gameState: "SnowFlakeCreation")
+                    }
+                    
+                    DispatchQueue.main.async {
+                        updateGameStateViewModel.hostRoomCode = roomCode
+                        updateGameStateViewModel.currentGameState = GameState.SnowFlakeCreation
+                        updateGameStateViewModel.updateGameState()
+                    }
+                } else {
+                    DispatchQueue.main.async {
+                        updateGameStateViewModel.hostRoomCode = roomCode
+                        updateGameStateViewModel.currentGameState = GameState.Leaderboard
+                        updateGameStateViewModel.updateGameState()
+                    }
+                }
+            }
         }
     }
 }
