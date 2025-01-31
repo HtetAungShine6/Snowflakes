@@ -11,8 +11,9 @@ enum Destination: Hashable {
     case hostSettingView
     case joinRoomView
     case teamListView(team: [Team])
-//    case hostTimerView(title: String, subtitle: String, imageName: String)
-    case gameView
+    case hostTimerView(roomCode: String)
+    case hostShopTimerView(roomCode: String)
+//    case gameView
     case hostShopView
     case teamListPlayerView(team: [Team])
     case teamDetailsPlayerView(teamNumber: Int, balance: Int, scissorsCount: Int, paperCount: Int, penCount: Int)

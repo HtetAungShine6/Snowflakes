@@ -24,6 +24,11 @@ struct JoinRoomView: View {
     @State private var teams: [Team] = []
     @State private var showAlertView: Bool = false
     
+    @State private var snowflakeCreationState: Bool = false
+    @State private var shopPeriod: Bool = false
+    @State private var hostRoomCode: String = ""
+    @State private var isSuccess: Bool = false
+    
     enum Role {
         case host
         case player
@@ -101,6 +106,18 @@ struct JoinRoomView: View {
                     }
                 }
             })
+            .onChange(of: getTeamsByRoomCodeVM.isSuccess, { _, newValue in
+                if newValue {
+                    if let selectedRole = selectedRole {
+                        switch selectedRole {
+                        case .host:
+                            navigationManager.navigateTo(Destination.teamListView(team: self.teams))
+                        case .player:
+                            navigationManager.navigateTo(Destination.teamListPlayerView(team: self.teams))
+                        }
+                    }
+                }
+            })
             .onReceive(getTeamsByRoomCodeVM.$teams) { teams in
                 print("On Receive Teams")
                 if !teams.isEmpty {
@@ -111,54 +128,50 @@ struct JoinRoomView: View {
             }
             .onReceive(getGameStateVM.$gameState) { gameState in
                 if let currentState = gameState?.currentGameState {
-                    if currentState == "SnowFlakeCreation" && selectedRole != nil {
-//                        if !websocketManager.isConnected {
-//                            websocketManager.connect()
-//                        }
-//                        websocketManager.joinGroup(roomCode: roomCode)
-                        switch selectedRole {
-                        case .host:
-                            navigationManager.navigateTo(Destination.gameView)
-                        case .player:
-                            navigationManager.navigateTo(Destination.gameViewPlayer)
-                        case nil:
-                            break
+                    switch currentState {
+                    case "TeamCreation":
+                        if let selectedRole = selectedRole {
+                            switch selectedRole {
+                            case .host:
+                                websocketManager.connect()
+                            case .player:
+                                websocketManager.connect()
+                            }
                         }
+                    case "SnowFlakeCreation":
+                        if let selectedRole = selectedRole {
+                            switch selectedRole {
+                            case .host, .player:
+                                snowflakeCreationState = true
+                                websocketManager.connect()
+                            }
+                        }
+                    case "ShopPeriod":
+                        print("Handling ShopPeriod")
+                    default:
+                        print("Unhandled game state: \(currentState)")
                     }
                 }
             }
-//            .onReceive(getPlayerVM.$playerInfo, perform: { playerInfo in
-//                guard let playerInfo = playerInfo else { return }
-//                let playerData: [String: Any] = [
-//                    "playerName": playerInfo.playerName,
-//                    "roomCode": playerInfo.roomCode,
-//                    "teamNumber": playerInfo.teamNumber,
-//                    "id": playerInfo.id
-//                ]
-//                UserDefaults.standard.setValue(playerData, forKey: "playerInfo")
-//                print("Stored player info: \(playerData)")
-//            })
             .onReceive(getTeamsByRoomCodeVM.$errorMessage) { errorMessage in
                 if let errorMessage = errorMessage {
                     print("Error: \(errorMessage)") 
                 }
             }
-            .onChange(of: getTeamsByRoomCodeVM.isSuccess, { _, newValue in
-                if newValue {
+            .onChange(of: websocketManager.isConnected) { _, isConnected in
+                if isConnected {
                     switch selectedRole {
                     case .host:
-                        if !teams.isEmpty {
-                            navigationManager.navigateTo(Destination.teamListView(team: self.teams))
-                        }
+                        websocketManager.joinGroup(roomCode: roomCode)
                     case .player:
                         if !teams.isEmpty {
-                            navigationManager.navigateTo(Destination.teamListPlayerView(team: self.teams))
+                            websocketManager.joinGroup(roomCode: teams.first?.hostRoomCode ?? "")
                         }
                     case nil:
                         break
                     }
                 }
-            })
+            }
         }
     }
     
@@ -298,3 +311,15 @@ struct JoinRoomView: View {
         }
     }
 }
+
+//            .onReceive(getPlayerVM.$playerInfo, perform: { playerInfo in
+//                guard let playerInfo = playerInfo else { return }
+//                let playerData: [String: Any] = [
+//                    "playerName": playerInfo.playerName,
+//                    "roomCode": playerInfo.roomCode,
+//                    "teamNumber": playerInfo.teamNumber,
+//                    "id": playerInfo.id
+//                ]
+//                UserDefaults.standard.setValue(playerData, forKey: "playerInfo")
+//                print("Stored player info: \(playerData)")
+//            })

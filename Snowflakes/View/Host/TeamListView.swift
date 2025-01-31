@@ -13,8 +13,10 @@ struct TeamListView: View {
     @EnvironmentObject private var webSocketManager: WebSocketManager
     
     @StateObject private var updateGameStateViewModel = UpdateGameStateViewModel()
+    @StateObject private var getPlaygroundVM = GetPlaygroundViewModel()
     
     @State private var showAlertView: Bool = false
+    @State private var hasNavigated = false
     
     let teams: [Team]
     
@@ -70,30 +72,24 @@ struct TeamListView: View {
                 }
                 .navigationBarBackButtonHidden()
                 .navigationBarTitleDisplayMode(.inline)
-                .onAppear {
-                    webSocketManager.connect()
+                .onAppear(perform: {
+                    getPlaygroundVM.fetchPlayground(hostRoomCode: hostRoomCode)
+                })
+                .onReceive(webSocketManager.$currentGameState) {  currentGameState in
+                    if currentGameState == "SnowFlakeCreation" {
+                        if !hasNavigated {
+                            navigationManager.navigateTo(Destination.hostTimerView(roomCode: hostRoomCode))
+                            hasNavigated = true
+                        }
+                    }
                 }
-                .onChange(of: webSocketManager.isConnected) { _, isConnected in
-                    if isConnected {
-                        // join
-                        webSocketManager.joinGroup(roomCode: hostRoomCode)
+                .onChange(of: webSocketManager.timerStarted) { _, newValue in
+                    if newValue {
+                        navigationManager.currentRound = 1
                     }
                 }
             }
         }
-//        .onChange(of: updateGameStateViewModel.isLoading) { _, newValue in
-//            if newValue {
-//                showAlertView = true
-//            } else {
-//                showAlertView = false
-//            }
-//        }
-//        .onChange(of: updateGameStateViewModel.isSuccess) { _, newValue in
-//            if newValue {
-//                navigationManager.navigateTo(Destination.gameView)
-//                navigationManager.isShopTime = false
-//            }
-//        }
     }
     
     private var navBar: some View {
@@ -147,16 +143,16 @@ struct TeamListView: View {
             }
             
             HStack(spacing: 10) {
-                ForEach(team.teamStocks, id: \.self) { itemName in
-                    VStack {
-                        Image("\(itemName.productName)")
-                            .resizable()
-                            .frame(width: 40, height: 40)
-                        Text("\(itemName.remainingStock)")
-                            .font(.custom("Lato-Regular", size: 16))
-                            .foregroundStyle(Color.gray)
-                    }
-                }
+//                ForEach(team.teamStocks, id: \.self) { itemName in
+//                    VStack {
+//                        Image("\(itemName.productName)")
+//                            .resizable()
+//                            .frame(width: 40, height: 40)
+//                        Text("\(itemName.remainingStock)")
+//                            .font(.custom("Lato-Regular", size: 16))
+//                            .foregroundStyle(Color.gray)
+//                    }
+//                }
                 Spacer()
                 HStack {
                     Image("tokenCoin")
@@ -190,17 +186,27 @@ struct TeamListView: View {
     
     private var startPlaygroundButton: some View {
         Button(action: {
-            //            if let hostRoomCode = teams.first?.hostRoomCode {
-            //                updateGameStateViewModel.hostRoomCode = hostRoomCode
-            //                updateGameStateViewModel.currentGameState = .SnowFlakeCreation
-            //                updateGameStateViewModel.updateGameState()
-            //            }
-            if let hostRoomCode = teams.first?.hostRoomCode {
-                navigationManager.roomCode = hostRoomCode
-                navigationManager.playerRoomCode = playerRoomCode
-                navigationManager.navigateTo(Destination.gameView, roomCode: hostRoomCode, playerRoomCode: playerRoomCode)
+            guard let rounds = getPlaygroundVM.playgroundInfo?.rounds else {
+                print("No rounds available.")
+                return
             }
-            navigationManager.isShopTime = false
+            
+            if let roundOne = rounds.first(where: { $0.roundNumber == 1 }) {
+                let currentRoundDuration = roundOne.duration
+                print("Duration for Round 1: \(currentRoundDuration)")
+                webSocketManager.createTimer(roomCode: hostRoomCode, socketMessage: currentRoundDuration, gameState: "SnowFlakeCreation")
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                    webSocketManager.startCountdown(roomCode: hostRoomCode)
+                    webSocketManager.pauseCountdown(roomCode: hostRoomCode)
+                }
+                DispatchQueue.main.async {
+                    updateGameStateViewModel.hostRoomCode = hostRoomCode
+                    updateGameStateViewModel.currentGameState = GameState.SnowFlakeCreation
+                    updateGameStateViewModel.updateGameState()
+                }
+            } else {
+                print("Round 1 not found.")
+            }
         }) {
             Text("Start a playground")
                 .font(.custom("Lato-Bold", size: 20))
@@ -210,11 +216,8 @@ struct TeamListView: View {
                 .foregroundStyle(.black)
                 .cornerRadius(10)
         }
-       
     }
 }
-
-
 
 //#Preview {
 //    TeamListView(hostRoomCode: "ABC12", playerRoomCode: "DFH123")

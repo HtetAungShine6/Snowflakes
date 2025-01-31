@@ -10,6 +10,7 @@ import SwiftUI
 struct HostSettingView: View {
     
     @EnvironmentObject var navigationManager: NavigationManager
+    @EnvironmentObject private var webSocketManager: WebSocketManager
     
     @StateObject private var createPlaygroundVM = CreatePlaygroundViewModel()
     @ObservedObject private var getTeamsByRoomCodeVM = GetTeamsByRoomCode()
@@ -112,6 +113,7 @@ struct HostSettingView: View {
         })
         .onReceive(getTeamsByRoomCodeVM.$teams) { teams in
             if !teams.isEmpty {
+                webSocketManager.connect()
                 navigationManager.navigateTo(Destination.teamListView(team: teams))
             }
         }

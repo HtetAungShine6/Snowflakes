@@ -6,14 +6,18 @@
 //
 
 import SwiftUI
-
+ 
 struct ShopTimerViewHost: View {
     
     @EnvironmentObject var navigationManager: NavigationManager
     @EnvironmentObject var webSocketManager: WebSocketManager
     
+    @StateObject private var getPlaygroundVM = GetPlaygroundViewModel()
+    
     @State private var timerValueFromSocket: String = ""
     @State private var isPlaying: Bool = false
+    
+    let roomCode: String
     
     var body: some View {
         VStack(alignment: .leading) {
@@ -24,12 +28,15 @@ struct ShopTimerViewHost: View {
                 controlButton
             }
             .frame(maxWidth: .infinity, alignment: .top)
+            Spacer()
             adjustTimeField
+            Spacer()
             shopLabel
             VStack {
                 nextRoundButton
             }
             .frame(maxWidth: .infinity, alignment: .top)
+            Spacer()
         }
         .background(
             Image("timerBackground")
@@ -37,17 +44,15 @@ struct ShopTimerViewHost: View {
                 .scaledToFill()
                 .ignoresSafeArea(.all)
         )
+        .navigationBarBackButtonHidden()
         .onAppear {
-            webSocketManager.createTimer(roomCode: webSocketManager.roomCode, socketMessage: "2:00")
-        }
-        .onChange(of: webSocketManager.timerCreated) { _, newValue in
-            if newValue {
-                webSocketManager.startCountdown(roomCode: webSocketManager.roomCode)
-            }
+            getPlaygroundVM.fetchPlayground(hostRoomCode: roomCode)
         }
         .onChange(of: webSocketManager.timerStarted) { _, newValue in
             if newValue {
-                webSocketManager.pauseCountdown(roomCode: webSocketManager.roomCode)
+                webSocketManager.pauseCountdown(roomCode: roomCode)
+                navigationManager.navigateTo(Destination.hostTimerView(roomCode: roomCode))
+                webSocketManager.timerStarted = false
             }
         }
     }
@@ -78,7 +83,7 @@ struct ShopTimerViewHost: View {
     private var timer: some View {
         HStack {
             Spacer()
-            Text("\(timerValueFromSocket)")
+            Text("\(webSocketManager.countdown)")
                 .font(.custom("Montserrat-Medium", size: 40))
                 .foregroundColor(.black)
             Spacer()
@@ -96,9 +101,9 @@ struct ShopTimerViewHost: View {
         Button{
             isPlaying.toggle()
             if isPlaying {
-                webSocketManager.resumeCountdown(roomCode: webSocketManager.roomCode)
+                webSocketManager.resumeCountdown(roomCode: roomCode)
             } else {
-                webSocketManager.pauseCountdown(roomCode: webSocketManager.roomCode)
+                webSocketManager.pauseCountdown(roomCode: roomCode)
             }
         } label: {
             Image(systemName: isPlaying ? "pause.fill" : "play.fill")
@@ -125,10 +130,10 @@ struct ShopTimerViewHost: View {
             .padding(.horizontal)
             AdjustTimeComponent(
                 onDecrease: { time in
-                    webSocketManager.minusCountdown(roomCode: webSocketManager.roomCode, socketMessage: "01:00")
+                    webSocketManager.minusCountdown(roomCode: roomCode, socketMessage: "01:00")
                 },
                 onIncrease: { time in
-                    webSocketManager.addCountdown(roomCode: webSocketManager.roomCode, socketMessage: "01:00")
+                    webSocketManager.addCountdown(roomCode: roomCode, socketMessage: "01:00")
                 }
             )
         }
@@ -154,8 +159,11 @@ struct ShopTimerViewHost: View {
     
     private var nextRoundButton: some View {
         SwipeToConfirmButton {
-            webSocketManager.stopCountdown(roomCode: webSocketManager.roomCode)
-            navigationManager.isShopTime.toggle()
+            if navigationManager.currentRound < navigationManager.totalRound {
+                navigationManager.currentRound += 1
+            }
+            webSocketManager.createTimer(roomCode: roomCode, socketMessage: "01:00")
+            webSocketManager.startCountdown(roomCode: roomCode)
         }
     }
 }
