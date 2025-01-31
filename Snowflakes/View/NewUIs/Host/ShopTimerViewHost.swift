@@ -165,7 +165,7 @@ struct ShopTimerViewHost: View {
     
     private var nextRoundButton: some View {
         SwipeToConfirmButton {
-            webSocketManager.createTimer(roomCode: roomCode, socketMessage: "01:00")
+            webSocketManager.createTimer(roomCode: roomCode, socketMessage: "01:00", gameState: "SnowFlakeCreation")
             webSocketManager.startCountdown(roomCode: roomCode)
         }
     }
