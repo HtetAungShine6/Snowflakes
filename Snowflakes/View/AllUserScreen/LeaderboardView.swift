@@ -27,6 +27,7 @@ struct LeaderboardView: View {
                 .padding()
             }
         }
+        .navigationBarBackButtonHidden()
     }
     
     private var navBar: some View {

@@ -4,6 +4,7 @@ struct HostScreenView: View {
     
     @State private var rotationAngle: Double = 0
     @EnvironmentObject var navigationManager: NavigationManager
+    @EnvironmentObject var webSocketManager: WebSocketManager
     
     var body: some View {
         GeometryReader { geometry in
@@ -20,7 +21,7 @@ struct HostScreenView: View {
                 
                 VStack(spacing: 20) {
                     createRoomButton
-                    joinRoomButton
+                    joinRoomButton 
                 }
                 .padding(.top, 10)
                 
@@ -29,6 +30,9 @@ struct HostScreenView: View {
             .padding(.horizontal, 30)
             .background(Color(UIColor.systemBackground))
             .frame(maxWidth: .infinity, maxHeight: .infinity)
+        }
+        .onAppear {
+            webSocketManager.connect()
         }
     }
     

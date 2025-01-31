@@ -121,16 +121,16 @@ struct TeamListPlayerView: View {
             }
             
             HStack(spacing: 10) {
-                ForEach(team.teamStocks, id: \.self) { stock in
-                    VStack {
-                        Image(stock.productName)
-                            .resizable()
-                            .frame(width: 40, height: 40)
-                        Text("\(stock.remainingStock)x")
-                            .font(.custom("Lato-Regular", size: 16))
-                            .foregroundStyle(Color.gray)
-                    }
-                }
+//                ForEach(team.teamStocks, id: \.self) { stock in
+//                    VStack {
+//                        Image(stock.productName)
+//                            .resizable()
+//                            .frame(width: 40, height: 40)
+//                        Text("\(stock.remainingStock)x")
+//                            .font(.custom("Lato-Regular", size: 16))
+//                            .foregroundStyle(Color.gray)
+//                    }
+//                }
                 Spacer()
                 HStack {
                     Image("tokenCoin")
