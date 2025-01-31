@@ -32,6 +32,7 @@ struct ShopTimerViewHost: View {
             adjustTimeField
             Spacer()
             shopLabel
+            Spacer()
             VStack {
                 nextRoundButton
             }
@@ -51,7 +52,12 @@ struct ShopTimerViewHost: View {
         .onChange(of: webSocketManager.timerStarted) { _, newValue in
             if newValue {
                 webSocketManager.pauseCountdown(roomCode: roomCode)
-                navigationManager.navigateTo(Destination.hostTimerView(roomCode: roomCode))
+                if navigationManager.currentRound == navigationManager.totalRound {
+                    // leaderboard view
+                } else {
+                    navigationManager.currentRound += 1
+                    navigationManager.navigateTo(Destination.hostTimerView(roomCode: roomCode))
+                }
                 webSocketManager.timerStarted = false
             }
         }
@@ -159,9 +165,6 @@ struct ShopTimerViewHost: View {
     
     private var nextRoundButton: some View {
         SwipeToConfirmButton {
-            if navigationManager.currentRound < navigationManager.totalRound {
-                navigationManager.currentRound += 1
-            }
             webSocketManager.createTimer(roomCode: roomCode, socketMessage: "01:00")
             webSocketManager.startCountdown(roomCode: roomCode)
         }
