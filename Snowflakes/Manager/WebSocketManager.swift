@@ -16,12 +16,16 @@ class WebSocketManager: ObservableObject, WebSocketDelegate {
     @Published var message: String = ""
     @Published var isConnected: Bool = false
     @Published var countdown: String = ""
+    @Published var userJoined: Bool = false
     @Published var timerCreated: Bool = false
     @Published var timerStarted: Bool = false
+    @Published var timerPaused: Bool = false
+    @Published var timerStopped: Bool = false
     @Published var targetValue: String = ""
     @Published var socketMessage: String = ""
     @Published var addedTimer: String = ""
     @Published var roomCode: String = ""
+    @Published var currentGameState: String = ""
     
     var countdownTimer: Timer?
     
@@ -50,7 +54,7 @@ class WebSocketManager: ObservableObject, WebSocketDelegate {
         do {
             let jsonData = try JSONSerialization.data(withJSONObject: message, options: [])
             if var jsonString = String(data: jsonData, encoding: .utf8) {
-                jsonString.append("\u{1e}") // Append Record Separator (RS) at the end (important for SignalR)
+                jsonString.append("\u{1e}")
                 socket.write(string: jsonString)
                 print("Sent message: \(jsonString)")
             }
@@ -116,9 +120,9 @@ class WebSocketManager: ObservableObject, WebSocketDelegate {
         sendMessage(messageToSocket)
     }
     
-    func createTimer(roomCode: String, socketMessage: String) {
+    func createTimer(roomCode: String, socketMessage: String, gameState: String) {
         let messageToSocket: [String: Any] = [
-            "arguments": [roomCode, socketMessage],
+            "arguments": [roomCode, socketMessage, gameState],
             "target": "CreateTimer",
             "type": 1
         ]
@@ -141,6 +145,7 @@ class WebSocketManager: ObservableObject, WebSocketDelegate {
             "type": 1
         ]
         sendMessage(messageToSocket)
+        print("💕 Pause Timer called!!!!")
     }
     
     func resumeCountdown(roomCode: String) {
@@ -193,11 +198,20 @@ class WebSocketManager: ObservableObject, WebSocketDelegate {
                     case "ReceivedMessage":
                         print("ReceivedMessage passed✅")
                     case "JoinUserGroup":
+                        self.userJoined = true
                         print("JoinUserGroup passed✅")
                     case "CreateTimer":
+                        if let arguments = response.arguments, arguments.count > 0 {
+                            let extractedGameState = arguments[0]
+                            DispatchQueue.main.async {
+                                self.currentGameState = extractedGameState
+                                print("❤️GameState updated to: \(self.currentGameState)")
+                            }
+                        }
                         print("CreateTimer passed✅")
                     case "TimerStarted":
                         self.timerStarted = true
+                        print("TimerStarted passed✅")
                     case "TimerUpdate":
                         print("TimerUpdate passed✅")
                         if let countdownValue = response.arguments?.first {
@@ -214,6 +228,7 @@ class WebSocketManager: ObservableObject, WebSocketDelegate {
                         print("TimerResume passed✅")
                     case "TimerStopped":
                         print("TimerStopped passed✅")
+                        self.timerStarted = false
                     default:
                         print("Unhandled target❌: \(target)")
                     }
@@ -233,5 +248,4 @@ class WebSocketManager: ObservableObject, WebSocketDelegate {
         print("Sent handshake: \(handshakeMessage)")
     }
 }
-
 

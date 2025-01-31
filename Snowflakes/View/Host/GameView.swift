@@ -14,7 +14,10 @@ struct GameView: View {
     var body: some View {
         Group {
             if navigationManager.isShopTime {
-                HostShopTimer(navBarTitle: "Snowflake", navBarSubtitle: "Round", image: Image("Shop 1"))
+//                HostShopTimer(navBarTitle: "Snowflake", navBarSubtitle: "Round", image: Image("Shop 1"))
+                if let roomCode = navigationManager.roomCode {
+                    ShopTimerViewHost(roomCode: roomCode)
+                }
             } else if let roomCode = navigationManager.roomCode {
                 TimerViewHost(roomCode: roomCode)
             }

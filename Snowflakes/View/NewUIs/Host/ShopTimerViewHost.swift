@@ -6,14 +6,20 @@
 //
 
 import SwiftUI
-
+ 
 struct ShopTimerViewHost: View {
     
     @EnvironmentObject var navigationManager: NavigationManager
     @EnvironmentObject var webSocketManager: WebSocketManager
     
+    @StateObject private var getPlaygroundVM = GetPlaygroundViewModel()
+    @StateObject private var updateGameStateViewModel = UpdateGameStateViewModel()
+    
     @State private var timerValueFromSocket: String = ""
     @State private var isPlaying: Bool = false
+    @State private var hasNavigated: Bool = false
+    
+    let roomCode: String
     
     var body: some View {
         VStack(alignment: .leading) {
@@ -24,12 +30,16 @@ struct ShopTimerViewHost: View {
                 controlButton
             }
             .frame(maxWidth: .infinity, alignment: .top)
+            Spacer()
             adjustTimeField
+            Spacer()
             shopLabel
+            Spacer()
             VStack {
                 nextRoundButton
             }
             .frame(maxWidth: .infinity, alignment: .top)
+            Spacer()
         }
         .background(
             Image("timerBackground")
@@ -37,17 +47,20 @@ struct ShopTimerViewHost: View {
                 .scaledToFill()
                 .ignoresSafeArea(.all)
         )
+        .navigationBarBackButtonHidden()
         .onAppear {
-            webSocketManager.createTimer(roomCode: webSocketManager.roomCode, socketMessage: "2:00")
+            getPlaygroundVM.fetchPlayground(hostRoomCode: roomCode)
+            hasNavigated = false
         }
-        .onChange(of: webSocketManager.timerCreated) { _, newValue in
-            if newValue {
-                webSocketManager.startCountdown(roomCode: webSocketManager.roomCode)
-            }
-        }
-        .onChange(of: webSocketManager.timerStarted) { _, newValue in
-            if newValue {
-                webSocketManager.pauseCountdown(roomCode: webSocketManager.roomCode)
+        .onReceive(webSocketManager.$currentGameState) { currentGameState in
+            if currentGameState == "SnowFlakeCreation" && !hasNavigated {
+                if navigationManager.currentRound == navigationManager.totalRound {
+                    navigationManager.navigateTo(Destination.leaderboard)
+                } else {
+                    navigationManager.currentRound += 1
+                    navigationManager.navigateTo(Destination.hostTimerView(roomCode: roomCode))
+                    hasNavigated = true
+                }
             }
         }
     }
@@ -74,11 +87,10 @@ struct ShopTimerViewHost: View {
         .padding(.horizontal)
     }
     
-    
     private var timer: some View {
         HStack {
             Spacer()
-            Text("\(timerValueFromSocket)")
+            Text("\(webSocketManager.countdown)")
                 .font(.custom("Montserrat-Medium", size: 40))
                 .foregroundColor(.black)
             Spacer()
@@ -96,9 +108,9 @@ struct ShopTimerViewHost: View {
         Button{
             isPlaying.toggle()
             if isPlaying {
-                webSocketManager.resumeCountdown(roomCode: webSocketManager.roomCode)
+                webSocketManager.resumeCountdown(roomCode: roomCode)
             } else {
-                webSocketManager.pauseCountdown(roomCode: webSocketManager.roomCode)
+                webSocketManager.pauseCountdown(roomCode: roomCode)
             }
         } label: {
             Image(systemName: isPlaying ? "pause.fill" : "play.fill")
@@ -125,10 +137,10 @@ struct ShopTimerViewHost: View {
             .padding(.horizontal)
             AdjustTimeComponent(
                 onDecrease: { time in
-                    webSocketManager.minusCountdown(roomCode: webSocketManager.roomCode, socketMessage: "01:00")
+                    webSocketManager.minusCountdown(roomCode: roomCode, socketMessage: "01:00")
                 },
                 onIncrease: { time in
-                    webSocketManager.addCountdown(roomCode: webSocketManager.roomCode, socketMessage: "01:00")
+                    webSocketManager.addCountdown(roomCode: roomCode, socketMessage: "01:00")
                 }
             )
         }
@@ -154,8 +166,40 @@ struct ShopTimerViewHost: View {
     
     private var nextRoundButton: some View {
         SwipeToConfirmButton {
-            webSocketManager.stopCountdown(roomCode: webSocketManager.roomCode)
-            navigationManager.isShopTime.toggle()
+            if let rounds = getPlaygroundVM.playgroundInfo?.rounds.sorted(by: { $0.duration < $1.duration }),
+               navigationManager.currentRound < rounds.count + 1 {
+                
+                let adjustedRoundIndex = min(navigationManager.currentRound, rounds.count - 1)
+                
+                if adjustedRoundIndex > 0 {
+                    let currentRoundInfo = rounds[adjustedRoundIndex]
+                    let duration = currentRoundInfo.duration
+                    
+                    webSocketManager.stopCountdown(roomCode: roomCode)
+                    
+                    if navigationManager.currentRound != navigationManager.totalRound {
+                        webSocketManager.createTimer(roomCode: roomCode, socketMessage: duration, gameState: "SnowFlakeCreation")
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                            webSocketManager.startCountdown(roomCode: roomCode)
+                            webSocketManager.pauseCountdown(roomCode: roomCode)
+                        }
+                    } else {
+                        webSocketManager.createTimer(roomCode: roomCode, socketMessage: "01:00", gameState: "SnowFlakeCreation")
+                    }
+                    
+                    DispatchQueue.main.async {
+                        updateGameStateViewModel.hostRoomCode = roomCode
+                        updateGameStateViewModel.currentGameState = GameState.SnowFlakeCreation
+                        updateGameStateViewModel.updateGameState()
+                    }
+                } else {
+                    DispatchQueue.main.async {
+                        updateGameStateViewModel.hostRoomCode = roomCode
+                        updateGameStateViewModel.currentGameState = GameState.Leaderboard
+                        updateGameStateViewModel.updateGameState()
+                    }
+                }
+            }
         }
     }
 }

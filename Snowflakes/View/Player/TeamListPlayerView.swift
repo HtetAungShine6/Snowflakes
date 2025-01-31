@@ -14,7 +14,7 @@ struct TeamListPlayerView: View {
     
     @State private var updateGameStateViewModel = UpdateGameStateViewModel()
     
-    @State private var isJoined: Bool = false
+//    @State private var isJoined: Bool = false
     
     let teams: [Team]
     
@@ -47,9 +47,6 @@ struct TeamListPlayerView: View {
         }
         .navigationBarBackButtonHidden()
         .navigationBarTitleDisplayMode(.inline)
-        .onAppear {
-            webSocketManager.connect()
-        }
         .onChange(of: webSocketManager.isConnected) { _, isConnected in
             if isConnected {
                 webSocketManager.joinGroup(roomCode: hostRoomCode)
@@ -89,27 +86,15 @@ struct TeamListPlayerView: View {
     
     private var totalNumberPlayers: some View {
         HStack {
-            Text("Player: \(totalPlayerCount)") // Call API or use local data
+            Text("Player: \(totalPlayerCount)")
                 .font(.custom("Lato-Medium", size: 15))
         }
         .padding(.horizontal)
     }
-    
-    
-    private var buttonText: String {
-        isJoined ? "Leave" : "Join"
-    }
 
-    private var buttonBackgroundColor: Color {
-        isJoined ? .red : .green
-    }
-
-    private func toggleJoinLeave() {
-        isJoined.toggle()
-    }
-    
     private func teamCardView(team: Team) -> some View {
-        VStack(alignment: .leading, spacing: 10) {
+        @State var isJoined = false
+        return VStack(alignment: .leading, spacing: 10) {
             HStack {
                 Text("Team: \(team.teamNumber)")
                     .font(.custom("Lato-Regular", size: 20))
@@ -119,15 +104,15 @@ struct TeamListPlayerView: View {
                 Spacer()
                 Button(action: {
                     withAnimation {
-                        toggleJoinLeave()
+                        isJoined.toggle()
                     }
                 }) {
-                    Text(buttonText)
+                    Text(isJoined ? "Leave" : "Join")
                         .font(.custom("Lato-Regular", size: 16))
                         .padding(.horizontal)
                         .padding(.vertical, 4)
                         .background(.white)
-                        .foregroundColor(buttonBackgroundColor)
+                        .foregroundColor(isJoined ? .red : .green)
                         .overlay(
                             RoundedRectangle(cornerRadius: 15)
                                 .stroke(Color.black, lineWidth: 1)
@@ -136,16 +121,16 @@ struct TeamListPlayerView: View {
             }
             
             HStack(spacing: 10) {
-                ForEach(team.teamStocks, id: \.self) { stock in
-                    VStack {
-                        Image(stock.productName)
-                            .resizable()
-                            .frame(width: 40, height: 40)
-                        Text("\(stock.remainingStock)x")
-                            .font(.custom("Lato-Regular", size: 16))
-                            .foregroundStyle(Color.gray)
-                    }
-                }
+//                ForEach(team.teamStocks, id: \.self) { stock in
+//                    VStack {
+//                        Image(stock.productName)
+//                            .resizable()
+//                            .frame(width: 40, height: 40)
+//                        Text("\(stock.remainingStock)x")
+//                            .font(.custom("Lato-Regular", size: 16))
+//                            .foregroundStyle(Color.gray)
+//                    }
+//                }
                 Spacer()
                 HStack {
                     Image("tokenCoin")

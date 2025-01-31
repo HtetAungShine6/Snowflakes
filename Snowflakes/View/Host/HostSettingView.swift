@@ -10,6 +10,7 @@ import SwiftUI
 struct HostSettingView: View {
     
     @EnvironmentObject var navigationManager: NavigationManager
+    @EnvironmentObject private var webSocketManager: WebSocketManager
     
     @StateObject private var createPlaygroundVM = CreatePlaygroundViewModel()
     @ObservedObject private var getTeamsByRoomCodeVM = GetTeamsByRoomCode()
@@ -85,15 +86,10 @@ struct HostSettingView: View {
             if newValue {
                 showAlertView = true
             } else {
-                showAlertView = false
+//                showAlertView = false
             }
         })
         .onChange(of: createPlaygroundVM.isSuccess, { _, newValue in
-//            if newValue {
-//                getTeamsByRoomCodeVM.fetchTeams(hostRoomCode: hostRoomCode)
-//            } else {
-//                print("Need to handle isSuccess false error.")
-//            }
             if newValue {
                 createGameStateVM.hostRoomCode = hostRoomCode
                 createGameStateVM.playerRoomCode = playerRoomCode
@@ -112,7 +108,8 @@ struct HostSettingView: View {
         })
         .onReceive(getTeamsByRoomCodeVM.$teams) { teams in
             if !teams.isEmpty {
-                navigationManager.navigateTo(Destination.teamListView(team: teams))
+                webSocketManager.joinGroup(roomCode: hostRoomCode)
+                navigationManager.navigateTo(Destination.teamListView(team: teams)) 
             }
         }
         .onReceive(getTeamsByRoomCodeVM.$errorMessage) { errorMessage in
@@ -389,15 +386,16 @@ struct HostSettingView: View {
                     ShopItemViewModel(productName: "Pen", price: 15, remainingStock: penVM.remainingStock)
                 ]
                 
-                createPlaygroundVM.hostRoomCode = hostRoomCode
-                createPlaygroundVM.playerRoomCode = playerRoomCode
-                createPlaygroundVM.numberOfTeam = teamNumber
-                createPlaygroundVM.teamToken = teamToken
-                createPlaygroundVM.rounds = roundsData
-                createPlaygroundVM.shopToken = 0
-                createPlaygroundVM.shop = shopData
-                createPlaygroundVM.createPlayground()
-                
+                DispatchQueue.main.async {
+                    createPlaygroundVM.hostRoomCode = hostRoomCode
+                    createPlaygroundVM.playerRoomCode = playerRoomCode
+                    createPlaygroundVM.numberOfTeam = teamNumber
+                    createPlaygroundVM.teamToken = teamToken
+                    createPlaygroundVM.rounds = roundsData
+                    createPlaygroundVM.shopToken = 0
+                    createPlaygroundVM.shop = shopData
+                    createPlaygroundVM.createPlayground()
+                }
             }) {
                 Text("Confirm")
                     .font(.custom("Lato-Bold", size: 20))
@@ -411,3 +409,16 @@ struct HostSettingView: View {
         .padding()
     }
 }
+
+
+//        .onReceive(webSocketManager.$isConnected) { isConnected in
+//            if isConnected {
+//                isReadyToJoin = true
+//            }
+//        }
+//        .onChange(of: isReadyToJoin) { _, newValue in
+//            if newValue {
+//                webSocketManager.joinGroup(roomCode: hostRoomCode)
+//                isReadyToJoin = false
+//            }
+//        }

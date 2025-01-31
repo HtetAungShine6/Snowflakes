@@ -13,6 +13,7 @@ class NavigationManager: ObservableObject {
     @Published var roomCode: String?
     @Published var playerRoomCode: String?
     @Published var currentRound: Int = 0
+    @Published var totalRound: Int = 0
 
     func navigateTo(_ destination: Destination, roomCode: String? = nil, playerRoomCode: String? = nil) {
         path.append(destination)
