@@ -1,28 +1,28 @@
-import SwiftUI
-
-struct GameViewPlayer: View {
-    
-    @EnvironmentObject var navigationManager: NavigationManager
-    
-    var body: some View {
-        Group {
-            if navigationManager.isShopTime {
-                PlayerShopTimerView(
-                    navBarTitle: "Snowflake",
-                    navBarSubtitle: "Shop Round",
-                    image: Image("Shop 1")
-                )
-            } else {
-                PlayerTimerView(
-                    navBarTitle: "Snowflake",
-                    navBarSubtitle: "Player Round",
-                    image: Image("Snowman")
-                )
-            }
-        }
-        .navigationBarBackButtonHidden()
-    }
-}
+//import SwiftUI
+//
+//struct GameViewPlayer: View {
+//    
+//    @EnvironmentObject var navigationManager: NavigationManager
+//    
+//    var body: some View {
+//        Group {
+//            if navigationManager.isShopTime {
+//                PlayerShopTimerView(
+//                    navBarTitle: "Snowflake",
+//                    navBarSubtitle: "Shop Round",
+//                    image: Image("Shop 1")
+//                )
+//            } else {
+//                PlayerTimerView(
+//                    navBarTitle: "Snowflake",
+//                    navBarSubtitle: "Player Round",
+//                    image: Image("Snowman")
+//                )
+//            }
+//        }
+//        .navigationBarBackButtonHidden()
+//    }
+//}
 
 //#Preview {
 //    let navigationManager = NavigationManager()

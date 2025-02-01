@@ -63,7 +63,7 @@ struct TeamListView: View {
                         Button(action: {
                             // Action for the back button
                             navigationManager.pop()
-                            webSocketManager.disconnect()
+//                            webSocketManager.disconnect()
                         }) {
                             Image(systemName: "chevron.left")
                                 .foregroundColor(.black)

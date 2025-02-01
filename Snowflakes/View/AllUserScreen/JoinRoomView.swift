@@ -82,14 +82,14 @@ struct JoinRoomView: View {
                 if newValue {
                     showAlertView = true
                 } else {
-//                    showAlertView = false
+                    showAlertView = false
                 }
             }
             .onChange(of: getGameStateVM.isLoading) { _, newValue in
                 if newValue {
                     showAlertView = true
                 } else {
-//                    showAlertView = false
+                    showAlertView = false
                 }
             }
             .onReceive(getTeamsByRoomCodeVM.$teams) { teams in
@@ -110,7 +110,7 @@ struct JoinRoomView: View {
             }
             .onReceive(getGameStateVM.$gameState) { gameState in
                 if let currentState = gameState?.currentGameState {
-                    if let hostRoomCode = gameState?.hostRoomCode {
+                    if let hostRoomCode = gameState?.hostRoomCode, let playerRoomCode = gameState?.playerRoomCode {
                         websocketManager.joinGroup(roomCode: hostRoomCode)
                         switch currentState {
                         case "TeamCreation":
@@ -128,7 +128,7 @@ struct JoinRoomView: View {
                                 case .host:
                                     navigationManager.navigateTo(Destination.hostTimerView(roomCode: hostRoomCode))
                                 case .player:
-                                    navigationManager.navigateTo(Destination.hostTimerView(roomCode: hostRoomCode))
+                                    navigationManager.navigateTo(Destination.playerTimerView(hostRoomCode: hostRoomCode, playerRoomCode: playerRoomCode))
                                 }
                             }
                         case "ShopPeriod":
@@ -137,7 +137,7 @@ struct JoinRoomView: View {
                                 case .host:
                                     navigationManager.navigateTo(Destination.hostShopTimerView(roomCode: hostRoomCode))
                                 case .player:
-                                    navigationManager.navigateTo(Destination.hostTimerView(roomCode: hostRoomCode))
+                                    navigationManager.navigateTo(Destination.playerShopTimerView(hostRoomCode: hostRoomCode, playerRoomCode: playerRoomCode))
                                 }
                             }
                         default:
