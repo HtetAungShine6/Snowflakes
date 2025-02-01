@@ -8,6 +8,8 @@
 
 /* Begin PBXBuildFile section */
 		B3832B502D0EDDC70016154B /* Starscream in Frameworks */ = {isa = PBXBuildFile; productRef = B3832B4F2D0EDDC70016154B /* Starscream */; };
+		B38947A72D4E288500F4B0C4 /* IQKeyboardManagerSwift in Frameworks */ = {isa = PBXBuildFile; productRef = B38947A62D4E288500F4B0C4 /* IQKeyboardManagerSwift */; };
+		B38947AA2D4E2A7600F4B0C4 /* IQKeyboardToolbarManager in Frameworks */ = {isa = PBXBuildFile; productRef = B38947A92D4E2A7600F4B0C4 /* IQKeyboardToolbarManager */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -40,7 +42,9 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				B38947AA2D4E2A7600F4B0C4 /* IQKeyboardToolbarManager in Frameworks */,
 				B3832B502D0EDDC70016154B /* Starscream in Frameworks */,
+				B38947A72D4E288500F4B0C4 /* IQKeyboardManagerSwift in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -92,6 +96,8 @@
 			name = Snowflakes;
 			packageProductDependencies = (
 				B3832B4F2D0EDDC70016154B /* Starscream */,
+				B38947A62D4E288500F4B0C4 /* IQKeyboardManagerSwift */,
+				B38947A92D4E2A7600F4B0C4 /* IQKeyboardToolbarManager */,
 			);
 			productName = Snowflakes;
 			productReference = B3D468892CD899C9001F1147 /* Snowflakes.app */;
@@ -123,6 +129,8 @@
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
 				B3832B4E2D0EDDC70016154B /* XCRemoteSwiftPackageReference "Starscream" */,
+				B38947A52D4E288500F4B0C4 /* XCRemoteSwiftPackageReference "IQKeyboardManager" */,
+				B38947A82D4E2A7600F4B0C4 /* XCRemoteSwiftPackageReference "IQKeyboardToolbarManager" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = B3D4688A2CD899C9001F1147 /* Products */;
@@ -374,6 +382,22 @@
 				minimumVersion = 4.0.8;
 			};
 		};
+		B38947A52D4E288500F4B0C4 /* XCRemoteSwiftPackageReference "IQKeyboardManager" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/hackiftekhar/IQKeyboardManager.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 8.0.0;
+			};
+		};
+		B38947A82D4E2A7600F4B0C4 /* XCRemoteSwiftPackageReference "IQKeyboardToolbarManager" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/hackiftekhar/IQKeyboardToolbarManager.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.1.2;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -381,6 +405,16 @@
 			isa = XCSwiftPackageProductDependency;
 			package = B3832B4E2D0EDDC70016154B /* XCRemoteSwiftPackageReference "Starscream" */;
 			productName = Starscream;
+		};
+		B38947A62D4E288500F4B0C4 /* IQKeyboardManagerSwift */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = B38947A52D4E288500F4B0C4 /* XCRemoteSwiftPackageReference "IQKeyboardManager" */;
+			productName = IQKeyboardManagerSwift;
+		};
+		B38947A92D4E2A7600F4B0C4 /* IQKeyboardToolbarManager */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = B38947A82D4E2A7600F4B0C4 /* XCRemoteSwiftPackageReference "IQKeyboardToolbarManager" */;
+			productName = IQKeyboardToolbarManager;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

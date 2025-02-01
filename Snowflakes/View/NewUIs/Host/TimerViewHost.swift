@@ -53,7 +53,9 @@ struct TimerViewHost: View {
         )
         .navigationBarBackButtonHidden()
         .onAppear {
-            getGameStateViewModel.fetchGameState(hostRoomCode: roomCode)
+            DispatchQueue.main.asyncAfter(deadline: .now()+0.5) {
+                getGameStateViewModel.fetchGameState(hostRoomCode: roomCode)
+            }
             getPlaygroundVM.fetchPlayground(hostRoomCode: roomCode)
             hasNavigated = false
             hasStartedCountdown = false

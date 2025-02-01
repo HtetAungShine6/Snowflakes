@@ -254,7 +254,6 @@ struct JoinRoomView: View {
                 } else {
                     createPlayerVM.name = userName
                     createPlayerVM.playerRoomCode = roomCode
-                    print("😡RoomCode: \(roomCode)")
                     createPlayerVM.createPlayer()
                     UserDefaults.standard.set(userName, forKey: "\(roomCode)")
                     getGameStateVM.fetchGameState(playerRoomCode: roomCode)
@@ -286,3 +285,5 @@ struct JoinRoomView: View {
         }
     }
 }
+
+
