@@ -27,6 +27,9 @@ struct JoinRoomView: View {
     @State private var shopPeriod: Bool = false
     @State private var isSuccess: Bool = false
     
+    @FocusState private var isRoomCodeFocused: Bool
+    @FocusState private var isUserNameFocused: Bool
+    
     enum Role {
         case host
         case player
@@ -67,6 +70,10 @@ struct JoinRoomView: View {
             }
             .background(Color(UIColor.systemBackground))
             .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .onTapGesture {
+                 isRoomCodeFocused = false
+                 isUserNameFocused = false
+             }
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {
                     Button(action: {
@@ -174,36 +181,37 @@ struct JoinRoomView: View {
     }
     
     private var roleSelectionView: some View {
-        HStack(spacing: 20) {
-            Button(action: {
-                selectedRole = .host
-            }) {
-                Text("Host")
-                    .font(Font.custom("Roboto-Regular", size: 18))
-                    .frame(maxWidth: .infinity)
-                    .padding()
-                    .background(selectedRole == .host ? Color(red: 0.69, green: 0.89, blue: 0.96) : Color.gray.opacity(0.3))
-                    .foregroundColor(.black)
-                    .cornerRadius(10)
-            }
-            
-            Button(action: {
-                selectedRole = .player
-            }) {
-                Text("Player")
-                    .font(Font.custom("Roboto-Regular", size: 18))
-                    .frame(maxWidth: .infinity)
-                    .padding()
-                    .background(selectedRole == .player ? Color(red: 0.69, green: 0.89, blue: 0.96) : Color.gray.opacity(0.3))
-                    .foregroundColor(.black)
-                    .cornerRadius(10)
-            }
-        }
-        .frame(maxWidth: .infinity)
-    }
-    
+           HStack(spacing: 20) {
+               Button(action: {
+                   selectedRole = .host
+               }) {
+                   Text("Host")
+                       .font(Font.custom("Roboto-Regular", size: 18))
+                       .frame(maxWidth: .infinity)
+                       .padding()
+                       .background(selectedRole == .host ? Color(red: 0.69, green: 0.89, blue: 0.96) : Color.gray.opacity(0.3))
+                       .foregroundColor(.black)
+                       .cornerRadius(10)
+               }
+               
+               Button(action: {
+                   selectedRole = .player
+               }) {
+                   Text("Player")
+                       .font(Font.custom("Roboto-Regular", size: 18))
+                       .frame(maxWidth: .infinity)
+                       .padding()
+                       .background(selectedRole == .player ? Color(red: 0.69, green: 0.89, blue: 0.96) : Color.gray.opacity(0.3))
+                       .foregroundColor(.black)
+                       .cornerRadius(10)
+               }
+           }
+           .frame(maxWidth: .infinity)
+       }
+
     private var roomCodeTextField: some View {
         TextField("Enter Room Code", text: $roomCode)
+            .focused($isRoomCodeFocused)
             .padding()
             .background(Color.white)
             .cornerRadius(10)
@@ -215,9 +223,10 @@ struct JoinRoomView: View {
             .padding(.horizontal)
             .frame(maxWidth: .infinity)
     }
-    
+
     private var userNameTextField: some View {
         TextField("Enter Your Name", text: $userName)
+            .focused($isUserNameFocused)
             .padding()
             .background(Color.white)
             .cornerRadius(10)
@@ -229,6 +238,7 @@ struct JoinRoomView: View {
             .padding(.horizontal)
             .frame(maxWidth: .infinity)
     }
+
     
     private var confirmButton: some View {
         Button {

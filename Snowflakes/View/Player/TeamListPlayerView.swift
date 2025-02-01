@@ -11,9 +11,8 @@ struct TeamListPlayerView: View {
     
     @EnvironmentObject var navigationManager: NavigationManager
     @EnvironmentObject var webSocketManager: WebSocketManager
-    
+    @State private var joinedTeams: [Int: Bool] = [:]
     @StateObject private var getPlaygroundVM = GetPlaygroundViewModel()
-    
 //    @State private var isJoined: Bool = false
     @State private var hasNavigated = false
     
@@ -103,7 +102,7 @@ struct TeamListPlayerView: View {
     }
 
     private func teamCardView(team: Team) -> some View {
-        @State var isJoined = false
+        let isJoined = joinedTeams[team.teamNumber] ?? false
         return VStack(alignment: .leading, spacing: 10) {
             HStack {
                 Text("Team: \(team.teamNumber)")
@@ -114,7 +113,7 @@ struct TeamListPlayerView: View {
                 Spacer()
                 Button(action: {
                     withAnimation {
-                        isJoined.toggle()
+                        joinedTeams[team.teamNumber] = !(joinedTeams[team.teamNumber] ?? false)
                     }
                 }) {
                     Text(isJoined ? "Leave" : "Join")
@@ -131,16 +130,6 @@ struct TeamListPlayerView: View {
             }
             
             HStack(spacing: 10) {
-//                ForEach(team.teamStocks, id: \.self) { stock in
-//                    VStack {
-//                        Image(stock.productName)
-//                            .resizable()
-//                            .frame(width: 40, height: 40)
-//                        Text("\(stock.remainingStock)x")
-//                            .font(.custom("Lato-Regular", size: 16))
-//                            .foregroundStyle(Color.gray)
-//                    }
-//                }
                 Spacer()
                 HStack {
                     Image("tokenCoin")
@@ -171,6 +160,7 @@ struct TeamListPlayerView: View {
         .padding()
         .background(RoundedRectangle(cornerRadius: 8).stroke(Color.secondary))
     }
+
     
     private var waitingForHostButton: some View {
         HStack {

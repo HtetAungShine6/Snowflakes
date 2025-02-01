@@ -117,12 +117,21 @@ struct PlayerShopTimerView: View {
     }
     
     private var descriptionText: some View {
-        Text("It is time to sell snowflakes.")
-            .font(.custom("Lato", size: 36).weight(.medium))
-            .foregroundColor(.black)
-            .multilineTextAlignment(.center)
-            .padding(.horizontal)
-            .frame(maxWidth: .infinity, alignment: .top)
+        VStack {
+            (Text("It is time to ")
+                .font(.custom("Roboto-Regular", size: 36))
+                .foregroundColor(.primary) +
+             Text("sell")
+                .font(.custom("Roboto-Regular", size: 36))
+                .foregroundColor(.red) +
+             Text(" a \n snow flake")
+                .font(.custom("Roboto-Regular", size: 36))
+                .foregroundColor(.primary))
+            .lineLimit(2)
+            .multilineTextAlignment(.leading)
+            .fixedSize(horizontal: false, vertical: true)
+        }
+        .frame(maxWidth: .infinity)
     }
 }
 
