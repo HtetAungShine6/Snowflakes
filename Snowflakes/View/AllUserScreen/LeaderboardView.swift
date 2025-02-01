@@ -60,7 +60,7 @@ struct LeaderboardView: View {
             }
             
             HStack(spacing: 10) {
-                ForEach(["scissors", "paper", "pen"], id: \.self) { itemName in
+                ForEach(["Scissor", "Paper", "Pen"], id: \.self) { itemName in
                     if let count = team.items[itemName] {
                         VStack {
                             Image(itemName)

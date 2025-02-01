@@ -104,12 +104,21 @@ struct PlayerTimerView: View {
     }
     
     private var descriptionText: some View {
-        Text("It is time to create snowflakes.")
-            .font(.custom("Lato", size: 36).weight(.medium))
-            .foregroundColor(.black)
-            .multilineTextAlignment(.center)
-            .padding(.horizontal)
-            .frame(maxWidth: .infinity, alignment: .top)
+        VStack {
+            (Text("It is time to ")
+                .font(.custom("Roboto-Regular", size: 36))
+                .foregroundColor(.primary) +
+             Text("create")
+                .font(.custom("Roboto-Regular", size: 36))
+                .foregroundColor(.green) +
+             Text(" a \n snow flake")
+                .font(.custom("Roboto-Regular", size: 36))
+                .foregroundColor(.primary))
+            .lineLimit(2)
+            .multilineTextAlignment(.leading)
+            .fixedSize(horizontal: false, vertical: true)
+        }
+        .frame(maxWidth: .infinity)
     }
 }
 
