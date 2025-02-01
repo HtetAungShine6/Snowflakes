@@ -14,4 +14,5 @@ struct GameStateMessage: Codable, Hashable {
     let hostRoomCode: String
     let playerRoomCode: String
     let currentGameState: String
+    let currentRoundNumber: Int
 }

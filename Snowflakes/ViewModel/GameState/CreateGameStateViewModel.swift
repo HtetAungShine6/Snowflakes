@@ -12,15 +12,17 @@ class CreateGameStateViewModel: ObservableObject {
     @Published var hostRoomCode: String
     @Published var playerRoomCode: String
     @Published var currentGameState: GameState
+    @Published var currentRoundNumber: Int
     
     @Published var errorMessage: String? = nil
     @Published var isLoading: Bool = false
     @Published var isSuccess: Bool = false
     
-    init(hostRoomCode: String = "", playerRoomCode: String = "", currentGameState: GameState = .TeamCreation) {
+    init(hostRoomCode: String = "", playerRoomCode: String = "", currentGameState: GameState = .TeamCreation, currentRoundNumber: Int = 0) {
         self.hostRoomCode = hostRoomCode
         self.playerRoomCode = playerRoomCode
         self.currentGameState = currentGameState
+        self.currentRoundNumber = currentRoundNumber
     }
     
     func createGameState() {
@@ -28,7 +30,8 @@ class CreateGameStateViewModel: ObservableObject {
         let newGameState = GameStateDTO(
             hostRoomCode: hostRoomCode,
             playerRoomCode: playerRoomCode,
-            currentGameState: currentGameState
+            currentGameState: currentGameState,
+            currentRoundNumber: currentRoundNumber
         )
         
         let createGameStateManager = PostGameStateUseCase()

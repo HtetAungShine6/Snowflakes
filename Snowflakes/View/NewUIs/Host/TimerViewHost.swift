@@ -14,6 +14,7 @@ struct TimerViewHost: View {
     
     @StateObject private var getPlaygroundVM = GetPlaygroundViewModel()
     @StateObject private var updateGameStateViewModel = UpdateGameStateViewModel()
+    @StateObject private var getGameStateViewModel = GetGameStateViewModel()
     
     @State private var timerValueFromSocket: String = ""
     @State private var sendMessageText: String = ""
@@ -52,6 +53,7 @@ struct TimerViewHost: View {
         )
         .navigationBarBackButtonHidden()
         .onAppear {
+            getGameStateViewModel.fetchGameState(hostRoomCode: roomCode)
             getPlaygroundVM.fetchPlayground(hostRoomCode: roomCode)
             hasNavigated = false
             hasStartedCountdown = false
@@ -75,6 +77,13 @@ struct TimerViewHost: View {
                 hasStartedCountdown = true
             }
         }
+        .onChange(of: webSocketManager.timerPaused) { _, newValue in
+            if newValue {
+                isPlaying = false
+            } else {
+                isPlaying = true
+            }
+        }
     }
     
     private var navBar: some View {
@@ -84,10 +93,12 @@ struct TimerViewHost: View {
                     .font(.custom("Montserrat-Medium", size: 32))
                     .foregroundStyle(Color.black)
                 
-                Text("Round (\(navigationManager.currentRound)/\(navigationManager.totalRound))")
+                Text("Round (\(getGameStateViewModel.currentRoundNumber)/\(navigationManager.totalRound))")
                     .foregroundStyle(Color.gray)
             }
             Spacer()
+            Text("Host Room Code: \(roomCode)")
+                .font(.custom("Lato-Regular", size: 16))
         }
         .padding(.horizontal)
     }
@@ -108,9 +119,9 @@ struct TimerViewHost: View {
             .scaledToFit()
             .frame(width: 250, height: 226)
     }
-    
+
     private var controlButton: some View {
-        Button{
+        Button {
             isPlaying.toggle()
             if isPlaying {
                 webSocketManager.resumeCountdown(roomCode: roomCode)
@@ -122,18 +133,20 @@ struct TimerViewHost: View {
                 isButtonDisabled = false
             }
         } label: {
-            Image(systemName: isPlaying ? "pause.fill" : "play.fill")
-                .resizable()
-                .scaledToFit()
-                .frame(width: 25, height: 25)
+            ZStack {
+                Circle()
+                    .fill(AppColors.glacialBlue)
+                    .frame(width: 70, height: 70)
+                    .shadow(color: AppColors.glacialBlue, radius: 5, x: 0, y: 1)
+                
+                Image(systemName: isPlaying ? "pause.fill" : "play.fill")
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: 25, height: 25)
+                    .foregroundColor(.white)
+            }
         }
         .disabled(isButtonDisabled)
-        .frame(width: 40, height: 40)
-        .foregroundColor(.white)
-        .padding()
-        .background(AppColors.glacialBlue)
-        .clipShape(Circle())
-        .shadow(color: AppColors.glacialBlue, radius: 5, x: 0, y: 1)
     }
     
     private var adjustTimeField: some View {
@@ -201,8 +214,37 @@ struct TimerViewHost: View {
             DispatchQueue.main.async {
                 updateGameStateViewModel.hostRoomCode = roomCode
                 updateGameStateViewModel.currentGameState = GameState.ShopPeriod
+                updateGameStateViewModel.currentRoundNumber = getGameStateViewModel.currentRoundNumber
                 updateGameStateViewModel.updateGameState()
             }
         }
     }
 }
+
+
+//    private var controlButton: some View {
+//        Button{
+//            isPlaying.toggle()
+//            if isPlaying {
+//                webSocketManager.resumeCountdown(roomCode: roomCode)
+//            } else {
+//                webSocketManager.pauseCountdown(roomCode: roomCode)
+//            }
+//            isButtonDisabled = true
+//            DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+//                isButtonDisabled = false
+//            }
+//        } label: {
+//            Image(systemName: isPlaying ? "pause.fill" : "play.fill")
+//                .resizable()
+//                .scaledToFit()
+//                .frame(width: 25, height: 25)
+//        }
+//        .disabled(isButtonDisabled)
+//        .frame(width: 40, height: 40)
+//        .foregroundColor(.white)
+//        .padding()
+//        .background(AppColors.glacialBlue)
+//        .clipShape(Circle())
+//        .shadow(color: AppColors.glacialBlue, radius: 5, x: 0, y: 1)
+//    }

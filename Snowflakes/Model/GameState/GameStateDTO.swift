@@ -9,4 +9,5 @@ struct GameStateDTO: Codable {
     let hostRoomCode: String
     let playerRoomCode: String
     let currentGameState: GameState
+    let currentRoundNumber: Int
 }

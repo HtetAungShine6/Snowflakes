@@ -7,5 +7,5 @@
 
 struct PlayerDTO: Codable {
     let name: String
-    let roomCode: String
+    let playerRoomCode: String
 }

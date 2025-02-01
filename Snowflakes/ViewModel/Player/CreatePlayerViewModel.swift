@@ -10,22 +10,22 @@ import Foundation
 class CreatePlayerViewModel: ObservableObject {
     
     @Published var name: String
-    @Published var roomCode: String
+    @Published var playerRoomCode: String
     
     @Published var errorMessage: String? = nil
     @Published var isLoading: Bool = false
     @Published var isSuccess: Bool = false
     
-    init(name: String = "", roomCode: String = "") {
+    init(name: String = "", playerRoomCode: String = "") {
         self.name = name
-        self.roomCode = roomCode
+        self.playerRoomCode = playerRoomCode
     }
     
     func createPlayer() {
         
         let newPlayer = PlayerDTO(
             name: name,
-            roomCode: roomCode
+            playerRoomCode: playerRoomCode
         )
                 
         let createPlayerManager = CreatePlayerUseCase()
@@ -37,7 +37,7 @@ class CreatePlayerViewModel: ObservableObject {
                 self?.isLoading = false
                 switch result {
                 case .success(let newPlayer):
-                    print("\(newPlayer.message)")
+                    print("New Player Created: \(newPlayer.message)")
                     self?.isSuccess = true
                 case .failure(let error):
                     self?.errorMessage = "Failed to create team: \(error.localizedDescription)"
