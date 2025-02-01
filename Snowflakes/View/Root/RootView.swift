@@ -26,9 +26,6 @@ struct RootView: View {
                     case .teamListView(let teams):
                         TeamListView(teams: teams)
                             .environmentObject(navigationManager)
-//                    case .gameView:
-//                        GameView()
-//                            .environmentObject(navigationManager)
                     case .hostTimerView(let roomCode):
                         TimerViewHost(roomCode: roomCode)
                             .environmentObject(navigationManager)
@@ -54,14 +51,14 @@ struct RootView: View {
                             members: ["Hein Thant", "Thu Yein", "Htet Aung Shine"] // Example members
                         )
                         .environmentObject(navigationManager)
-                    case .gameViewPlayer:
-                        GameViewPlayer()
-                            .environmentObject(navigationManager)
-//                    case .hostTeamDetailView(let team):
-//                        HostTeamDetailView(team: team)
-//                        .environmentObject(navigationManager)
                     case .leaderboard:
                         LeaderboardView()
+                            .environmentObject(navigationManager)
+                    case .playerTimerView(let hostRoomCode, let playerRoomCode):
+                        PlayerTimerView(playerRoomCode: playerRoomCode, hostRoomCode: hostRoomCode)
+                            .environmentObject(navigationManager)
+                    case .playerShopTimerView(let hostRoomCode, let playerRoomCode):
+                        PlayerShopTimerView(playerRoomCode: playerRoomCode, hostRoomCode: hostRoomCode)
                             .environmentObject(navigationManager)
                     }
                 }

@@ -12,9 +12,10 @@ struct TeamListPlayerView: View {
     @EnvironmentObject var navigationManager: NavigationManager
     @EnvironmentObject var webSocketManager: WebSocketManager
     
-    @State private var updateGameStateViewModel = UpdateGameStateViewModel()
+    @StateObject private var getPlaygroundVM = GetPlaygroundViewModel()
     
 //    @State private var isJoined: Bool = false
+    @State private var hasNavigated = false
     
     let teams: [Team]
     
@@ -47,21 +48,30 @@ struct TeamListPlayerView: View {
         }
         .navigationBarBackButtonHidden()
         .navigationBarTitleDisplayMode(.inline)
-        .onChange(of: webSocketManager.isConnected) { _, isConnected in
-            if isConnected {
-                webSocketManager.joinGroup(roomCode: hostRoomCode)
+        .onAppear(perform: {
+            getPlaygroundVM.fetchPlayground(hostRoomCode: hostRoomCode)
+        })
+        .onReceive(webSocketManager.$currentGameState) {  currentGameState in
+            if currentGameState == "SnowFlakeCreation" {
+                if !hasNavigated {
+                    navigationManager.navigateTo(Destination.playerTimerView(hostRoomCode: hostRoomCode, playerRoomCode: playerRoomCode))
+                    hasNavigated = true
+                }
             }
         }
         .onChange(of: webSocketManager.timerStarted) { _, newValue in
             if newValue {
-                navigationManager.isShopTime = false
-                navigationManager.navigateTo(Destination.gameViewPlayer)
+                navigationManager.currentRound = 1
             }
         }
     }
     
     private var hostRoomCode: String {
         teams.first?.hostRoomCode ?? "N/A"
+    }
+    
+    private var playerRoomCode: String {
+        teams.first?.playerRoomCode ?? "N/A"
     }
     
     private var navBar: some View {
