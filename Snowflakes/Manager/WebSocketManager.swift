@@ -20,6 +20,7 @@ class WebSocketManager: ObservableObject, WebSocketDelegate {
     @Published var timerCreated: Bool = false
     @Published var timerStarted: Bool = false
     @Published var timerPaused: Bool = false
+    @Published var timerResumed: Bool = false
     @Published var timerStopped: Bool = false
     @Published var targetValue: String = ""
     @Published var socketMessage: String = ""
@@ -222,10 +223,14 @@ class WebSocketManager: ObservableObject, WebSocketDelegate {
                         }
                     case "TimerPaused":
                         print("TimerPaused passed✅")
+                        self.timerPaused = true
+                        self.timerResumed = false
                     case "TimerModify":
                         print("TimerModify passed✅")
                     case "TimerResume":
                         print("TimerResume passed✅")
+                        self.timerResumed = true
+                        self.timerPaused = false
                     case "TimerStopped":
                         print("TimerStopped passed✅")
                         self.timerStarted = false

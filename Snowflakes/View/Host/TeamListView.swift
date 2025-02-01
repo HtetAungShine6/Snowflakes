@@ -83,11 +83,11 @@ struct TeamListView: View {
                         }
                     }
                 }
-                .onChange(of: webSocketManager.timerStarted) { _, newValue in
-                    if newValue {
-                        navigationManager.currentRound = 1
-                    }
-                }
+//                .onChange(of: webSocketManager.timerStarted) { _, newValue in
+//                    if newValue {
+//                        navigationManager.currentRound = 1
+//                    }
+//                }
             }
         }
     }
@@ -143,16 +143,16 @@ struct TeamListView: View {
             }
             
             HStack(spacing: 10) {
-//                ForEach(team.teamStocks, id: \.self) { itemName in
-//                    VStack {
-//                        Image("\(itemName.productName)")
-//                            .resizable()
-//                            .frame(width: 40, height: 40)
-//                        Text("\(itemName.remainingStock)")
-//                            .font(.custom("Lato-Regular", size: 16))
-//                            .foregroundStyle(Color.gray)
-//                    }
-//                }
+                ForEach(team.teamStocks, id: \.self) { itemName in
+                    VStack {
+                        Image("\(itemName.productName)")
+                            .resizable()
+                            .frame(width: 40, height: 40)
+                        Text("\(itemName.remainingStock)")
+                            .font(.custom("Lato-Regular", size: 16))
+                            .foregroundStyle(Color.gray)
+                    }
+                }
                 Spacer()
                 HStack {
                     Image("tokenCoin")
@@ -202,6 +202,7 @@ struct TeamListView: View {
                 DispatchQueue.main.async {
                     updateGameStateViewModel.hostRoomCode = hostRoomCode
                     updateGameStateViewModel.currentGameState = GameState.SnowFlakeCreation
+                    updateGameStateViewModel.currentRoundNumber = 1
                     updateGameStateViewModel.updateGameState()
                 }
             } else {

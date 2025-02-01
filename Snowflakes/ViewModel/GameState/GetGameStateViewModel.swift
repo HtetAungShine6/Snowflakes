@@ -10,6 +10,7 @@ import Foundation
 class GetGameStateViewModel: ObservableObject {
     
     @Published var gameState: GameStateMessage? = nil
+    @Published var currentRoundNumber: Int = 0
     @Published var isLoading: Bool = false
     @Published var isSuccess: Bool = false
     @Published var errorMessage: String? = ""
@@ -30,8 +31,10 @@ class GetGameStateViewModel: ObservableObject {
                 switch result {
                 case .success(let gameStateResponse):
                     self?.gameState = gameStateResponse.message
+                    self?.currentRoundNumber = gameStateResponse.message.currentRoundNumber
                     self?.isSuccess = true
                     print("\(gameStateResponse.message)")
+                    print("Current Round Number: \(gameStateResponse.message.currentRoundNumber)")
                 case .failure(let error):
                     self?.errorMessage = "Failed to fetch Game State: \(error.localizedDescription)"
                 }

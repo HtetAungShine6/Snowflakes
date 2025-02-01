@@ -86,7 +86,7 @@ struct HostSettingView: View {
             if newValue {
                 showAlertView = true
             } else {
-//                showAlertView = false
+                showAlertView = false
             }
         })
         .onChange(of: createPlaygroundVM.isSuccess, { _, newValue in
@@ -94,6 +94,7 @@ struct HostSettingView: View {
                 createGameStateVM.hostRoomCode = hostRoomCode
                 createGameStateVM.playerRoomCode = playerRoomCode
                 createGameStateVM.currentGameState = .TeamCreation
+                createGameStateVM.currentRoundNumber = 0
                 createGameStateVM.createGameState()
             } else {
                 print("Need to handle isSuccess false error.")

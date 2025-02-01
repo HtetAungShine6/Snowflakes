@@ -11,21 +11,24 @@ class UpdateGameStateViewModel: ObservableObject {
     
     @Published var hostRoomCode: String
     @Published var currentGameState: GameState
+    @Published var currentRoundNumber: Int
     
     @Published var errorMessage: String? = nil
     @Published var isLoading: Bool = false
     @Published var isSuccess: Bool = false
     
-    init(hostRoomCode: String = "", currentGameState: GameState = .TeamCreation) {
+    init(hostRoomCode: String = "", currentGameState: GameState = .TeamCreation, currentRoundNumber: Int = 0) {
         self.hostRoomCode = hostRoomCode
         self.currentGameState = currentGameState
+        self.currentRoundNumber = currentRoundNumber
     }
     
     func updateGameState() {
         
         let newGameState = UpdateGameStateDTO(
             hostRoomCode: hostRoomCode,
-            currentGameState: currentGameState
+            currentGameState: currentGameState,
+            currentRoundNumber: currentRoundNumber
         )
         
         let updateGameStateManager = UpdateGameStateUseCase()

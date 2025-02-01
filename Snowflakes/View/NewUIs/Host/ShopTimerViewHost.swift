@@ -14,9 +14,11 @@ struct ShopTimerViewHost: View {
     
     @StateObject private var getPlaygroundVM = GetPlaygroundViewModel()
     @StateObject private var updateGameStateViewModel = UpdateGameStateViewModel()
+    @StateObject private var getGameStateViewModel = GetGameStateViewModel()
     
     @State private var timerValueFromSocket: String = ""
     @State private var isPlaying: Bool = false
+    @State private var isButtonDisabled = false
     @State private var hasNavigated: Bool = false
     
     let roomCode: String
@@ -50,17 +52,25 @@ struct ShopTimerViewHost: View {
         .navigationBarBackButtonHidden()
         .onAppear {
             getPlaygroundVM.fetchPlayground(hostRoomCode: roomCode)
+            getGameStateViewModel.fetchGameState(hostRoomCode: roomCode)
             hasNavigated = false
         }
         .onReceive(webSocketManager.$currentGameState) { currentGameState in
             if currentGameState == "SnowFlakeCreation" && !hasNavigated {
-                if navigationManager.currentRound == navigationManager.totalRound {
+                if getGameStateViewModel.currentRoundNumber == navigationManager.totalRound {
                     navigationManager.navigateTo(Destination.leaderboard)
                 } else {
-                    navigationManager.currentRound += 1
+                    getGameStateViewModel.currentRoundNumber += 1
                     navigationManager.navigateTo(Destination.hostTimerView(roomCode: roomCode))
                     hasNavigated = true
                 }
+            }
+        }
+        .onChange(of: webSocketManager.timerPaused) { _, newValue in
+            if newValue {
+                isPlaying = false
+            } else {
+                isPlaying = true
             }
         }
     }
@@ -105,25 +115,32 @@ struct ShopTimerViewHost: View {
     }
     
     private var controlButton: some View {
-        Button{
+        Button {
             isPlaying.toggle()
             if isPlaying {
                 webSocketManager.resumeCountdown(roomCode: roomCode)
             } else {
                 webSocketManager.pauseCountdown(roomCode: roomCode)
             }
+            isButtonDisabled = true
+            DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+                isButtonDisabled = false
+            }
         } label: {
-            Image(systemName: isPlaying ? "pause.fill" : "play.fill")
-                .resizable()
-                .scaledToFit()
-                .frame(width: 25, height: 25)
+            ZStack {
+                Circle()
+                    .fill(AppColors.glacialBlue)
+                    .frame(width: 70, height: 70)
+                    .shadow(color: AppColors.glacialBlue, radius: 5, x: 0, y: 1)
+                
+                Image(systemName: isPlaying ? "pause.fill" : "play.fill")
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: 25, height: 25)
+                    .foregroundColor(.white)
+            }
         }
-        .frame(width: 40, height: 40)
-        .foregroundColor(.white)
-        .padding()
-        .background(AppColors.glacialBlue)
-        .clipShape(Circle())
-        .shadow(color: AppColors.glacialBlue, radius: 5, x: 0, y: 1)
+        .disabled(isButtonDisabled)
     }
     
     private var adjustTimeField: some View {
@@ -167,9 +184,9 @@ struct ShopTimerViewHost: View {
     private var nextRoundButton: some View {
         SwipeToConfirmButton {
             if let rounds = getPlaygroundVM.playgroundInfo?.rounds.sorted(by: { $0.duration < $1.duration }),
-               navigationManager.currentRound < rounds.count + 1 {
+               getGameStateViewModel.currentRoundNumber < rounds.count + 1 {
                 
-                let adjustedRoundIndex = min(navigationManager.currentRound, rounds.count - 1)
+                let adjustedRoundIndex = min(getGameStateViewModel.currentRoundNumber, rounds.count - 1)
                 
                 if adjustedRoundIndex > 0 {
                     let currentRoundInfo = rounds[adjustedRoundIndex]
@@ -177,7 +194,7 @@ struct ShopTimerViewHost: View {
                     
                     webSocketManager.stopCountdown(roomCode: roomCode)
                     
-                    if navigationManager.currentRound != navigationManager.totalRound {
+                    if getGameStateViewModel.currentRoundNumber != navigationManager.totalRound {
                         webSocketManager.createTimer(roomCode: roomCode, socketMessage: duration, gameState: "SnowFlakeCreation")
                         DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
                             webSocketManager.startCountdown(roomCode: roomCode)
@@ -190,6 +207,7 @@ struct ShopTimerViewHost: View {
                     DispatchQueue.main.async {
                         updateGameStateViewModel.hostRoomCode = roomCode
                         updateGameStateViewModel.currentGameState = GameState.SnowFlakeCreation
+                        updateGameStateViewModel.currentRoundNumber = getGameStateViewModel.currentRoundNumber + 1
                         updateGameStateViewModel.updateGameState()
                     }
                 } else {
@@ -203,3 +221,26 @@ struct ShopTimerViewHost: View {
         }
     }
 }
+
+
+//    private var controlButton: some View {
+//        Button{
+//            isPlaying.toggle()
+//            if isPlaying {
+//                webSocketManager.resumeCountdown(roomCode: roomCode)
+//            } else {
+//                webSocketManager.pauseCountdown(roomCode: roomCode)
+//            }
+//        } label: {
+//            Image(systemName: isPlaying ? "pause.fill" : "play.fill")
+//                .resizable()
+//                .scaledToFit()
+//                .frame(width: 25, height: 25)
+//        }
+//        .frame(width: 40, height: 40)
+//        .foregroundColor(.white)
+//        .padding()
+//        .background(AppColors.glacialBlue)
+//        .clipShape(Circle())
+//        .shadow(color: AppColors.glacialBlue, radius: 5, x: 0, y: 1)
+//    }
