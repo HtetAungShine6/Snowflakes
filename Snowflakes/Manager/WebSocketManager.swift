@@ -12,7 +12,7 @@ import Starscream
 class WebSocketManager: ObservableObject, WebSocketDelegate {
     
     private var socket: WebSocket!
-    
+
     @Published var message: String = ""
     @Published var isConnected: Bool = false
     @Published var countdown: String = ""
