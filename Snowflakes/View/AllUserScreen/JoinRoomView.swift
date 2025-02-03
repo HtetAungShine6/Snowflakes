@@ -30,6 +30,9 @@ struct JoinRoomView: View {
     @FocusState private var isRoomCodeFocused: Bool
     @FocusState private var isUserNameFocused: Bool
     
+    @State private var keyboardIsVisible: Bool = false
+
+    
     enum Role {
         case host
         case player
@@ -45,14 +48,16 @@ struct JoinRoomView: View {
                     VStack(spacing: 20) {
                         Spacer()
                         
-                        rotatingSnowflakeIcon(size: min(geometry.size.width * 0.9, 290))
-                            .padding(.bottom, -20)
-                        
-                        Text("Snowflake")
-                            .font(Font.custom("Futura-Medium", size: 40).weight(.medium))
-                            .foregroundColor(.black)
-                            .padding(.top, -10)
-                        
+                        if !keyboardIsVisible {
+                            rotatingSnowflakeIcon(size: min(geometry.size.width * 0.9, 290))
+                                .padding(.bottom, -20)
+                            
+                            Text("Snowflake")
+                                .font(Font.custom("Futura-Medium", size: 40).weight(.medium))
+                                .foregroundColor(.black)
+                                .padding(.top, -10)
+                        }
+
                         VStack(spacing: 20) {
                             roleSelectionView
                             if selectedRole != nil {
@@ -74,6 +79,13 @@ struct JoinRoomView: View {
                  isRoomCodeFocused = false
                  isUserNameFocused = false
              }
+            .onReceive(NotificationCenter.default.publisher(for: UIResponder.keyboardWillShowNotification)) { _ in
+                keyboardIsVisible = true
+            }
+            .onReceive(NotificationCenter.default.publisher(for: UIResponder.keyboardWillHideNotification)) { _ in
+                keyboardIsVisible = false
+            }
+
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {
                     Button(action: {
