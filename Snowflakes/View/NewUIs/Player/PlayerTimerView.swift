@@ -7,6 +7,7 @@ struct PlayerTimerView: View {
     
     @StateObject private var getPlaygroundVM = GetPlaygroundViewModel()
     @StateObject private var updateGameStateViewModel = UpdateGameStateViewModel()
+    @StateObject private var getGameStateViewModel = GetGameStateViewModel()
     
     @State private var timerValueFromSocket: String = ""
     @State private var sendMessageText: String = ""
@@ -48,6 +49,9 @@ struct PlayerTimerView: View {
         )
         .navigationBarBackButtonHidden()
         .onAppear {
+            DispatchQueue.main.asyncAfter(deadline: .now()+0.5) {
+                getGameStateViewModel.fetchGameState(playerRoomCode: playerRoomCode)
+            }
             getPlaygroundVM.fetchPlayground(hostRoomCode: hostRoomCode)
             hasNavigated = false
         }
@@ -78,7 +82,7 @@ struct PlayerTimerView: View {
                     .font(.custom("Montserrat-Medium", size: 32))
                     .foregroundStyle(Color.black)
                 
-                Text("Round (\(navigationManager.currentRound)/\(navigationManager.totalRound))")
+                Text("Round (\(getGameStateViewModel.currentRoundNumber)/\(navigationManager.totalRound))")
                     .foregroundStyle(Color.gray)
             }
             Spacer()

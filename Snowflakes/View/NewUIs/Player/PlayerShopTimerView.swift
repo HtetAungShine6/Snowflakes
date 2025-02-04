@@ -14,6 +14,7 @@ struct PlayerShopTimerView: View {
     
     @StateObject private var getPlaygroundVM = GetPlaygroundViewModel()
     @StateObject private var updateGameStateViewModel = UpdateGameStateViewModel()
+    @StateObject private var getGameStateViewModel = GetGameStateViewModel()
     
     @State private var timerValueFromSocket: String = ""
     @State private var sendMessageText: String = ""
@@ -57,12 +58,8 @@ struct PlayerShopTimerView: View {
         .navigationBarBackButtonHidden()
         .onAppear {
             getPlaygroundVM.fetchPlayground(hostRoomCode: hostRoomCode)
+            getGameStateViewModel.fetchGameState(playerRoomCode: playerRoomCode)
             hasNavigated = false
-        }
-        .onReceive(getPlaygroundVM.$playgroundInfo) { playgroundInfo in
-            if let rounds = playgroundInfo?.rounds, !rounds.isEmpty {
-                navigationManager.totalRound = rounds.count
-            }
         }
         .onChange(of: getPlaygroundVM.isLoading, { _, newValue in
             if newValue {
@@ -73,10 +70,10 @@ struct PlayerShopTimerView: View {
         })
         .onReceive(webSocketManager.$currentGameState) { currentGameState in
             if currentGameState == "SnowFlakeCreation" && !hasNavigated {
-                if navigationManager.currentRound == navigationManager.totalRound {
+                if getGameStateViewModel.currentRoundNumber == navigationManager.totalRound {
                     navigationManager.navigateTo(Destination.leaderboard)
                 } else {
-                    navigationManager.currentRound += 1
+                    getGameStateViewModel.currentRoundNumber += 1
                     navigationManager.navigateTo(Destination.playerTimerView(hostRoomCode: hostRoomCode, playerRoomCode: playerRoomCode))
                     hasNavigated = true
                 }
@@ -91,7 +88,7 @@ struct PlayerShopTimerView: View {
                     .font(.custom("Montserrat-Medium", size: 32))
                     .foregroundStyle(Color.black)
                 
-                Text("Round (\(navigationManager.currentRound)/\(navigationManager.totalRound))")
+                Text("Round (\(getGameStateViewModel.currentRoundNumber)/\(navigationManager.totalRound))")
                     .foregroundStyle(Color.gray)
             }
             Spacer()

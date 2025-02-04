@@ -21,6 +21,8 @@ struct ShopTimerViewHost: View {
     @State private var isButtonDisabled = false
     @State private var hasNavigated: Bool = false
     
+    @State private var gameState: String = ""
+    
     let roomCode: String
     
     var body: some View {
@@ -60,8 +62,8 @@ struct ShopTimerViewHost: View {
                 if getGameStateViewModel.currentRoundNumber == navigationManager.totalRound {
                     navigationManager.navigateTo(Destination.leaderboard)
                 } else {
-                    getGameStateViewModel.currentRoundNumber += 1
                     navigationManager.navigateTo(Destination.hostTimerView(roomCode: roomCode))
+                    getGameStateViewModel.currentRoundNumber += 1
                     hasNavigated = true
                 }
             }

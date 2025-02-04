@@ -94,7 +94,7 @@ struct HostSettingView: View {
                 createGameStateVM.hostRoomCode = hostRoomCode
                 createGameStateVM.playerRoomCode = playerRoomCode
                 createGameStateVM.currentGameState = .TeamCreation
-                createGameStateVM.currentRoundNumber = 0
+                createGameStateVM.currentRoundNumber = 1
                 createGameStateVM.createGameState()
             } else {
                 print("Need to handle isSuccess false error.")
