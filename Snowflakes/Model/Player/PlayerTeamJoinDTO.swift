@@ -11,3 +11,8 @@ struct PlayerTeamJoinDTO: Codable {
     let playerRoomCode: String
     let status: String
 }
+
+struct PlayerTeamJoinResponse: Codable {
+    let success: Bool
+    let message: String
+}

@@ -86,7 +86,6 @@ struct JoinRoomView: View {
             .onReceive(NotificationCenter.default.publisher(for: UIResponder.keyboardWillHideNotification)) { _ in
                 keyboardIsVisible = false
             }
-
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {
                     Button(action: {
@@ -172,6 +171,9 @@ struct JoinRoomView: View {
                 if let errorMessage = errorMessage {
                     print("Error: \(errorMessage)")
                 }
+            }
+            .onAppear {
+                UserDefaults.standard.removeObject(forKey: "15HROJ")
             }
         }
     }
