@@ -39,7 +39,6 @@ struct JoinRoomView: View {
     }
     
     var body: some View {
-        
         GeometryReader { geometry in
             VStack(spacing: 20) {
                 if showAlertView {
@@ -47,11 +46,11 @@ struct JoinRoomView: View {
                 } else {
                     VStack(spacing: 20) {
                         Spacer()
-                        
+
                         if !keyboardIsVisible {
                             rotatingSnowflakeIcon(size: min(geometry.size.width * 0.9, 290))
                                 .padding(.bottom, -20)
-                            
+
                             Text("Snowflake")
                                 .font(Font.custom("Futura-Medium", size: 40).weight(.medium))
                                 .foregroundColor(.black)
@@ -62,12 +61,14 @@ struct JoinRoomView: View {
                             roleSelectionView
                             if selectedRole != nil {
                                 roomCodeTextField
-                                userNameTextField
+                                if selectedRole == .player {
+                                    userNameTextField
+                                }
                                 confirmButton
                             }
                         }
                         .padding(.top, 10)
-                        
+
                         Spacer()
                     }
                     .padding(.horizontal, 30)
