@@ -131,7 +131,9 @@ struct JoinRoomView: View {
             .onReceive(getGameStateVM.$gameState) { gameState in
                 if let currentState = gameState?.currentGameState {
                     if let hostRoomCode = gameState?.hostRoomCode, let playerRoomCode = gameState?.playerRoomCode {
-                        websocketManager.joinGroup(roomCode: hostRoomCode)
+                        DispatchQueue.main.async {
+                            websocketManager.joinGroup(roomCode: hostRoomCode)
+                        }
                         switch currentState {
                         case "TeamCreation":
                             if let selectedRole = selectedRole {
