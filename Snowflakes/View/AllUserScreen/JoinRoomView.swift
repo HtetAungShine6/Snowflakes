@@ -12,7 +12,6 @@ struct JoinRoomView: View {
     @EnvironmentObject var navigationManager: NavigationManager
     @EnvironmentObject var websocketManager: WebSocketManager
     
-    @ObservedObject private var getTeamsByRoomCodeVM = GetTeamsByRoomCode()
     @ObservedObject private var getGameStateVM = GetGameStateViewModel()
     @ObservedObject private var getPlayerVM = GetPlayerViewModel()
     @ObservedObject private var createPlayerVM = CreatePlayerViewModel()
@@ -97,34 +96,11 @@ struct JoinRoomView: View {
                 }
             }
             .navigationBarBackButtonHidden()
-            .onChange(of: getTeamsByRoomCodeVM.isLoading) { _, newValue in
-                if newValue {
-                    showAlertView = true
-                } else {
-                    showAlertView = false
-                }
-            }
             .onChange(of: getGameStateVM.isLoading) { _, newValue in
                 if newValue {
                     showAlertView = true
                 } else {
                     showAlertView = false
-                }
-            }
-            .onReceive(getTeamsByRoomCodeVM.$teams) { teams in
-                print("On Receive Teams")
-                if !teams.isEmpty {
-                    self.teams = teams
-                    if let selectedRole = selectedRole {
-                        switch selectedRole {
-                        case .host:
-                            navigationManager.navigateTo(Destination.teamListView(team: teams))
-                        case .player:
-                            navigationManager.navigateTo(Destination.teamListPlayerView(team: teams))
-                        }
-                    }
-                } else {
-                    print("Empty Teams")
                 }
             }
             .onReceive(getGameStateVM.$gameState) { gameState in
@@ -138,9 +114,9 @@ struct JoinRoomView: View {
                             if let selectedRole = selectedRole {
                                 switch selectedRole {
                                 case .host:
-                                    getTeamsByRoomCodeVM.fetchTeams(hostRoomCode: roomCode)
+                                    navigationManager.navigateTo(Destination.teamListView(hostRoomCode: hostRoomCode))
                                 case .player:
-                                    getTeamsByRoomCodeVM.fetchTeams(playerRoomCode: roomCode)
+                                    navigationManager.navigateTo(Destination.teamListPlayerView(playerRoomCode: playerRoomCode))
                                 }
                             }
                         case "SnowFlakeCreation":
@@ -161,19 +137,20 @@ struct JoinRoomView: View {
                                     navigationManager.navigateTo(Destination.playerShopTimerView(hostRoomCode: hostRoomCode, playerRoomCode: playerRoomCode))
                                 }
                             }
+                        case "Leaderboard":
+                            if let selectedRole = selectedRole{
+                                switch selectedRole {
+                                case .host:
+                                    navigationManager.navigateTo(Destination.leaderboard)
+                                case .player:
+                                    navigationManager.navigateTo(Destination.leaderboard)
+                                }
+                            }
                         default:
                             print("Unhandled game state: \(currentState)")
                         }
                     }
                 }
-            }
-            .onReceive(getTeamsByRoomCodeVM.$errorMessage) { errorMessage in
-                if let errorMessage = errorMessage {
-                    print("Error: \(errorMessage)")
-                }
-            }
-            .onAppear {
-                UserDefaults.standard.removeObject(forKey: "15HROJ")
             }
         }
     }

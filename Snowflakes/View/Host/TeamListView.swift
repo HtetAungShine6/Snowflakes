@@ -14,11 +14,13 @@ struct TeamListView: View {
     
     @StateObject private var updateGameStateViewModel = UpdateGameStateViewModel()
     @StateObject private var getPlaygroundVM = GetPlaygroundViewModel()
+    @StateObject private var getTeamsByRoomCodeVM = GetTeamsByRoomCode()
     
     @State private var showAlertView: Bool = false
     @State private var hasNavigated = false
+    @State private var teams: [Team] = []
     
-    let teams: [Team]
+    let hostRoomCode: String
     
     var body: some View {
 
@@ -32,7 +34,7 @@ struct TeamListView: View {
                         ProgressView()
                             .progressViewStyle(CircularProgressViewStyle(tint: .white))
                             .scaleEffect(2)
-                        Text("Updating your Playground...")
+                        Text("Loading your Playground...")
                             .font(.custom("Lato-Bold", size: 20))
                             .foregroundColor(.white)
                         Text("This may take a few seconds.")
@@ -55,39 +57,44 @@ struct TeamListView: View {
                         }
                         .padding()
                     }
+                    .refreshable {
+                        getTeamsByRoomCodeVM.fetchTeams(hostRoomCode: hostRoomCode)
+                    }
                     startPlaygroundButton
                         .padding()
                 }
                 .toolbar {
                     ToolbarItem(placement: .navigationBarLeading) {
                         Button(action: {
-                            // Action for the back button
                             navigationManager.pop()
-//                            webSocketManager.disconnect()
                         }) {
                             Image(systemName: "chevron.left")
                                 .foregroundColor(.black)
                         }
                     }
                 }
-                .navigationBarBackButtonHidden()
-                .navigationBarTitleDisplayMode(.inline)
-                .onAppear(perform: {
-                    getPlaygroundVM.fetchPlayground(hostRoomCode: hostRoomCode)
-                })
-                .onReceive(webSocketManager.$currentGameState) {  currentGameState in
-                    if currentGameState == "SnowFlakeCreation" {
-                        if !hasNavigated {
-                            navigationManager.navigateTo(Destination.hostTimerView(roomCode: hostRoomCode))
-                            hasNavigated = true
-                        }
-                    }
+            }
+        }
+        .navigationBarBackButtonHidden()
+        .navigationBarTitleDisplayMode(.inline)
+        .onAppear(perform: {
+            getPlaygroundVM.fetchPlayground(hostRoomCode: hostRoomCode)
+            getTeamsByRoomCodeVM.fetchTeams(hostRoomCode: hostRoomCode)
+        })
+        .onReceive(webSocketManager.$currentGameState) {  currentGameState in
+            if currentGameState == "SnowFlakeCreation" {
+                if !hasNavigated {
+                    navigationManager.navigateTo(Destination.hostTimerView(roomCode: hostRoomCode))
+                    hasNavigated = true
                 }
-//                .onChange(of: webSocketManager.timerStarted) { _, newValue in
-//                    if newValue {
-//                        navigationManager.currentRound = 1
-//                    }
-//                }
+            }
+        }
+//        .onChange(of: getTeamsByRoomCodeVM.isLoading, { _, newValue in
+//            showAlertView = newValue
+//        })
+        .onReceive(getTeamsByRoomCodeVM.$teams) { teams in
+            if !teams.isEmpty {
+                self.teams = teams
             }
         }
     }
@@ -106,10 +113,6 @@ struct TeamListView: View {
             }
         }
         .padding(.horizontal)
-    }
-    
-    private var hostRoomCode: String {
-        teams.first?.hostRoomCode ?? "N/A"
     }
     
     private var playerRoomCode: String {
@@ -219,8 +222,3 @@ struct TeamListView: View {
         }
     }
 }
-
-//#Preview {
-//    TeamListView(hostRoomCode: "ABC12", playerRoomCode: "DFH123")
-//}
-//

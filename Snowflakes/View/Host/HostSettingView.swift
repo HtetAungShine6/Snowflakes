@@ -102,22 +102,23 @@ struct HostSettingView: View {
         })
         .onChange(of: createGameStateVM.isSuccess, { _, newValue in
             if newValue {
-                getTeamsByRoomCodeVM.fetchTeams(hostRoomCode: hostRoomCode)
+                webSocketManager.joinGroup(roomCode: hostRoomCode)
+                navigationManager.navigateTo(Destination.teamListView(hostRoomCode: hostRoomCode))
             } else {
                 print("Need to handle isSuccess false error.")
             }
         })
-        .onReceive(getTeamsByRoomCodeVM.$teams) { teams in
-            if !teams.isEmpty {
-                webSocketManager.joinGroup(roomCode: hostRoomCode)
-                navigationManager.navigateTo(Destination.teamListView(team: teams)) 
-            }
-        }
-        .onReceive(getTeamsByRoomCodeVM.$errorMessage) { errorMessage in
-            if let errorMessage = errorMessage {
-                print("Error: \(errorMessage)")
-            }
-        }
+//        .onReceive(getTeamsByRoomCodeVM.$teams) { teams in
+//            if !teams.isEmpty {
+//                webSocketManager.joinGroup(roomCode: hostRoomCode)
+//                navigationManager.navigateTo(Destination.teamListView(hostRoomCode: hostRoomCode)) 
+//            }
+//        }
+//        .onReceive(getTeamsByRoomCodeVM.$errorMessage) { errorMessage in
+//            if let errorMessage = errorMessage {
+//                print("Error: \(errorMessage)")
+//            }
+//        }
     }
     
     //MARK: - Setting Bar

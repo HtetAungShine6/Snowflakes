@@ -88,7 +88,7 @@ struct ShopTimerViewHost: View {
             }
             Spacer()
             Button {
-                print("Shop Button tapped!")
+                navigationManager.navigateTo(Destination.hostShopView)
             }label: {
                 Image("shop2")
                     .resizable()
@@ -202,21 +202,20 @@ struct ShopTimerViewHost: View {
                             webSocketManager.startCountdown(roomCode: roomCode)
                             webSocketManager.pauseCountdown(roomCode: roomCode)
                         }
+                        
+                        DispatchQueue.main.async {
+                            updateGameStateViewModel.hostRoomCode = roomCode
+                            updateGameStateViewModel.currentGameState = GameState.SnowFlakeCreation
+                            updateGameStateViewModel.currentRoundNumber = getGameStateViewModel.currentRoundNumber + 1
+                            updateGameStateViewModel.updateGameState()
+                        }
                     } else {
                         webSocketManager.createTimer(roomCode: roomCode, socketMessage: "01:00", gameState: "SnowFlakeCreation")
-                    }
-                    
-                    DispatchQueue.main.async {
-                        updateGameStateViewModel.hostRoomCode = roomCode
-                        updateGameStateViewModel.currentGameState = GameState.SnowFlakeCreation
-                        updateGameStateViewModel.currentRoundNumber = getGameStateViewModel.currentRoundNumber + 1
-                        updateGameStateViewModel.updateGameState()
-                    }
-                } else {
-                    DispatchQueue.main.async {
-                        updateGameStateViewModel.hostRoomCode = roomCode
-                        updateGameStateViewModel.currentGameState = GameState.Leaderboard
-                        updateGameStateViewModel.updateGameState()
+                        DispatchQueue.main.async {
+                            updateGameStateViewModel.hostRoomCode = roomCode
+                            updateGameStateViewModel.currentGameState = GameState.Leaderboard
+                            updateGameStateViewModel.updateGameState()
+                        }
                     }
                 }
             }

@@ -18,8 +18,8 @@ class GetTeamsByRoomCode: ObservableObject {
     
     func fetchTeams(hostRoomCode: String? = nil, playerRoomCode: String? = nil) {
         
-        isLoading = true
-        errorMessage = nil
+        self.isLoading = true
+        self.errorMessage = nil
         
         let getTeamsByRoomCodeUseCase = GetTeamByRoomCodeUseCase(
             hostRoomCode: hostRoomCode,
