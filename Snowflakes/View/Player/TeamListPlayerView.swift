@@ -12,17 +12,19 @@ struct TeamListPlayerView: View {
     @EnvironmentObject var navigationManager: NavigationManager
     @EnvironmentObject var webSocketManager: WebSocketManager
     @State private var joinedTeams: [Int: Bool] = [:]
-    @StateObject private var getPlaygroundVM = GetPlaygroundViewModel()
-//    @State private var isJoined: Bool = false
-    @State private var hasNavigated = false
+    @State private var joinedTeamNumber: Int?
+    @StateObject private var joinTeamVM = JoinTeamViewModel()
+    @StateObject private var getTeamsByRoomCodeVM = GetTeamsByRoomCode()
+    @State private var teams: [Team] = []
+    @State private var hasNavigated: Bool = false
     
-    let teams: [Team]
+    let playerRoomCode: String
     
     var body: some View {
-        
         VStack(alignment: .leading) {
             navBar
             totalNumberPlayers
+            
             ScrollView {
                 VStack(alignment: .leading) {
                     ForEach(teams, id: \.teamNumber) { team in
@@ -32,24 +34,22 @@ struct TeamListPlayerView: View {
                 }
                 .padding()
             }
+            .refreshable {
+                refreshTeams()
+            }
+            
             waitingForHostButton
                 .padding()
         }
-        .toolbar {
-            ToolbarItem(placement: .navigationBarLeading) {
-                Button(action: {
-                    navigationManager.pop()
-                }) {
-                    Image(systemName: "chevron.left")
-                        .foregroundColor(.black)
-                }
+        .onAppear {
+            getTeamsByRoomCodeVM.fetchTeams(playerRoomCode: playerRoomCode)
+        }
+        .onReceive(getTeamsByRoomCodeVM.$teams) { newTeams in
+            if !newTeams.isEmpty {
+                self.teams = newTeams
+                updateJoinedTeams()
             }
         }
-        .navigationBarBackButtonHidden()
-        .navigationBarTitleDisplayMode(.inline)
-        .onAppear(perform: {
-            getPlaygroundVM.fetchPlayground(hostRoomCode: hostRoomCode)
-        })
         .onReceive(webSocketManager.$currentGameState) {  currentGameState in
             if currentGameState == "SnowFlakeCreation" {
                 if !hasNavigated {
@@ -58,19 +58,24 @@ struct TeamListPlayerView: View {
                 }
             }
         }
-        .onChange(of: webSocketManager.timerStarted) { _, newValue in
-            if newValue {
-                navigationManager.currentRound = 1
-            }
-        }
     }
     
     private var hostRoomCode: String {
         teams.first?.hostRoomCode ?? "N/A"
     }
     
-    private var playerRoomCode: String {
-        teams.first?.playerRoomCode ?? "N/A"
+    private var totalPlayerCount: Int {
+        teams.reduce(0) { total, team in
+            total + (team.members?.count ?? 0)
+        }
+    }
+    
+    private var totalNumberPlayers: some View {
+        HStack {
+            Text("Player: \(totalPlayerCount)")
+                .font(.custom("Lato-Medium", size: 15))
+        }
+        .padding(.horizontal)
     }
     
     private var navBar: some View {
@@ -87,22 +92,10 @@ struct TeamListPlayerView: View {
         .padding(.horizontal)
     }
     
-    private var totalPlayerCount: Int {
-        teams.reduce(0) { total, team in
-            total + (team.members?.count ?? 0)
-        }
-    }
-    
-    private var totalNumberPlayers: some View {
-        HStack {
-            Text("Player: \(totalPlayerCount)")
-                .font(.custom("Lato-Medium", size: 15))
-        }
-        .padding(.horizontal)
-    }
-
     private func teamCardView(team: Team) -> some View {
         let isJoined = joinedTeams[team.teamNumber] ?? false
+        let isDisabled = joinedTeamNumber != nil && joinedTeamNumber != team.teamNumber
+        
         return VStack(alignment: .leading, spacing: 10) {
             HStack {
                 Text("Team: \(team.teamNumber)")
@@ -111,9 +104,10 @@ struct TeamListPlayerView: View {
                     .font(.custom("Lato-Regular", size: 16))
                     .foregroundStyle(Color.gray)
                 Spacer()
+                
                 Button(action: {
                     withAnimation {
-                        joinedTeams[team.teamNumber] = !(joinedTeams[team.teamNumber] ?? false)
+                        toggleTeamMembership(for: team)
                     }
                 }) {
                     Text(isJoined ? "Leave" : "Join")
@@ -124,9 +118,11 @@ struct TeamListPlayerView: View {
                         .foregroundColor(isJoined ? .red : .green)
                         .overlay(
                             RoundedRectangle(cornerRadius: 15)
-                                .stroke(Color.black, lineWidth: 1)
+                                .stroke(isDisabled ? Color.gray : Color.black, lineWidth: 1)
                         )
                 }
+                .disabled(isDisabled)
+                .opacity(isDisabled ? 0.5 : 1.0)
             }
             
             HStack(spacing: 10) {
@@ -160,7 +156,6 @@ struct TeamListPlayerView: View {
         .padding()
         .background(RoundedRectangle(cornerRadius: 8).stroke(Color.secondary))
     }
-
     
     private var waitingForHostButton: some View {
         HStack {
@@ -171,13 +166,49 @@ struct TeamListPlayerView: View {
             Spacer()
         }
     }
+    
+    // MARK: - Functions
+    
+    private func refreshTeams() {
+        getTeamsByRoomCodeVM.fetchTeams(playerRoomCode: playerRoomCode)
+    }
+    
+    private func updateJoinedTeams() {
+        if let playerName = UserDefaults.standard.string(forKey: "\(playerRoomCode)") {
+            for team in teams {
+                if team.members?.contains(playerName) == true {
+                    joinedTeams[team.teamNumber] = true
+                    joinedTeamNumber = team.teamNumber
+                }
+            }
+        }
+    }
+    
+    private func toggleTeamMembership(for team: Team) {
+        guard let playerName = UserDefaults.standard.string(forKey: "\(playerRoomCode)") else {
+            return
+        }
+        let isCurrentlyJoined = joinedTeams[team.teamNumber] ?? false
+        
+        if isCurrentlyJoined {
+            joinedTeams[team.teamNumber] = false
+            joinedTeamNumber = nil
+            
+            joinTeamVM.teamNumber = team.teamNumber
+            joinTeamVM.playerRoomCode = team.playerRoomCode
+            joinTeamVM.status = "remove"
+            joinTeamVM.playerName = playerName
+            joinTeamVM.join()
+        } else {
+            joinedTeams.keys.forEach { joinedTeams[$0] = false }
+            joinedTeams[team.teamNumber] = true
+            joinedTeamNumber = team.teamNumber
+            
+            joinTeamVM.teamNumber = team.teamNumber
+            joinTeamVM.playerRoomCode = team.playerRoomCode
+            joinTeamVM.status = "add"
+            joinTeamVM.playerName = playerName
+            joinTeamVM.join()
+        }
+    }
 }
-
-//#Preview {
-//    TeamListPlayerView(teams: [])
-//        .environmentObject(NavigationManager())
-//}
-//#Preview {
-//    TeamListView(hostRoomCode: "ABC12", playerRoomCode: "DFH123")
-//}
-//

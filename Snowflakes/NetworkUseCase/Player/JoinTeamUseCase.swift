@@ -8,7 +8,7 @@
 import Foundation
 
 class JoinTeamUseCase: APIManager {
-    typealias ModelType = PlayerResponse
+    typealias ModelType = PlayerTeamJoinResponse
     var methodPath: String {
         return "/player/status"
     }

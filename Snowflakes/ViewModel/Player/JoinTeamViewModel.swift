@@ -46,7 +46,7 @@ class JoinTeamViewModel: ObservableObject {
                     print("New Team Joined: \(joinedTeam.message)")
                     self?.isSuccess = true
                 case .failure(let error):
-                    self?.errorMessage = "Failed to join team: \(error.localizedDescription)"
+                    self?.errorMessage = "Failded to join team: \(error.localizedDescription)"
                     print(error.localizedDescription)
                 }
             }
