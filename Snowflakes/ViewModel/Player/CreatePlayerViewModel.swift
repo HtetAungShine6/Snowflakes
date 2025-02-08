@@ -40,7 +40,8 @@ class CreatePlayerViewModel: ObservableObject {
                     print("New Player Created: \(newPlayer.message)")
                     self?.isSuccess = true
                 case .failure(let error):
-                    self?.errorMessage = "Failed to create team: \(error.localizedDescription)"
+//                    self?.errorMessage = "Failed to create team: \(error.localizedDescription)"
+                    self?.errorMessage = "The room code that you entered is not correct. Please try again."
                     print(error.localizedDescription)
                 }
             }

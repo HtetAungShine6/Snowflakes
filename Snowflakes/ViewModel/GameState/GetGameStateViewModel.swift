@@ -36,7 +36,7 @@ class GetGameStateViewModel: ObservableObject {
                     print("\(gameStateResponse.message)")
                     print("Current Round Number: \(gameStateResponse.message.currentRoundNumber)")
                 case .failure(let error):
-                    self?.errorMessage = "Failed to fetch Game State: \(error.localizedDescription)"
+                    self?.errorMessage = "The room code that you entered is incorrect."
                 }
             }
         }

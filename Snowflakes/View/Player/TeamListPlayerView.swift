@@ -118,7 +118,7 @@ struct TeamListPlayerView: View {
                         .foregroundColor(isJoined ? .red : .green)
                         .overlay(
                             RoundedRectangle(cornerRadius: 15)
-                                .stroke(isDisabled ? Color.gray : Color.black, lineWidth: 1)
+                                .stroke(isJoined ? Color.green : Color.black, lineWidth: 2) // Change border color based on membership
                         )
                 }
                 .disabled(isDisabled)
@@ -154,7 +154,7 @@ struct TeamListPlayerView: View {
             }
         }
         .padding()
-        .background(RoundedRectangle(cornerRadius: 8).stroke(Color.secondary))
+        .background(RoundedRectangle(cornerRadius: 8).stroke(isJoined ? Color.green : Color.secondary, lineWidth: 2)) // Change background border color based on membership
     }
     
     private var waitingForHostButton: some View {
