@@ -22,6 +22,9 @@ struct JoinRoomView: View {
     @State private var selectedRole: Role? = nil
     @State private var teams: [Team] = []
     @State private var showAlertView: Bool = false
+    @State private var showAlert: Bool = false
+    @State private var alertTitle: String = ""
+    @State private var alertMessage: String = ""
     
     @State private var shopPeriod: Bool = false
     @State private var isSuccess: Bool = false
@@ -30,7 +33,7 @@ struct JoinRoomView: View {
     @FocusState private var isUserNameFocused: Bool
     
     @State private var keyboardIsVisible: Bool = false
-
+    
     
     enum Role {
         case host
@@ -45,17 +48,17 @@ struct JoinRoomView: View {
                 } else {
                     VStack(spacing: 20) {
                         Spacer()
-
+                        
                         if !keyboardIsVisible {
                             rotatingSnowflakeIcon(size: min(geometry.size.width * 0.9, 290))
                                 .padding(.bottom, -20)
-
+                            
                             Text("Snowflake")
                                 .font(Font.custom("Futura-Medium", size: 40).weight(.medium))
                                 .foregroundColor(.black)
                                 .padding(.top, -10)
                         }
-
+                        
                         VStack(spacing: 20) {
                             roleSelectionView
                             if selectedRole != nil {
@@ -67,7 +70,7 @@ struct JoinRoomView: View {
                             }
                         }
                         .padding(.top, 10)
-
+                        
                         Spacer()
                     }
                     .padding(.horizontal, 30)
@@ -76,9 +79,9 @@ struct JoinRoomView: View {
             .background(Color(UIColor.systemBackground))
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .onTapGesture {
-                 isRoomCodeFocused = false
-                 isUserNameFocused = false
-             }
+                isRoomCodeFocused = false
+                isUserNameFocused = false
+            }
             .onReceive(NotificationCenter.default.publisher(for: UIResponder.keyboardWillShowNotification)) { _ in
                 keyboardIsVisible = true
             }
@@ -97,61 +100,77 @@ struct JoinRoomView: View {
             }
             .navigationBarBackButtonHidden()
             .onChange(of: getGameStateVM.isLoading) { _, newValue in
-                if newValue {
-                    showAlertView = true
-                } else {
-                    showAlertView = false
+                showAlertView = newValue
+            }
+            .onChange(of: getGameStateVM.errorMessage) { newErrorMessage in
+                if let message = newErrorMessage, !message.isEmpty {
+                    alertTitle = "Error"
+                    alertMessage = message
+                    showAlert = true
                 }
             }
             .onReceive(getGameStateVM.$gameState) { gameState in
-                if let currentState = gameState?.currentGameState {
-                    if let hostRoomCode = gameState?.hostRoomCode, let playerRoomCode = gameState?.playerRoomCode {
-                        DispatchQueue.main.async {
-                            websocketManager.joinGroup(roomCode: hostRoomCode)
-                        }
-                        switch currentState {
-                        case "TeamCreation":
-                            if let selectedRole = selectedRole {
-                                switch selectedRole {
-                                case .host:
-                                    navigationManager.navigateTo(Destination.teamListView(hostRoomCode: hostRoomCode))
-                                case .player:
-                                    navigationManager.navigateTo(Destination.teamListPlayerView(playerRoomCode: playerRoomCode))
-                                }
-                            }
-                        case "SnowFlakeCreation":
-                            if let selectedRole = selectedRole {
-                                switch selectedRole {
-                                case .host:
-                                    navigationManager.navigateTo(Destination.hostTimerView(roomCode: hostRoomCode))
-                                case .player:
-                                    navigationManager.navigateTo(Destination.playerTimerView(hostRoomCode: hostRoomCode, playerRoomCode: playerRoomCode))
-                                }
-                            }
-                        case "ShopPeriod":
-                            if let selectedRole = selectedRole {
-                                switch selectedRole {
-                                case .host:
-                                    navigationManager.navigateTo(Destination.hostShopTimerView(roomCode: hostRoomCode))
-                                case .player:
-                                    navigationManager.navigateTo(Destination.playerShopTimerView(hostRoomCode: hostRoomCode, playerRoomCode: playerRoomCode))
-                                }
-                            }
-                        case "Leaderboard":
-                            if let selectedRole = selectedRole{
-                                switch selectedRole {
-                                case .host:
-                                    navigationManager.navigateTo(Destination.leaderboard)
-                                case .player:
-                                    navigationManager.navigateTo(Destination.leaderboard)
-                                }
-                            }
-                        default:
-                            print("Unhandled game state: \(currentState)")
+                   if let currentState = gameState?.currentGameState {
+                       if let hostRoomCode = gameState?.hostRoomCode, let playerRoomCode = gameState?.playerRoomCode {
+                           DispatchQueue.main.async {
+                               websocketManager.joinGroup(roomCode: hostRoomCode)
+                           }
+                           switch currentState {
+                           case "TeamCreation":
+                               if let selectedRole = selectedRole {
+                                   switch selectedRole {
+                                   case .host:
+                                       navigationManager.navigateTo(Destination.teamListView(hostRoomCode: hostRoomCode))
+                                   case .player:
+                                       navigationManager.navigateTo(Destination.teamListPlayerView(playerRoomCode: playerRoomCode))
+                                   }
+                               }
+                           case "SnowFlakeCreation":
+                               if let selectedRole = selectedRole {
+                                   switch selectedRole {
+                                   case .host:
+                                       navigationManager.navigateTo(Destination.hostTimerView(roomCode: hostRoomCode))
+                                   case .player:
+                                       navigationManager.navigateTo(Destination.playerTimerView(hostRoomCode: hostRoomCode, playerRoomCode: playerRoomCode))
+                                   }
+                               }
+                           case "ShopPeriod":
+                               if let selectedRole = selectedRole {
+                                   switch selectedRole {
+                                   case .host:
+                                       navigationManager.navigateTo(Destination.hostShopTimerView(roomCode: hostRoomCode))
+                                   case .player:
+                                       navigationManager.navigateTo(Destination.playerShopTimerView(hostRoomCode: hostRoomCode, playerRoomCode: playerRoomCode))
+                                   }
+                               }
+                           case "Leaderboard":
+                               if let selectedRole = selectedRole{
+                                   switch selectedRole {
+                                   case .host:
+                                       navigationManager.navigateTo(Destination.leaderboard)
+                                   case .player:
+                                       navigationManager.navigateTo(Destination.leaderboard)
+                                   }
+                               }
+                           default:
+                               print("Unhandled game state: \(currentState)")
                         }
                     }
                 }
             }
+        }
+        .alert(isPresented: $showAlert) {
+            Alert(title: Text(alertTitle), message: Text(alertMessage), dismissButton: .default(Text("OK")))
+        }
+    }
+    
+    private func navigateToAppropriateView(roomCode: String, playerRoomCode: String) {
+        guard let selectedRole = selectedRole else { return }
+        switch selectedRole {
+        case .host:
+            navigationManager.navigateTo(Destination.hostTimerView(roomCode: roomCode))
+        case .player:
+            navigationManager.navigateTo(Destination.playerTimerView(hostRoomCode: roomCode, playerRoomCode: playerRoomCode))
         }
     }
     
@@ -175,34 +194,34 @@ struct JoinRoomView: View {
     }
     
     private var roleSelectionView: some View {
-           HStack(spacing: 20) {
-               Button(action: {
-                   selectedRole = .host
-               }) {
-                   Text("Host")
-                       .font(Font.custom("Roboto-Regular", size: 18))
-                       .frame(maxWidth: .infinity)
-                       .padding()
-                       .background(selectedRole == .host ? Color(red: 0.69, green: 0.89, blue: 0.96) : Color.gray.opacity(0.3))
-                       .foregroundColor(.black)
-                       .cornerRadius(10)
-               }
-               
-               Button(action: {
-                   selectedRole = .player
-               }) {
-                   Text("Player")
-                       .font(Font.custom("Roboto-Regular", size: 18))
-                       .frame(maxWidth: .infinity)
-                       .padding()
-                       .background(selectedRole == .player ? Color(red: 0.69, green: 0.89, blue: 0.96) : Color.gray.opacity(0.3))
-                       .foregroundColor(.black)
-                       .cornerRadius(10)
-               }
-           }
-           .frame(maxWidth: .infinity)
-       }
-
+        HStack(spacing: 20) {
+            Button(action: {
+                selectedRole = .host
+            }) {
+                Text("Host")
+                    .font(Font.custom("Roboto-Regular", size: 18))
+                    .frame(maxWidth: .infinity)
+                    .padding()
+                    .background(selectedRole == .host ? Color(red: 0.69, green: 0.89, blue: 0.96) : Color.gray.opacity(0.3))
+                    .foregroundColor(.black)
+                    .cornerRadius(10)
+            }
+            
+            Button(action: {
+                selectedRole = .player
+            }) {
+                Text("Player")
+                    .font(Font.custom("Roboto-Regular", size: 18))
+                    .frame(maxWidth: .infinity)
+                    .padding()
+                    .background(selectedRole == .player ? Color(red: 0.69, green: 0.89, blue: 0.96) : Color.gray.opacity(0.3))
+                    .foregroundColor(.black)
+                    .cornerRadius(10)
+            }
+        }
+        .frame(maxWidth: .infinity)
+    }
+    
     private var roomCodeTextField: some View {
         TextField("Enter Room Code", text: $roomCode)
             .focused($isRoomCodeFocused)
@@ -217,7 +236,7 @@ struct JoinRoomView: View {
             .padding(.horizontal)
             .frame(maxWidth: .infinity)
     }
-
+    
     private var userNameTextField: some View {
         TextField("Enter Your Name", text: $userName)
             .focused($isUserNameFocused)
@@ -232,11 +251,32 @@ struct JoinRoomView: View {
             .padding(.horizontal)
             .frame(maxWidth: .infinity)
     }
-
     
     private var confirmButton: some View {
         Button {
             guard let role = selectedRole else { return }
+
+            if roomCode.isEmpty {
+                alertTitle = "Error"
+                alertMessage = "Room Code cannot be empty!"
+                showAlert = true
+                return
+            }
+
+            if !isValidRoomCode(roomCode) {
+                alertTitle = "Error"
+                alertMessage = "Invalid Room Code!"
+                showAlert = true
+                return
+            }
+
+            if selectedRole == .player && userName.isEmpty {
+                alertTitle = "Error"
+                alertMessage = "Username cannot be empty!"
+                showAlert = true
+                return
+            }
+
             switch role {
             case .host:
                 getGameStateVM.fetchGameState(hostRoomCode: roomCode)
@@ -244,6 +284,10 @@ struct JoinRoomView: View {
                 if let playerName = UserDefaults.standard.string(forKey: "\(roomCode)") {
                     if playerName == userName {
                         getGameStateVM.fetchGameState(playerRoomCode: roomCode)
+                    } else {
+                        alertTitle = "Error"
+                        alertMessage = "Username doesn't match for this room!"
+                        showAlert = true
                     }
                 } else {
                     createPlayerVM.name = userName
@@ -278,6 +322,9 @@ struct JoinRoomView: View {
             .shadow(color: Color.black.opacity(0.1), radius: 5, x: 0, y: 5)
         }
     }
+
+    private func isValidRoomCode(_ code: String) -> Bool {
+        // Check if the code is valid (e.g., a specific length, alphanumeric)
+        return code.count == 6 && code.range(of: "^[a-zA-Z0-9]+$", options: .regularExpression) != nil
+    }
 }
-
-
