@@ -186,7 +186,7 @@ struct TimerViewHost: View {
                     .frame(height: 80)
  
                 Button(action: {
-                    print("Send a message text field is tapped.")
+                    webSocketManager.messageSend(roomCode: roomCode, message: sendMessageText)
                 }) {
                     Image(systemName: "chevron.right")
                         .resizable()

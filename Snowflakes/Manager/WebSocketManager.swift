@@ -15,6 +15,7 @@ class WebSocketManager: ObservableObject, WebSocketDelegate {
     @Published var message: String = ""
     @Published var isConnected: Bool = false
     @Published var countdown: String = ""
+    @Published var messageFromHost: String = ""
     @Published var userJoined: Bool = false
     @Published var timerCreated: Bool = false
     @Published var timerStarted: Bool = false
@@ -120,6 +121,15 @@ class WebSocketManager: ObservableObject, WebSocketDelegate {
         sendMessage(messageToSocket)
     }
     
+    func messageSend(roomCode: String, message: String) {
+        let messageToSocket: [String: Any] = [
+            "arguments": [roomCode, message],
+            "target": "SendMessage",
+            "type": 1
+        ]
+        sendMessage(messageToSocket)
+    }
+    
     func createTimer(roomCode: String, socketMessage: String, gameState: String) {
         let messageToSocket: [String: Any] = [
             "arguments": [roomCode, socketMessage, gameState],
@@ -194,12 +204,21 @@ class WebSocketManager: ObservableObject, WebSocketDelegate {
                 let response = try JSONDecoder().decode(WebSocketResponse.self, from: data)
                 
                 if let target = response.target {
+                    print("🎯\(target)🎯")
                     switch target {
                     case "ReceivedMessage":
                         print("ReceivedMessage passed✅")
                     case "JoinUserGroup":
                         self.userJoined = true
                         print("JoinUserGroup passed✅")
+                    case "ReceiveMessage":
+                        if let arguments = response.arguments?.first {
+                            DispatchQueue.main.async {
+                                self.messageFromHost = arguments
+                                print("💌Message fetched: \(self.messageFromHost)")
+                            }
+                        }
+                        print("SendMessage passed✅")
                     case "CreateTimer":
                         if let arguments = response.arguments, arguments.count > 0 {
                             let extractedGameState = arguments[0]

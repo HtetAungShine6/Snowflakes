@@ -10,15 +10,18 @@ import SwiftUI
 struct HostShopView: View {
     
     @EnvironmentObject var navigationManager: NavigationManager
+    @StateObject private var getTeamsByRoomCodeVM = GetTeamsByRoomCode()
+    @StateObject private var getShopVM = GetShopByRoomCodeViewModel()
+    @State private var teams: [Team] = []
+    @State private var shopItems: ShopMessageResponse? = nil
     
-    let teams: [TeamMockUp] = teamListMockUp
+    let hostRoomCode: String
     
     var body: some View {
         VStack(alignment: .leading) {
             items
             teamList
         }
-        .padding(.horizontal)
         .toolbar {
             ToolbarItem(placement: .navigationBarLeading) {
                 Button(action: {
@@ -35,9 +38,16 @@ struct HostShopView: View {
         }
         .navigationBarBackButtonHidden()
         .navigationBarTitleDisplayMode(.inline)
-//        .navigationDestination(for: TeamMockUp.self) { team in
-//            HostTeamDetailView(team: team)
-//        }
+        .onAppear {
+            getTeamsByRoomCodeVM.fetchTeams(hostRoomCode: hostRoomCode)
+            getShopVM.fetchShop(hostRoomCode: hostRoomCode)
+        }
+        .onReceive(getTeamsByRoomCodeVM.$teams) { teams in
+            self.teams = teams
+        }
+        .onReceive(getShopVM.$shopMessageResponse) { items in
+            self.shopItems = items
+        }
     }
     
     private var items: some View {
@@ -47,15 +57,18 @@ struct HostShopView: View {
                     .font(.custom("Lato-Bold", size: 24))
                 Spacer()
             }
+            .padding(.horizontal)
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack {
-                    ForEach(shopItems, id: \.title) { item in
-                        HostShopItemView(imageName: item.imageName, title: item.title)
+                    if let shopItems = shopItems {
+                        ForEach(shopItems.shopStocks, id: \.productName) { item in
+                            HostShopItemView(imageName: item.productName, title: item.productName, itemCount: item.remainingStock)
+                        }
                     }
                 }
             }
+            .padding(.horizontal, 3)
         }
-        .padding(.horizontal)
     }
     
     private var teamList: some View {
@@ -75,31 +88,32 @@ struct HostShopView: View {
                     }
                 }
             }
+            .refreshable {
+                refreshData()
+            }
         }
         .padding(.horizontal)
     }
     
-    private func teamCardView(team: TeamMockUp) -> some View {
+    private func teamCardView(team: Team) -> some View {
         VStack(alignment: .leading, spacing: 10) {
             HStack {
                 Text("Team: \(team.teamNumber)")
                     .font(.custom("Lato-Regular", size: 20))
                 Spacer()
-                Text("Players: \(team.playersCount) players")
+                Text("Players: \(totalPlayerCount) players")
                     .font(.custom("Lato-Regular", size: 20))
             }
             
             HStack(spacing: 10) {
-                ForEach(["scissors", "paper", "pen"], id: \.self) { itemName in
-                    if let count = team.items[itemName] {
-                        VStack {
-                            Image(itemName)
-                                .resizable()
-                                .frame(width: 40, height: 40)
-                            Text("\(count)x")
-                                .font(.custom("Lato-Regular", size: 16))
-                                .foregroundStyle(Color.gray)
-                        }
+                ForEach(team.teamStocks, id: \.self) { itemName in
+                    VStack {
+                        Image("\(itemName.productName)")
+                            .resizable()
+                            .frame(width: 40, height: 40)
+                        Text("\(itemName.remainingStock)")
+                            .font(.custom("Lato-Regular", size: 16))
+                            .foregroundStyle(Color.gray)
                     }
                 }
                 Spacer()
@@ -116,15 +130,24 @@ struct HostShopView: View {
         .padding()
         .background(RoundedRectangle(cornerRadius: 8).stroke(Color.black))
     }
+    
+    private var totalPlayerCount: Int {
+        teams.reduce(0) { total, team in
+            total + (team.members?.count ?? 0)
+        }
+    }
+    
+    private func refreshData() {
+        getTeamsByRoomCodeVM.fetchTeams(hostRoomCode: hostRoomCode)
+        getShopVM.fetchShop(hostRoomCode: hostRoomCode)
+    }
 }
 
-#Preview {
-    HostShopView()
-}
 
 struct HostShopItemView: View {
     var imageName: String
     var title: String
+    var itemCount: Int
     var width: CGFloat = 130
     var height: CGFloat = 165
 
@@ -136,12 +159,18 @@ struct HostShopItemView: View {
                 .frame(width: 70, height: 70)
                 .padding()
 
-            Text(title)
-                .font(.custom("Lato-Regular", size: 12))
+            HStack {
+                Text("\(itemCount) x \(title) left")
+                    .font(.custom("Lato-Regular", size: 12))
+            }
         }
         .frame(maxWidth: width, maxHeight: height)
         .padding()
         .background(AppColors.frostBlue)
         .cornerRadius(20)
     }
+}
+
+#Preview{
+    HostShopView(hostRoomCode: "ABCD")
 }
