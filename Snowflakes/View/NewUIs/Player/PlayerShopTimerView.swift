@@ -92,6 +92,14 @@ struct PlayerShopTimerView: View {
                     .foregroundStyle(Color.gray)
             }
             Spacer()
+            Button {
+//                navigationManager.navigateTo(Destination.)
+            }label: {
+                Image("shop2")
+                    .resizable()
+                    .scaledToFit()
+                    .frame(height: 30)
+            }
         }
         .padding(.horizontal)
     }

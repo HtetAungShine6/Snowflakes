@@ -89,9 +89,6 @@ struct TeamListView: View {
                 }
             }
         }
-//        .onChange(of: getTeamsByRoomCodeVM.isLoading, { _, newValue in
-//            showAlertView = newValue
-//        })
         .onReceive(getTeamsByRoomCodeVM.$teams) { teams in
             if !teams.isEmpty {
                 self.teams = teams

@@ -33,7 +33,8 @@ struct PlayerTimerView: View {
                     }
                     .frame(maxWidth: .infinity, alignment: .top)
                     
-                    descriptionText
+//                    descriptionText
+                    hostMessage
                         .frame(maxWidth: .infinity, alignment: .top)
                         .padding(.top, 150)
                 }
@@ -123,6 +124,10 @@ struct PlayerTimerView: View {
             .fixedSize(horizontal: false, vertical: true)
         }
         .frame(maxWidth: .infinity)
+    }
+    
+    private var hostMessage: some View {
+        Text("\(webSocketManager.messageFromHost)")
     }
 }
 

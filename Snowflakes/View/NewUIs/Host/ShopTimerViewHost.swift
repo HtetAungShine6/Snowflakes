@@ -88,7 +88,7 @@ struct ShopTimerViewHost: View {
             }
             Spacer()
             Button {
-                navigationManager.navigateTo(Destination.hostShopView)
+                navigationManager.navigateTo(Destination.hostShopView(hostRoomCode: roomCode))
             }label: {
                 Image("shop2")
                     .resizable()
