@@ -40,11 +40,11 @@ class UpdateGameStateViewModel: ObservableObject {
                 self?.isLoading = false
                 switch result {
                 case .success(let gameState):
-                    print("\(gameState.message)")
+//                    print("\(gameState.message)")
                     self?.isSuccess = true
                 case .failure(let error):
                     self?.errorMessage = "Failed to create team: \(error.localizedDescription)"
-                    print(error.localizedDescription)
+//                    print(error.localizedDescription)
                 }
             }
         }

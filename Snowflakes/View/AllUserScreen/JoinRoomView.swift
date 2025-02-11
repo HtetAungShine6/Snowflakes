@@ -102,7 +102,7 @@ struct JoinRoomView: View {
             .onChange(of: getGameStateVM.isLoading) { _, newValue in
                 showAlertView = newValue
             }
-            .onChange(of: getGameStateVM.errorMessage) { newErrorMessage in
+            .onChange(of: getGameStateVM.errorMessage) { _, newErrorMessage in
                 if let message = newErrorMessage, !message.isEmpty {
                     alertTitle = "Error"
                     alertMessage = message

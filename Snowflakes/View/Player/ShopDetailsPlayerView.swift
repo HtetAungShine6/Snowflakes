@@ -1,11 +1,20 @@
 import SwiftUI
+import PhotosUI
+import Mantis
 
 struct ShopDetailsPlayerView: View {
     
     @EnvironmentObject var navigationManager: NavigationManager
+    @StateObject private var getTeamDetailVM = GetTeamDetailByRoomCode()
     
-    var team: TeamMockUp
-    var members: [String]
+    @State private var team: Team? = nil
+    
+    @State private var selectedImage: UIImage?
+    @State private var croppedImage: UIImage?
+    @State private var showImagePicker = false
+    @State private var showImageCropper = false
+
+    let playerRoomCode: String
     
     @State private var notifications: [NotificationItem] = [
         NotificationItem(message: "You purchased Pen (x2) and Paper (x3)", amount: 10, color: Color.white, isChecked: false),
@@ -32,9 +41,22 @@ struct ShopDetailsPlayerView: View {
                 .frame(maxWidth: .infinity, alignment: .top)
                 .background(Color.white)
             }
+            .refreshable {
+                if let teamNumber = UserDefaults.standard.value(forKey: "TeamDetail-\(playerRoomCode)") as? Int {
+                    getTeamDetailVM.fetchTeams(playerRoomCode: playerRoomCode, teamNumber: teamNumber)
+                }
+            }
         }
         .background(Color.white)
         .navigationBarBackButtonHidden()
+        .onAppear {
+            if let teamNumber = UserDefaults.standard.value(forKey: "TeamDetail-\(playerRoomCode)") {
+                getTeamDetailVM.fetchTeams(playerRoomCode: playerRoomCode, teamNumber: teamNumber as! Int)
+            }
+        }
+        .onReceive(getTeamDetailVM.$team) { team in
+            self.team = team
+        }
     }
     
     // MARK: - Back Button (Private Function)
@@ -55,8 +77,13 @@ struct ShopDetailsPlayerView: View {
     private var teamLabel: some View {
         HStack {
             VStack(alignment: .leading) {
-                Text("Team: \(team.teamNumber)")
-                    .font(.custom("Lato-Bold", size: 20))
+                if let teamNumber = team?.teamNumber {
+                    Text("Team: \(teamNumber)")
+                        .font(.custom("Lato-Bold", size: 20))
+                } else {
+                    Text("No Team Found")
+                        .font(.custom("Lato-Bold", size: 20))
+                }
                 HStack {
                     Text("Balance: ")
                         .font(.custom("Lato-Regular", size: 15))
@@ -64,20 +91,27 @@ struct ShopDetailsPlayerView: View {
                         .resizable()
                         .scaledToFit()
                         .frame(height: 20)
-                    Text("\(team.tokens) tokens")
-                        .font(.custom("Lato-Regular", size: 15))
+                    if let tokens = team?.tokens {
+                        Text("\(String(describing: tokens)) tokens")
+                            .font(.custom("Lato-Regular", size: 15))
+                    } else {
+                        Text("No tokens found")
+                            .font(.custom("Lato-Regular", size: 15))
+                    }
                 }
             }
             Spacer()
-            ForEach(team.items.keys.sorted().reversed(), id: \.self) { itemName in
-                VStack {
-                    Image(itemName)
-                        .resizable()
-                        .scaledToFit()
-                        .frame(width: 30, height: 30)
-                    Text("\(team.items[itemName] ?? 0)x")
-                        .font(.custom("Lato-Regular", size: 16))
-                        .foregroundStyle(Color.gray)
+            if let teamStocks = team?.teamStocks {
+                ForEach(teamStocks, id: \.self) { item in
+                    VStack {
+                        Image(item.productName)
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: 30, height: 30)
+                        Text("\(item.remainingStock)x")
+                            .font(.custom("Lato-Regular", size: 16))
+                            .foregroundStyle(Color.gray)
+                    }
                 }
             }
         }
@@ -94,8 +128,10 @@ struct ShopDetailsPlayerView: View {
             }
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack {
-                    ForEach(team.items.keys.sorted(), id: \.self) { itemName in
-                        PlayerShopItemView(imageName: itemName, title: "\(itemName.capitalized) (\(team.items[itemName] ?? 0)x)")
+                    if let teamStocks = team?.teamStocks {
+                        ForEach(teamStocks, id: \.self) { item in
+                            PlayerShopItemView(imageName: item.productName, title: "\(item.remainingStock) x \(item.productName) left")
+                        }
                     }
                 }
             }
@@ -156,51 +192,169 @@ struct ShopDetailsPlayerView: View {
     
     // MARK: - Upload Image Section
     private var uploadImageSection: some View {
-        VStack(alignment: .leading, spacing: 10) {
+        VStack {
             Text("Sell your Snowflake")
                 .font(Font.custom("Lato", size: 22).weight(.medium))
                 .foregroundColor(.black)
-            ScrollView(.horizontal, showsIndicators: false) {
-                HStack(spacing: 15) {
-                    ForEach(0..<5, id: \.self) { _ in
-                        ZStack {
-                            
-                            Rectangle()
-                                .foregroundColor(.clear)
-                                .frame(width: 199, height: 238)
-                                .background(Color.white.opacity(0.50))
-                                .cornerRadius(20)
-                                .overlay(
-                                    RoundedRectangle(cornerRadius: 20)
-                                        .stroke(Color.black, lineWidth: 0.25)
-                                )
-                            
-                            Text("Upload Pic")
-                                .font(Font.custom("Lato", size: 20).weight(.medium))
-                                .foregroundColor(.black)
-                        }
-                        .padding(3)
-                    }
+            
+            ZStack {
+                Rectangle()
+                    .foregroundColor(.clear)
+                    .frame(width: 199, height: 238)
+                    .background(Color.white.opacity(0.50))
+                    .cornerRadius(20)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 20)
+                            .stroke(Color.black, lineWidth: 0.25)
+                    )
+                
+                if let image = selectedImage {
+                    Image(uiImage: image)
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: 199, height: 238)
+                        .cornerRadius(20)
+                } else {
+                    Image(systemName: "photo.fill")
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: 50, height: 50)
+                        .foregroundColor(.gray)
                 }
             }
-            .frame(height: 238)
+            .onTapGesture {
+                showImagePicker = true
+            }
         }
-        .padding(.horizontal, 10)
+        .sheet(isPresented: $showImagePicker) {
+            ImagePicker(selectedImage: $selectedImage, showImagePicker: $showImagePicker, showImageCropper: $showImageCropper)
+        }
+        .fullScreenCover(isPresented: $showImageCropper) {
+            if let image = selectedImage {
+                ImageCropper(image: image, croppedImage: $croppedImage, isPresented: $showImageCropper)
+            }
+        }
     }
-    
 }
 
+// MARK: - Image Picker (Select from Photo Library)
+struct ImagePicker: UIViewControllerRepresentable {
+    @Binding var selectedImage: UIImage?
+    @Binding var showImagePicker: Bool
+    @Binding var showImageCropper: Bool
+
+    class Coordinator: NSObject, UINavigationControllerDelegate, UIImagePickerControllerDelegate {
+        let parent: ImagePicker
+        
+        init(parent: ImagePicker) {
+            self.parent = parent
+        }
+        
+        func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey: Any]) {
+            if let uiImage = info[.originalImage] as? UIImage {
+                print("Image picked: \(uiImage)") // Debugging log
+                
+                DispatchQueue.main.async {
+                    self.parent.selectedImage = uiImage
+                    self.parent.showImageCropper = true // Trigger cropper after selecting image
+                }
+            }
+            parent.showImagePicker = false
+        }
+    }
+    
+    func makeCoordinator() -> Coordinator {
+        Coordinator(parent: self)
+    }
+    
+    func makeUIViewController(context: Context) -> UIImagePickerController {
+        let picker = UIImagePickerController()
+        picker.delegate = context.coordinator
+        picker.sourceType = .photoLibrary
+        return picker
+    }
+    
+    func updateUIViewController(_ uiViewController: UIImagePickerController, context: Context) {}
+}
+
+// MARK: - Image Cropper (Using Mantis)
+struct ImageCropper: UIViewControllerRepresentable {
+    var image: UIImage
+    @Binding var croppedImage: UIImage?
+    @Binding var isPresented: Bool
+
+    class Coordinator: NSObject, CropViewControllerDelegate {
+        var parent: ImageCropper
+
+        init(parent: ImageCropper) {
+            self.parent = parent
+        }
+
+        // Called when cropping succeeds
+        func cropViewControllerDidCrop(
+            _ cropViewController: Mantis.CropViewController,
+            cropped: UIImage,
+            transformation: Mantis.Transformation,
+            cropInfo: Mantis.CropInfo
+        ) {
+            DispatchQueue.main.async {
+                self.parent.croppedImage = cropped // Update the cropped image
+                self.parent.isPresented = false // Dismiss cropper
+                print("Image cropped successfully") // Debugging log
+            }
+        }
+
+        // Called when cropping fails
+        func cropViewControllerDidFailToCrop(
+            _ cropViewController: Mantis.CropViewController,
+            original: UIImage
+        ) {
+            DispatchQueue.main.async {
+                self.parent.isPresented = false // Dismiss cropper if fail
+                print("Failed to crop image") // Debugging log
+            }
+        }
+
+        // Called when the user cancels cropping
+        func cropViewControllerDidCancel(
+            _ cropViewController: Mantis.CropViewController,
+            original: UIImage
+        ) {
+            DispatchQueue.main.async {
+                self.parent.isPresented = false // Dismiss cropper
+                print("User canceled cropping") // Debugging log
+            }
+        }
+
+        // Called when resizing starts
+        func cropViewControllerDidBeginResize(_ cropViewController: Mantis.CropViewController) {
+            print("User started resizing the crop area") // Debugging log
+        }
+
+        // Called when resizing ends
+        func cropViewControllerDidEndResize(
+            _ cropViewController: Mantis.CropViewController,
+            original: UIImage,
+            cropInfo: Mantis.CropInfo
+        ) {
+            print("User finished resizing the crop area") // Debugging log
+        }
+    }
+
+    func makeCoordinator() -> Coordinator {
+        return Coordinator(parent: self)
+    }
+
+    func makeUIViewController(context: Context) -> Mantis.CropViewController {
+        let cropViewController = Mantis.cropViewController(image: image)
+        cropViewController.delegate = context.coordinator // Set the coordinator as delegate
+        return cropViewController
+    }
+
+    func updateUIViewController(_ uiViewController: Mantis.CropViewController, context: Context) {}
+}
+
+
 #Preview {
-    ShopDetailsPlayerView(
-        team: TeamMockUp(
-            teamNumber: 1,
-            code: 1234,
-            playersCount: 4,
-            items: ["scissors": 2, "paper": 1, "pen": 3],
-            tokens: 5,
-            members: ["Hein Thant", "Thu Yein", "Htet Aung Shine"]
-        ),
-        members: ["Hein Thant", "Thu Yein", "Htet Aung Shine"]
-    )
-    .environmentObject(NavigationManager())
+    ShopDetailsPlayerView(playerRoomCode: "ABCDEF")
 }

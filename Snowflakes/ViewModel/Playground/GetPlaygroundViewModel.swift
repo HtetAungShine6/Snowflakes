@@ -28,7 +28,7 @@ class GetPlaygroundViewModel : ObservableObject {
                 case .success(let playgroundResponse):
                     self?.playgroundInfo = playgroundResponse.message
                     self?.isSuccess = true
-                    print("\(playgroundResponse)")
+//                    print("\(playgroundResponse)")
                 case .failure(let error):
                     self?.errorMessage = "Failed to fetch Game State: \(error.localizedDescription)"
                 }

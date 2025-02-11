@@ -18,9 +18,14 @@ struct HostShopView: View {
     let hostRoomCode: String
     
     var body: some View {
-        VStack(alignment: .leading) {
-            items
-            teamList
+        ScrollView {
+            VStack(alignment: .leading) {
+                items
+                teamList
+            }
+        }
+        .refreshable {
+            refreshData()
         }
         .toolbar {
             ToolbarItem(placement: .navigationBarLeading) {
@@ -80,16 +85,12 @@ struct HostShopView: View {
                     ForEach(teams, id: \.teamNumber) { team in
                         teamCardView(team: team)
                             .padding(.bottom, 8)
+                            .contentShape(Rectangle())
                             .onTapGesture {
-//                                navigationManager.path.append("TeamDetail")
-//                                navigationManager.navigateTo(team)
-//                                navigationManager.navigateTo(Destination.hostTeamDetailView(team: team))
+                                navigationManager.navigateTo(Destination.hostTeamDetailView(hostRoomCode: hostRoomCode, teamNumber: team.teamNumber))
                             }
                     }
                 }
-            }
-            .refreshable {
-                refreshData()
             }
         }
         .padding(.horizontal)
@@ -101,8 +102,13 @@ struct HostShopView: View {
                 Text("Team: \(team.teamNumber)")
                     .font(.custom("Lato-Regular", size: 20))
                 Spacer()
-                Text("Players: \(totalPlayerCount) players")
-                    .font(.custom("Lato-Regular", size: 20))
+                if let member = team.members {
+                    Text("Players: \(String(describing: member.count)) players")
+                        .font(.custom("Lato-Regular", size: 20))
+                } else {
+                    Text("No player found")
+                        .font(.custom("Lato-Regular", size: 20))
+                }
             }
             
             HStack(spacing: 10) {

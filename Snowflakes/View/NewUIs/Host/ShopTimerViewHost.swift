@@ -17,6 +17,7 @@ struct ShopTimerViewHost: View {
     @StateObject private var getGameStateViewModel = GetGameStateViewModel()
     
     @State private var timerValueFromSocket: String = ""
+    @State private var sendMessageText: String = ""
     @State private var isPlaying: Bool = false
     @State private var isButtonDisabled = false
     @State private var hasNavigated: Bool = false
@@ -37,7 +38,7 @@ struct ShopTimerViewHost: View {
             Spacer()
             adjustTimeField
             Spacer()
-            shopLabel
+            sendMessageField
             Spacer()
             VStack {
                 nextRoundButton
@@ -165,22 +166,55 @@ struct ShopTimerViewHost: View {
         }
     }
     
-    private var shopLabel: some View {
+//    private var shopLabel: some View {
+//        VStack {
+//            (Text("It is time to ")
+//                .font(.custom("Roboto-Regular", size: 32))
+//                .foregroundColor(.primary) +
+//             Text("sell")
+//                .font(.custom("Roboto-Regular", size: 32))
+//                .foregroundColor(.red) +
+//             Text(" a \n snow flake")
+//                .font(.custom("Roboto-Regular", size: 32))
+//                .foregroundColor(.primary))
+//            .lineLimit(2)
+//            .multilineTextAlignment(.leading)
+//            .fixedSize(horizontal: false, vertical: true)
+//        }
+//        .frame(maxWidth: .infinity)
+//    }
+    private var sendMessageField: some View {
         VStack {
-            (Text("It is time to ")
-                .font(.custom("Roboto-Regular", size: 32))
-                .foregroundColor(.primary) +
-             Text("sell")
-                .font(.custom("Roboto-Regular", size: 32))
-                .foregroundColor(.red) +
-             Text(" a \n snow flake")
-                .font(.custom("Roboto-Regular", size: 32))
-                .foregroundColor(.primary))
-            .lineLimit(2)
-            .multilineTextAlignment(.leading)
-            .fixedSize(horizontal: false, vertical: true)
+            HStack {
+                Text("Send a message")
+                    .font(.custom("Roboto-Regular", size: 24))
+                    .foregroundStyle(Color.black)
+                Spacer()
+            }
+            .padding(.horizontal)
+            HStack {
+                TextField("Create a snowflake", text: $sendMessageText)
+                    .padding(.leading, 10)
+                    .frame(height: 80)
+ 
+                Button(action: {
+                    webSocketManager.messageSend(roomCode: roomCode, message: sendMessageText)
+                }) {
+                    Image(systemName: "chevron.right")
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: 15, height: 15)
+                        .foregroundColor(.black)
+                        .padding(.trailing, 10)
+                }
+            }
+            .overlay(
+                RoundedRectangle(cornerRadius: 8)
+                    .stroke(Color.black, lineWidth: 1)
+            )
+            .frame(height: 80)
+            .padding(.horizontal)
         }
-        .frame(maxWidth: .infinity)
     }
     
     private var nextRoundButton: some View {

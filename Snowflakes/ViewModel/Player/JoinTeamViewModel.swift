@@ -43,11 +43,11 @@ class JoinTeamViewModel: ObservableObject {
                 self?.isLoading = false
                 switch result {
                 case .success(let joinedTeam):
-                    print("New Team Joined: \(joinedTeam.message)")
+//                    print("New Team Joined: \(joinedTeam.message)")
                     self?.isSuccess = true
                 case .failure(let error):
                     self?.errorMessage = "Failded to join team: \(error.localizedDescription)"
-                    print(error.localizedDescription)
+//                    print(error.localizedDescription)
                 }
             }
         }

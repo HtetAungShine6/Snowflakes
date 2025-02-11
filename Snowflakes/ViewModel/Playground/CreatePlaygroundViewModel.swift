@@ -55,11 +55,11 @@ class CreatePlaygroundViewModel: ObservableObject {
                 switch result {
                 case .success(let data):
                     self?.isSuccess = true
-                    print("RESPONSE: \(data)")
+//                    print("RESPONSE: \(data)")
                 case .failure(let error):
                     self?.isSuccess = false
                     self?.errorMessage = "Failed to create team: \(error.localizedDescription)"
-                    print("\(error.localizedDescription )")
+//                    print("\(error.localizedDescription )")
                 }
             }
         }

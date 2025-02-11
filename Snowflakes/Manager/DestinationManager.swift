@@ -19,4 +19,6 @@ enum Destination: Hashable {
     case playerTimerView(hostRoomCode: String, playerRoomCode: String)
     case playerShopTimerView(hostRoomCode: String, playerRoomCode: String)
     case leaderboard
+    case shopDetailPlayerView(playerRoomCode: String)
+    case hostTeamDetailView(hostRoomCode: String, teamNumber: Int)
 }

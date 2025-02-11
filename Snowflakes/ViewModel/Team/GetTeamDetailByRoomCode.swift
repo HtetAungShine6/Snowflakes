@@ -1,39 +1,38 @@
 //
-//  GetTeamsByRoomCode.swift
+//  GetTeamDetailByRoomCode.swift
 //  Snowflakes
 //
-//  Created by Htet Aung Shine on 22/12/2024.
+//  Created by Htet Aung Shine on 9/2/25.
 //
 
 import Foundation
 
-class GetTeamsByRoomCode: ObservableObject {
+class GetTeamDetailByRoomCode: ObservableObject {
     
-    @Published var teams: [Team] = []
+    @Published var team: Team? = nil
     @Published var isLoading: Bool = false
     @Published var errorMessage: String? = ""
     @Published var isSuccess: Bool = false
     
-    //    private let getTeamsByRoomCode = GetTeamByRoomCodeUseCase()
-    
-    func fetchTeams(hostRoomCode: String? = nil, playerRoomCode: String? = nil) {
+    func fetchTeams(hostRoomCode: String? = nil, playerRoomCode: String? = nil, teamNumber: Int = 0) {
         
         self.isLoading = true
         self.errorMessage = nil
         
-        let getTeamsByRoomCodeUseCase = GetTeamByRoomCodeUseCase(
+        let getTeamsByRoomCodeUseCase = GetTeamDetailByRoomCodeUseCase(
             hostRoomCode: hostRoomCode,
-            playerRoomCode: playerRoomCode
+            playerRoomCode: playerRoomCode,
+            teamNumber: teamNumber
         )
         
         getTeamsByRoomCodeUseCase.execute(getMethod: "GET", token: nil) { [weak self] result in
             DispatchQueue.main.async {
                 self?.isLoading = false
                 switch result {
-                case .success(let teamSearchResponse):
-                    self?.teams = teamSearchResponse.message
+                case .success(let teamDetailResponse):
+                    self?.team = teamDetailResponse.message
                     self?.isSuccess = true
-//                    print("Get Teams By RoomCode:\(teamSearchResponse.message)")
+//                    print("Get TeamDetail By RoomCode:\(teamDetailResponse.message)")
                 case .failure(let error):
                     self?.errorMessage = "Failed to fetch teams: \(error.localizedDescription)"
                 }
