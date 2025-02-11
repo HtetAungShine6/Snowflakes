@@ -5,9 +5,10 @@
 //  Created by Htet Aung Shine on 15/12/2024.
 //
 
-
 import SwiftUI
 import Starscream
+import AVFoundation
+import UserNotifications
 
 class WebSocketManager: ObservableObject, WebSocketDelegate {
     
@@ -29,15 +30,31 @@ class WebSocketManager: ObservableObject, WebSocketDelegate {
     @Published var currentGameState: String = ""
     
     var countdownTimer: Timer?
+    var audioPlayer: AVAudioPlayer?
     
     static let shared = WebSocketManager()
     
     init() {
+        // Configure audio session
+        do {
+            try AVAudioSession.sharedInstance().setCategory(.playback, mode: .default, options: [])
+            try AVAudioSession.sharedInstance().setActive(true)
+        } catch {
+            print("Failed to set up audio session: \(error.localizedDescription)")
+        }
+        
         // Ensure you use the correct URL for your SignalR hub
         var request = URLRequest(url: URL(string: "wss://snowflakeapi-bkd0aygebke4fscg.southeastasia-01.azurewebsites.net/timer-hub")!)
         request.timeoutInterval = 5
         socket = WebSocket(request: request)
         socket.delegate = self
+        
+        // Request notification permissions
+        UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .sound]) { (granted, error) in
+            if let error = error {
+                print("Error requesting notification permissions: \(error.localizedDescription)")
+            }
+        }
     }
     
     // Connect to the WebSocket and send the handshake request
@@ -111,7 +128,7 @@ class WebSocketManager: ObservableObject, WebSocketDelegate {
         }
     }
     
-    // modified version
+    // Join a group
     func joinGroup(roomCode: String) {
         let messageToSocket: [String: Any] = [
             "arguments": [roomCode],
@@ -121,6 +138,7 @@ class WebSocketManager: ObservableObject, WebSocketDelegate {
         sendMessage(messageToSocket)
     }
     
+    // Send a message
     func messageSend(roomCode: String, message: String) {
         let messageToSocket: [String: Any] = [
             "arguments": [roomCode, message],
@@ -130,6 +148,7 @@ class WebSocketManager: ObservableObject, WebSocketDelegate {
         sendMessage(messageToSocket)
     }
     
+    // Create a timer
     func createTimer(roomCode: String, socketMessage: String, gameState: String) {
         let messageToSocket: [String: Any] = [
             "arguments": [roomCode, socketMessage, gameState],
@@ -139,6 +158,7 @@ class WebSocketManager: ObservableObject, WebSocketDelegate {
         sendMessage(messageToSocket)
     }
     
+    // Start countdown
     func startCountdown(roomCode: String) {
         let messageToSocket: [String: Any] = [
             "arguments": [roomCode],
@@ -148,6 +168,7 @@ class WebSocketManager: ObservableObject, WebSocketDelegate {
         sendMessage(messageToSocket)
     }
     
+    // Pause countdown
     func pauseCountdown(roomCode: String) {
         let messageToSocket: [String: Any] = [
             "arguments": [roomCode],
@@ -158,6 +179,7 @@ class WebSocketManager: ObservableObject, WebSocketDelegate {
         print("💕 Pause Timer called!!!!")
     }
     
+    // Resume countdown
     func resumeCountdown(roomCode: String) {
         let messageToSocket: [String: Any] = [
             "arguments": [roomCode],
@@ -167,6 +189,7 @@ class WebSocketManager: ObservableObject, WebSocketDelegate {
         sendMessage(messageToSocket)
     }
     
+    // Add countdown
     func addCountdown(roomCode: String, socketMessage: String) {
         let messageToSocket: [String: Any] = [
             "arguments": [roomCode, socketMessage],
@@ -176,6 +199,7 @@ class WebSocketManager: ObservableObject, WebSocketDelegate {
         sendMessage(messageToSocket)
     }
     
+    // Minus countdown
     func minusCountdown(roomCode: String, socketMessage: String) {
         let messageToSocket: [String: Any] = [
             "arguments": [roomCode, socketMessage],
@@ -185,6 +209,7 @@ class WebSocketManager: ObservableObject, WebSocketDelegate {
         sendMessage(messageToSocket)
     }
     
+    // Stop countdown
     func stopCountdown(roomCode: String) {
         let messageToSocket: [String: Any] = [
             "arguments": [roomCode],
@@ -196,69 +221,102 @@ class WebSocketManager: ObservableObject, WebSocketDelegate {
     
     // Handle incoming WebSocket response
     private func handleWebSocketResponse(text: String) {
-        // Remove the SignalR message delimiter \u{1E} from the end of the message
-        let cleanedText = text.trimmingCharacters(in: .controlCharacters)
+        // Log the raw response text
+        print("Raw WebSocket response: \(text)")
         
-        if let data = cleanedText.data(using: .utf8) {
-            do {
-                let response = try JSONDecoder().decode(WebSocketResponse.self, from: data)
-                
-                if let target = response.target {
-                    print("🎯\(target)🎯")
-                    switch target {
-                    case "ReceivedMessage":
-                        print("ReceivedMessage passed✅")
-                    case "JoinUserGroup":
-                        self.userJoined = true
-                        print("JoinUserGroup passed✅")
-                    case "ReceiveMessage":
-                        if let arguments = response.arguments?.first {
-                            DispatchQueue.main.async {
-                                self.messageFromHost = arguments
-                                print("💌Message fetched: \(self.messageFromHost)")
+        // Split the incoming text by the SignalR message delimiter
+        let messages = text.components(separatedBy: "\u{1E}")
+        
+        for message in messages {
+            // Trim whitespace and check if the message is not empty
+            let cleanedMessage = message.trimmingCharacters(in: .whitespacesAndNewlines)
+            guard !cleanedMessage.isEmpty else { continue }
+            
+            if let data = cleanedMessage.data(using: .utf8) {
+                do {
+                    let response = try JSONDecoder().decode(WebSocketResponse.self, from: data)
+                    
+                    if let target = response.target {
+                        print("🎯\(target)🎯")
+                        switch target {
+                        case "ReceivedMessage":
+                            print("ReceivedMessage passed✅")
+                        case "JoinUser   Group":
+                            self.userJoined = true
+                            print("JoinUser   Group passed✅")
+                        case "ReceiveMessage":
+                            if let arguments = response.arguments?.first {
+                                DispatchQueue.main.async {
+                                    self.messageFromHost = arguments
+                                    print("💌Message fetched: \(self.messageFromHost)")
+                                }
                             }
-                        }
-                        print("SendMessage passed✅")
-                    case "CreateTimer":
-                        if let arguments = response.arguments, arguments.count > 0 {
-                            let extractedGameState = arguments[0]
-                            DispatchQueue.main.async {
-                                self.currentGameState = extractedGameState
-                                print("❤️GameState updated to: \(self.currentGameState)")
+                            print("SendMessage passed✅")
+                        case "CreateTimer":
+                            if let arguments = response.arguments, arguments.count > 0 {
+                                let extractedGameState = arguments[0]
+                                DispatchQueue.main.async {
+                                    self.currentGameState = extractedGameState
+                                    print("❤️GameState updated to: \(self.currentGameState)")
+                                }
                             }
-                        }
-                        print("CreateTimer passed✅")
-                    case "TimerStarted":
-                        self.timerStarted = true
-                        print("TimerStarted passed✅")
-                    case "TimerUpdate":
-                        print("TimerUpdate passed✅")
-                        if let countdownValue = response.arguments?.first {
-                            DispatchQueue.main.async {
-                                self.countdown = countdownValue
-                                print("Countdown updated to: \(self.countdown)")
+                            print("CreateTimer passed✅")
+                        case "TimerStarted":
+                            self.timerStarted = true
+                            print("TimerStarted passed✅")
+                        case "TimerUpdate":
+                            print("TimerUpdate passed✅")
+                            if let countdownValue = response.arguments?.first {
+                                DispatchQueue.main.async {
+                                    self.countdown = countdownValue
+                                    print("Countdown updated to: \(self.countdown)")
+                                    
+                                    // Play custom sound when countdown reaches "00:00"
+                                    if self.countdown == "00:00" {
+                                        self.playSound(named: "snowflake_alert") // Play sound from assets
+                                        print("Testing: Custom sound played✅")
+                                    }
+                                }
                             }
+                        case "TimerPaused":
+                            print("TimerPaused passed✅")
+                            self.timerPaused = true
+                            self.timerResumed = false
+                        case "TimerModify":
+                            print("TimerModify passed✅")
+                        case "TimerResume":
+                            print("TimerResume passed✅")
+                            self.timerResumed = true
+                            self.timerPaused = false
+                        case "TimerStopped":
+                            print("TimerStopped passed✅")
+                            self.timerStarted = false
+                        case "CountdownCompleted":
+                            print("CountdownCompleted passed✅")
+                            // Handle countdown completion logic here
+                        default:
+                            print("Unhandled target❌: \(target)")
                         }
-                    case "TimerPaused":
-                        print("TimerPaused passed✅")
-                        self.timerPaused = true
-                        self.timerResumed = false
-                    case "TimerModify":
-                        print("TimerModify passed✅")
-                    case "TimerResume":
-                        print("TimerResume passed✅")
-                        self.timerResumed = true
-                        self.timerPaused = false
-                    case "TimerStopped":
-                        print("TimerStopped passed✅")
-                        self.timerStarted = false
-                    default:
-                        print("Unhandled target❌: \(target)")
                     }
+                } catch {
+                    print("Failed to parse WebSocket response: \(error.localizedDescription)")
                 }
-            } catch {
-                print("Failed to parse WebSocket response: \(error.localizedDescription)")
             }
+        }
+    }
+
+    // Play sound from assets
+    private func playSound(named name: String) {
+        guard let url = Bundle.main.url(forResource: name, withExtension: "wav") else {
+            print("Sound file not found")
+            return
+        }
+        
+        do {
+            audioPlayer = try AVAudioPlayer(contentsOf: url)
+            audioPlayer?.play()
+        } catch {
+            print("Error playing sound: \(error.localizedDescription)")
         }
     }
 
@@ -271,4 +329,3 @@ class WebSocketManager: ObservableObject, WebSocketDelegate {
         print("Sent handshake: \(handshakeMessage)")
     }
 }
-
