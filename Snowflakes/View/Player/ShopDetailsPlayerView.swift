@@ -176,12 +176,12 @@ struct ShopDetailsPlayerView: View {
             }
         }
         .padding(.horizontal)
-        .alert("How many \(selectedItem ?? "") do you want to buy?", isPresented: $showAlert) {
+        .alert("How many \(selectedItem ?? "Item cannot be found!") do you want to add to cart?", isPresented: $showAlert) {
             VStack {
                 TextField("Enter quantity", text: $quantity)
                     .keyboardType(.numberPad)
             }
-            Button("Buy", action: {
+            Button("Add", action: {
                 if let item = selectedItem, let price = selectedPrice, let quantityInt = Int(quantity) {
                     //                    cartManager.addItem(name: item, price: price, quantity: quantityInt)
                     addToCartVM.productName = item
@@ -266,7 +266,7 @@ struct ShopDetailsPlayerView: View {
             ZStack {
                 Rectangle()
                     .foregroundColor(.clear)
-                    .frame(width: 199, height: 238)
+                    .frame(width: .infinity, height: 238)
                     .background(Color.white.opacity(0.50))
                     .cornerRadius(20)
                     .overlay(
@@ -290,7 +290,7 @@ struct ShopDetailsPlayerView: View {
                     Image(systemName: "photo")
                         .resizable()
                         .scaledToFit()
-                        .frame(width: 30, height: 30)
+                        .frame(width: 199, height: 30)
                         .foregroundColor(.gray)
                 }
             }
@@ -298,20 +298,25 @@ struct ShopDetailsPlayerView: View {
                 showImagePicker = true
             }
             
-            Button(action: {
-                if let image = croppedImage {
-                    uploadImageVM.uploadImage(image, teamId: "67a274ae714f51d4009c54a3") // Use actual teamId
+            HStack {
+                Button(action: {
+                    if let image = croppedImage {
+                        if let teamId = team?.id {
+                            uploadImageVM.uploadImage(image, teamId: teamId)
+                        }
+                    }
+                }) {
+                    Text(uploadImageVM.isUploading ? "Uploading..." : "Send Snowflake to Shop")
+                        .font(.custom("Lato-Bold", size: 16))
+                        .foregroundColor(.black)
+                        .frame(maxWidth: .infinity)
+                        .padding()
+                        .background(uploadImageVM.uploadSuccess ? Color.green : AppColors.frostBlue)
+                        .cornerRadius(10)
                 }
-            }) {
-                Text(uploadImageVM.isUploading ? "Uploading..." : "Upload Image")
-                    .font(.custom("Lato-Bold", size: 16))
-                    .foregroundColor(.white)
-                    .padding()
-                    .background(uploadImageVM.uploadSuccess ? Color.green : Color.blue)
-                    .cornerRadius(10)
+                .padding(.top, 10)
+                .disabled(uploadImageVM.isUploading)
             }
-            .padding(.top, 10)
-            .disabled(uploadImageVM.isUploading)
             
             // Show Upload Result
             if let errorMessage = uploadImageVM.errorMessage {
@@ -335,56 +340,6 @@ struct ShopDetailsPlayerView: View {
         }
         .padding(.horizontal, 10)
     }
-//    private var uploadImageSection: some View {
-//        VStack(alignment: .leading) {
-//            Text("Sell your Snowflake")
-//                .font(Font.custom("Lato", size: 22).weight(.medium))
-//                .foregroundColor(.black)
-//            ZStack {
-//                Rectangle()
-//                    .foregroundColor(.clear)
-//                    .frame(width: 199, height: 238)
-//                    .background(Color.white.opacity(0.50))
-//                    .cornerRadius(20)
-//                    .overlay(
-//                        RoundedRectangle(cornerRadius: 20)
-//                            .stroke(Color.black, lineWidth: 0.25)
-//                    )
-//                
-//                if let image = croppedImage {
-//                    Image(uiImage: image)
-//                        .resizable()
-//                        .scaledToFill()
-//                        .frame(width: 199, height: 238)
-//                        .cornerRadius(20)
-//                } else if let image = selectedImage {
-//                    Image(uiImage: image)
-//                        .resizable()
-//                        .scaledToFill()
-//                        .frame(width: 199, height: 238)
-//                        .cornerRadius(20)
-//                } else {
-//                    Image(.upload)
-//                        .resizable()
-//                        .scaledToFit()
-//                        .frame(width: 30, height: 30)
-//                        .foregroundColor(.gray)
-//                }
-//            }
-//            .onTapGesture {
-//                showImagePicker = true
-//            }
-//        }
-//        .sheet(isPresented: $showImagePicker) {
-//            ImagePicker(selectedImage: $selectedImage, showImagePicker: $showImagePicker, showImageCropper: $showImageCropper)
-//        }
-//        .fullScreenCover(isPresented: $showImageCropper) {
-//            if let imageToCrop = selectedImage {
-//                ImageCropper(image: imageToCrop, croppedImage: $croppedImage, isPresented: $showImageCropper)
-//            }
-//        }
-//        .padding(.horizontal, 10)
-//    }
 }
 
 // MARK: - Image Picker (Select from Photo Library)

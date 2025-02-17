@@ -71,6 +71,9 @@ struct RootView: View {
                     case .addToCartView(let playerRoomCode, let teamNumber, let roundNumber, let hostRoomCode):
                         AddToCartView(playerRoomCode: playerRoomCode, teamNumber: teamNumber, roundNumber: roundNumber, hostRoomCode: hostRoomCode)
                             .environmentObject(navigationManager)
+                    case .galleryView(let teamNumber, let roomCode):
+                        GalleryView(teamNumber: teamNumber, roomCode: roomCode)
+                            .environmentObject(navigationManager)
                     }
                 }
         }

@@ -9,6 +9,7 @@ import SwiftUI
 
 struct LeaderboardView: View {
     
+    @EnvironmentObject var navigationManager: NavigationManager
     @StateObject private var getLeaderboardVM = GetLeaderboardViewModel()
     @State private var leaderboard: [LeaderboardMessage] = []
     
@@ -22,6 +23,9 @@ struct LeaderboardView: View {
                     if !leaderboard.isEmpty {
                         ForEach(leaderboard, id: \.teamNumber) { team in
                             teamCardView(team: team)
+                                .onTapGesture {
+                                    navigationManager.navigateTo(Destination.galleryView(teamNumber: team.teamNumber, roomCode: roomCode))
+                                }
                                 .padding(.bottom, 8)
                         }
                     }

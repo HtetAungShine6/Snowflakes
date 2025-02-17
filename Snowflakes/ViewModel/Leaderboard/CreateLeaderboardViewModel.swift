@@ -15,9 +15,13 @@ class CreateLeaderboardViewModel: ObservableObject {
     @Published var isLoading: Bool = false
     @Published var isSuccess: Bool = false
     
-    func createLeaderboard(hostRoomCode: String) {
+    func createLeaderboard(hostRoomCode: String? = nil, playerRoomCode: String? = nil) {
         
-        let createLeaderboardManager = LeaderboardUseCase(hostRoomCode: hostRoomCode)
+        let createLeaderboardManager = LeaderboardUseCase(
+            hostRoomCode: hostRoomCode,
+            playerRoomCode: playerRoomCode
+        )
+        
         errorMessage = nil
         isLoading = true
         

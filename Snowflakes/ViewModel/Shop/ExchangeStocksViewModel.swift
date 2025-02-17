@@ -10,6 +10,7 @@ import Foundation
 class ExchangeStocksViewModel: ObservableObject {
     
     @Published var roundNumber: Int
+    @Published var cartIds: [String]
     @Published var playerRoomCode: String
     @Published var hostRoomCode: String
     @Published var teamNumber: Int
@@ -19,8 +20,9 @@ class ExchangeStocksViewModel: ObservableObject {
     @Published var isLoading: Bool = false
     @Published var isSuccess: Bool = false
     
-    init(roundNumber: Int = 0, playerRoomCode: String = "", hostRoomCode: String = "", teamNumber: Int = 0, products: [ProductDTO] = []) {
+    init(roundNumber: Int = 0, cartIds: [String] = [], playerRoomCode: String = "", hostRoomCode: String = "", teamNumber: Int = 0, products: [ProductDTO] = []) {
         self.roundNumber = roundNumber
+        self.cartIds = cartIds
         self.playerRoomCode = playerRoomCode
         self.hostRoomCode = hostRoomCode
         self.teamNumber = teamNumber
@@ -30,6 +32,7 @@ class ExchangeStocksViewModel: ObservableObject {
     func exchangeStocks() {
         let newExchangeStocks = ShopExchangeDTO(
             roundNumber: roundNumber,
+            cartIds: cartIds,
             playerRoomCode: playerRoomCode,
             hostRoomCode: hostRoomCode,
             teamNumber: teamNumber,
@@ -48,7 +51,7 @@ class ExchangeStocksViewModel: ObservableObject {
                     print("Exchange Stocks Successful: \(exchangeStockItem.message)")
                     self?.isSuccess = true
                 case .failure(let error):
-                    self?.errorMessage = "Failed to create team: \(error.localizedDescription)"
+                    self?.errorMessage = "Failed to exchange stocks: \(error.localizedDescription)"
                     print(error.localizedDescription)
                 }
             }

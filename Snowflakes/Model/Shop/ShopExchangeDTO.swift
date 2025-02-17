@@ -8,6 +8,7 @@
 
 struct ShopExchangeDTO: Codable {
     let roundNumber: Int
+    let cartIds: [String]
     let playerRoomCode: String
     let hostRoomCode: String
     let teamNumber: Int
