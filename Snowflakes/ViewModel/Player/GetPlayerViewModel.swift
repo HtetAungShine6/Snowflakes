@@ -32,7 +32,7 @@ class GetPlayerViewModel: ObservableObject {
                 case .success(let playerResponse):
                     self?.playerInfo = playerResponse.message
                     self?.isSuccess = true
-                    print("\(playerResponse.message)")
+//                    print("\(playerResponse.message)")
                 case .failure(let error):
                     self?.errorMessage = "Failed to fetch Game State: \(error.localizedDescription)"
                 }

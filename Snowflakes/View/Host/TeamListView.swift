@@ -94,6 +94,12 @@ struct TeamListView: View {
                 self.teams = teams
             }
         }
+    #warning("I put that because sometimes websocket connection cancelled which means that I have to reconnect it again. The error said peer closed due to an error, then socket disconnected.")
+//        .onChange(of: webSocketManager.isConnected) { _, newValue in
+//            if newValue {
+//                webSocketManager.connect()
+//            }
+//        }
     }
     
     private var navBar: some View {

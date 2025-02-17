@@ -30,7 +30,6 @@ class GetShopByRoomCodeViewModel: ObservableObject {
                 case .success(let shopResponse):
                     self?.shopMessageResponse = shopResponse.message
                     self?.isSuccess = true
-                    print("🛍️Shop Response: \(shopResponse.message)")
                 case .failure(let error):
                     self?.errorMessage = "Failed to fetch Game State: \(error.localizedDescription)"
                 }

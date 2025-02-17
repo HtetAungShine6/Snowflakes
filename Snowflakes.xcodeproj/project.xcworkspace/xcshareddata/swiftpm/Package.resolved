@@ -1,5 +1,5 @@
 {
-  "originHash" : "d89efa44a3dc29f4531996fc3ea3f43aec3e4fe2ff3ffb82552bd0f66411ebd5",
+  "originHash" : "8a1d66f0a0a682c1afd09d1cb4040b43ffa9f04d768b370c0a7ab0d3aa9c6e1f",
   "pins" : [
     {
       "identity" : "iqkeyboardcore",
@@ -71,6 +71,15 @@
       "state" : {
         "revision" : "76f514eba5218bdf67659168ba227c77da5f75fe",
         "version" : "1.0.5"
+      }
+    },
+    {
+      "identity" : "mantis",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/guoyingtao/Mantis.git",
+      "state" : {
+        "revision" : "d6880eb97267248f89e6cef2dd52785d50627639",
+        "version" : "1.9.0"
       }
     },
     {

@@ -13,10 +13,13 @@ enum Destination: Hashable {
     case teamListView(hostRoomCode: String)
     case hostTimerView(roomCode: String)
     case hostShopTimerView(roomCode: String)
-    case hostShopView(hostRoomCode: String)
+    case hostShopView(hostRoomCode: String, roundNumber: Int)
     case teamListPlayerView(playerRoomCode: String)
     case teamDetailsPlayerView(teamNumber: Int, balance: Int, scissorsCount: Int, paperCount: Int, penCount: Int)
     case playerTimerView(hostRoomCode: String, playerRoomCode: String)
     case playerShopTimerView(hostRoomCode: String, playerRoomCode: String)
-    case leaderboard
+    case leaderboard(roomCode: String)
+    case shopDetailPlayerView(playerRoomCode: String, roundNumber: Int)
+    case hostTeamDetailView(hostRoomCode: String, teamNumber: Int, roundNumber: Int)
+    case addToCartView(playerRoomCode: String, teamNumber: Int, roundNumber: Int, hostRoomCode: String)
 }

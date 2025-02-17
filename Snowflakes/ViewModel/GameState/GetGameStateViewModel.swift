@@ -33,10 +33,10 @@ class GetGameStateViewModel: ObservableObject {
                     self?.gameState = gameStateResponse.message
                     self?.currentRoundNumber = gameStateResponse.message.currentRoundNumber
                     self?.isSuccess = true
-                    print("\(gameStateResponse.message)")
-                    print("Current Round Number: \(gameStateResponse.message.currentRoundNumber)")
+//                    print("\(gameStateResponse.message)")
+//                    print("Current Round Number: \(gameStateResponse.message.currentRoundNumber)")
                 case .failure(let error):
-                    self?.errorMessage = "The room code that you entered is incorrect."
+                    self?.errorMessage = "The room code that you entered is incorrect: \(error.localizedDescription)"
                 }
             }
         }

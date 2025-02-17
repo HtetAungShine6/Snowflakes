@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		B3099BCF2D5BAA4D00EC7024 /* Mantis in Frameworks */ = {isa = PBXBuildFile; productRef = B3099BCE2D5BAA4D00EC7024 /* Mantis */; };
 		B3832B502D0EDDC70016154B /* Starscream in Frameworks */ = {isa = PBXBuildFile; productRef = B3832B4F2D0EDDC70016154B /* Starscream */; };
 		B38947A72D4E288500F4B0C4 /* IQKeyboardManagerSwift in Frameworks */ = {isa = PBXBuildFile; productRef = B38947A62D4E288500F4B0C4 /* IQKeyboardManagerSwift */; };
 		B38947AA2D4E2A7600F4B0C4 /* IQKeyboardToolbarManager in Frameworks */ = {isa = PBXBuildFile; productRef = B38947A92D4E2A7600F4B0C4 /* IQKeyboardToolbarManager */; };
@@ -44,6 +45,7 @@
 			files = (
 				B38947AA2D4E2A7600F4B0C4 /* IQKeyboardToolbarManager in Frameworks */,
 				B3832B502D0EDDC70016154B /* Starscream in Frameworks */,
+				B3099BCF2D5BAA4D00EC7024 /* Mantis in Frameworks */,
 				B38947A72D4E288500F4B0C4 /* IQKeyboardManagerSwift in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -98,6 +100,7 @@
 				B3832B4F2D0EDDC70016154B /* Starscream */,
 				B38947A62D4E288500F4B0C4 /* IQKeyboardManagerSwift */,
 				B38947A92D4E2A7600F4B0C4 /* IQKeyboardToolbarManager */,
+				B3099BCE2D5BAA4D00EC7024 /* Mantis */,
 			);
 			productName = Snowflakes;
 			productReference = B3D468892CD899C9001F1147 /* Snowflakes.app */;
@@ -131,6 +134,7 @@
 				B3832B4E2D0EDDC70016154B /* XCRemoteSwiftPackageReference "Starscream" */,
 				B38947A52D4E288500F4B0C4 /* XCRemoteSwiftPackageReference "IQKeyboardManager" */,
 				B38947A82D4E2A7600F4B0C4 /* XCRemoteSwiftPackageReference "IQKeyboardToolbarManager" */,
+				B3099BCD2D5BAA4D00EC7024 /* XCRemoteSwiftPackageReference "Mantis" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = B3D4688A2CD899C9001F1147 /* Products */;
@@ -290,10 +294,12 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"Snowflakes/Preview Content\"";
-				DEVELOPMENT_TEAM = NTMB9Z2PLV;
+				DEVELOPMENT_TEAM = MAFKHQX2GF;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = Snowflakes/Info.plist;
+				INFOPLIST_KEY_NSCameraUsageDescription = "Please allow camera";
+				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "Please allow gallery";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -324,10 +330,12 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"Snowflakes/Preview Content\"";
-				DEVELOPMENT_TEAM = NTMB9Z2PLV;
+				DEVELOPMENT_TEAM = MAFKHQX2GF;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = Snowflakes/Info.plist;
+				INFOPLIST_KEY_NSCameraUsageDescription = "Please allow camera";
+				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "Please allow gallery";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -374,6 +382,14 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
+		B3099BCD2D5BAA4D00EC7024 /* XCRemoteSwiftPackageReference "Mantis" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/guoyingtao/Mantis.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.7.5;
+			};
+		};
 		B3832B4E2D0EDDC70016154B /* XCRemoteSwiftPackageReference "Starscream" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/daltoniam/Starscream";
@@ -401,6 +417,11 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		B3099BCE2D5BAA4D00EC7024 /* Mantis */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = B3099BCD2D5BAA4D00EC7024 /* XCRemoteSwiftPackageReference "Mantis" */;
+			productName = Mantis;
+		};
 		B3832B4F2D0EDDC70016154B /* Starscream */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = B3832B4E2D0EDDC70016154B /* XCRemoteSwiftPackageReference "Starscream" */;

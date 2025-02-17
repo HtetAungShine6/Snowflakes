@@ -10,6 +10,7 @@ import SwiftUI
 struct RootView: View {
     
     @StateObject private var navigationManager = NavigationManager()
+    @StateObject private var cartManager = CartManager()
 
     var body: some View {
         NavigationStack(path: $navigationManager.path) {
@@ -32,8 +33,8 @@ struct RootView: View {
                     case .hostShopTimerView(let roomCode):
                         ShopTimerViewHost(roomCode: roomCode)
                             .environmentObject(navigationManager)
-                    case .hostShopView(let hostRoomCode):
-                        HostShopView(hostRoomCode: hostRoomCode)
+                    case .hostShopView(let hostRoomCode, let roundNumber):
+                        HostShopView(hostRoomCode: hostRoomCode, roundNumber: roundNumber)
                             .environmentObject(navigationManager)
                     case .teamListPlayerView(let playerRoomCode):
                         TeamListPlayerView(playerRoomCode: playerRoomCode)
@@ -51,14 +52,24 @@ struct RootView: View {
                             members: ["Hein Thant", "Thu Yein", "Htet Aung Shine"] // Example members
                         )
                         .environmentObject(navigationManager)
-                    case .leaderboard:
-                        LeaderboardView()
+                    case .leaderboard(let roomCode):
+                        LeaderboardView(roomCode: roomCode)
                             .environmentObject(navigationManager)
                     case .playerTimerView(let hostRoomCode, let playerRoomCode):
                         PlayerTimerView(playerRoomCode: playerRoomCode, hostRoomCode: hostRoomCode)
                             .environmentObject(navigationManager)
                     case .playerShopTimerView(let hostRoomCode, let playerRoomCode):
                         PlayerShopTimerView(playerRoomCode: playerRoomCode, hostRoomCode: hostRoomCode)
+                            .environmentObject(navigationManager)
+                    case .shopDetailPlayerView(let playerRoomCode, let roundNumber):
+                        ShopDetailsPlayerView(playerRoomCode: playerRoomCode, roundNumber: roundNumber)
+                            .environmentObject(navigationManager)
+                            .environmentObject(cartManager)
+                    case .hostTeamDetailView(let hostRoomCode, let teamNumber, let roundNumber):
+                        HostTeamDetailView(teamNumber: teamNumber, hostRoomCode: hostRoomCode, roundNumber: roundNumber)
+                            .environmentObject(navigationManager)
+                    case .addToCartView(let playerRoomCode, let teamNumber, let roundNumber, let hostRoomCode):
+                        AddToCartView(playerRoomCode: playerRoomCode, teamNumber: teamNumber, roundNumber: roundNumber, hostRoomCode: hostRoomCode)
                             .environmentObject(navigationManager)
                     }
                 }

@@ -199,6 +199,7 @@ struct TeamListPlayerView: View {
             joinTeamVM.status = "remove"
             joinTeamVM.playerName = playerName
             joinTeamVM.join()
+            UserDefaults.standard.removeObject(forKey: "TeamDetail-\(team.playerRoomCode)")
         } else {
             joinedTeams.keys.forEach { joinedTeams[$0] = false }
             joinedTeams[team.teamNumber] = true
@@ -209,6 +210,7 @@ struct TeamListPlayerView: View {
             joinTeamVM.status = "add"
             joinTeamVM.playerName = playerName
             joinTeamVM.join()
+            UserDefaults.standard.set(team.teamNumber, forKey: "TeamDetail-\(team.playerRoomCode)")
         }
     }
 }

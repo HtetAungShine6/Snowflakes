@@ -44,7 +44,7 @@ class CreateTeamViewModel: ObservableObject {
                     self.teamCreationSuccess = true
                 case .failure(let error):
                     self.errorMessage = "Failed to create team: \(error.localizedDescription)"
-                    print(error.localizedDescription)
+//                    print(error.localizedDescription)
                 }
             }
         }
