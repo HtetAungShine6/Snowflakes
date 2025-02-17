@@ -16,6 +16,7 @@ struct HostShopView: View {
     @State private var shopItems: ShopMessageResponse? = nil
     
     let hostRoomCode: String
+    var roundNumber: Int
     
     var body: some View {
         ScrollView {
@@ -87,7 +88,7 @@ struct HostShopView: View {
                             .padding(.bottom, 8)
                             .contentShape(Rectangle())
                             .onTapGesture {
-                                navigationManager.navigateTo(Destination.hostTeamDetailView(hostRoomCode: hostRoomCode, teamNumber: team.teamNumber))
+                                navigationManager.navigateTo(Destination.hostTeamDetailView(hostRoomCode: hostRoomCode, teamNumber: team.teamNumber, roundNumber: roundNumber))
                             }
                     }
                 }
@@ -178,5 +179,5 @@ struct HostShopItemView: View {
 }
 
 #Preview{
-    HostShopView(hostRoomCode: "ABCD")
+    HostShopView(hostRoomCode: "ABCD", roundNumber: 2)
 }

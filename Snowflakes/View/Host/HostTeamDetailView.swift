@@ -11,16 +11,20 @@ struct HostTeamDetailView: View {
     
     @EnvironmentObject var navigationManager: NavigationManager
     @StateObject private var getTeamDetailVM = GetTeamDetailByRoomCode()
+    @StateObject private var getTransactionVM = GetTransactionViewModel()
     @State private var team: Team? = nil
+    @State private var transactions: [TransactionMessage] = []
     
     var teamNumber: Int
     var hostRoomCode: String
+    var roundNumber: Int
     
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 30) {
                 teamLabel
                 transferView
+                notificationView
                 Spacer()
             }
         }
@@ -34,9 +38,13 @@ struct HostTeamDetailView: View {
         .navigationBarBackButtonHidden(true)
         .onAppear {
             getTeamDetailVM.fetchTeams(hostRoomCode: hostRoomCode, teamNumber: teamNumber)
+            getTransactionVM.fetchTransactions(hostRoomCode: hostRoomCode, roundNumber: roundNumber, teamNumber: teamNumber)
         }
         .onReceive(getTeamDetailVM.$team) { team in
             self.team = team
+        }
+        .onReceive(getTransactionVM.$transactions) { transactions in
+            self.transactions = transactions
         }
     }
     
@@ -115,18 +123,38 @@ struct HostTeamDetailView: View {
                     }
                 }
             }
-//            TabView {
-//                ForEach(0..<4, id: \.self) { _ in
-//                    Image("MockSnowflake")
-//                        .resizable()
-//                        .scaledToFill()
-//                        .clipped()
-//                }
-//            }
-//            .tabViewStyle(PageTabViewStyle())
-//            .indexViewStyle(.page(backgroundDisplayMode: .always))
-//            .frame(height: 350)
         }
         .padding(.horizontal)
+    }
+    
+    private var notificationView: some View {
+        VStack {
+            Text("Notifications")
+                .font(.custom("Lato-Regular", size: 22))
+            if transactions.isEmpty {
+                Text("No transactions available")
+                    .font(.custom("Lato-Regular", size: 16))
+                    .foregroundStyle(Color.gray.opacity(0.75))
+            } else {
+                ForEach(transactions, id: \.productId) { transaction in
+                    HStack {
+                        Image(transaction.productName)
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: 30, height: 30)
+                        
+                        VStack(alignment: .leading) {
+                            Text("\(transaction.productName)")
+                                .font(.custom("Lato-Bold", size: 18))
+                            Text("Qty: \(transaction.quantity) - Total: \(transaction.total) tokens")
+                                .font(.custom("Lato-Regular", size: 14))
+                                .foregroundStyle(Color.gray)
+                        }
+                        Spacer()
+                    }
+                    .padding(.vertical, 5)
+                }
+            }
+        }
     }
 }

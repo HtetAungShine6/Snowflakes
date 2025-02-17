@@ -5,16 +5,30 @@ import Mantis
 struct ShopDetailsPlayerView: View {
     
     @EnvironmentObject var navigationManager: NavigationManager
+    @EnvironmentObject var cartManager: CartManager
     @StateObject private var getTeamDetailVM = GetTeamDetailByRoomCode()
+    @StateObject private var getShopVM = GetShopByRoomCodeViewModel()
+    @StateObject private var addToCartVM = AddToCartViewModel()
+    @StateObject private var uploadImageVM = UploadImageViewModel()
     
     @State private var team: Team? = nil
+    @State private var availableItemsFromShop: ShopMessageResponse? = nil
+    @State private var teamNumber: Int = 0
+    
+    @State private var selectedItem: String?
+    @State private var selectedStock: Int?
+    @State private var selectedPrice: Int?
+    @State private var showAlert = false
+    @State private var quantity = ""
     
     @State private var selectedImage: UIImage?
     @State private var croppedImage: UIImage?
     @State private var showImagePicker = false
     @State private var showImageCropper = false
-
+    @State private var selectedImages: [UIImage] = []
+    
     let playerRoomCode: String
+    var roundNumber: Int
     
     @State private var notifications: [NotificationItem] = [
         NotificationItem(message: "You purchased Pen (x2) and Paper (x3)", amount: 10, color: Color.white, isChecked: false),
@@ -32,7 +46,7 @@ struct ShopDetailsPlayerView: View {
                     
                     items
                     
-                    notificationList
+//                    notificationList
                     
                     uploadImageSection
                     
@@ -44,32 +58,47 @@ struct ShopDetailsPlayerView: View {
             .refreshable {
                 if let teamNumber = UserDefaults.standard.value(forKey: "TeamDetail-\(playerRoomCode)") as? Int {
                     getTeamDetailVM.fetchTeams(playerRoomCode: playerRoomCode, teamNumber: teamNumber)
+                    self.teamNumber = teamNumber
                 }
             }
         }
         .background(Color.white)
         .navigationBarBackButtonHidden()
         .onAppear {
-            if let teamNumber = UserDefaults.standard.value(forKey: "TeamDetail-\(playerRoomCode)") {
-                getTeamDetailVM.fetchTeams(playerRoomCode: playerRoomCode, teamNumber: teamNumber as! Int)
+            if let teamNumber = UserDefaults.standard.value(forKey: "TeamDetail-\(playerRoomCode)") as? Int {
+                getTeamDetailVM.fetchTeams(playerRoomCode: playerRoomCode, teamNumber: teamNumber)
+                self.teamNumber = teamNumber
             }
         }
         .onReceive(getTeamDetailVM.$team) { team in
             self.team = team
+            if let hostRoomCode = team?.hostRoomCode {
+                getShopVM.fetchShop(hostRoomCode: hostRoomCode)
+            }
+        }
+        .onReceive(getShopVM.$shopMessageResponse) { shopItems in
+            self.availableItemsFromShop = shopItems
         }
     }
     
     // MARK: - Back Button (Private Function)
     private var backButton: some View {
-        Button(action: {
-            navigationManager.pop()
-        }) {
-            HStack {
+        HStack {
+            Button(action: {
+                navigationManager.pop()
+            }) {
                 Image(systemName: "arrow.left")
                     .foregroundColor(.black)
             }
+            Spacer()
+            Button(action: {
+                navigationManager.navigateTo(Destination.addToCartView(playerRoomCode: playerRoomCode, teamNumber: teamNumber, roundNumber: roundNumber, hostRoomCode: team?.hostRoomCode ?? ""))
+            }) {
+                Image(systemName: "cart.badge.plus")
+                    .foregroundColor(.black)
+            }
         }
-        .padding(.leading, 10)
+        .padding(.horizontal, 10)
         .padding(.top, 10)
     }
     
@@ -128,17 +157,54 @@ struct ShopDetailsPlayerView: View {
             }
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack {
-                    if let teamStocks = team?.teamStocks {
-                        ForEach(teamStocks, id: \.self) { item in
-                            PlayerShopItemView(imageName: item.productName, title: "\(item.remainingStock) x \(item.productName) left")
+                    if let shopItems = availableItemsFromShop?.shopStocks {
+                        ForEach(shopItems, id: \.self) { item in
+                            PlayerShopItemView(
+                                imageName: item.productName,
+                                title: "\(item.remainingStock) x \(item.productName) left",
+                                onTap: {
+                                    selectedItem = item.productName
+                                    selectedStock = item.remainingStock
+                                    selectedPrice = item.price
+                                    showAlert = true
+                                    quantity = ""
+                                }
+                            )
                         }
                     }
                 }
             }
         }
         .padding(.horizontal)
+        .alert("How many \(selectedItem ?? "") do you want to buy?", isPresented: $showAlert) {
+            VStack {
+                TextField("Enter quantity", text: $quantity)
+                    .keyboardType(.numberPad)
+            }
+            Button("Buy", action: {
+                if let item = selectedItem, let price = selectedPrice, let quantityInt = Int(quantity) {
+                    //                    cartManager.addItem(name: item, price: price, quantity: quantityInt)
+                    addToCartVM.productName = item
+                    addToCartVM.price = price
+                    addToCartVM.quantity = quantityInt
+                    addToCartVM.playerRoomCode = playerRoomCode
+                    addToCartVM.teamNumber = teamNumber
+                    addToCartVM.addToCart()
+                }
+                showAlert = false
+            })
+            .disabled(isBuyButtonDisabled)
+            
+            Button("Cancel", role: .cancel) {}
+        }
     }
-
+    
+    private var isBuyButtonDisabled: Bool {
+        guard let stock = selectedStock, let quantityInt = Int(quantity) else {
+            return true
+        }
+        return quantityInt <= 0 || quantityInt > stock
+    }
     
     // MARK: - Notification List
     private var notificationList: some View {
@@ -192,7 +258,7 @@ struct ShopDetailsPlayerView: View {
     
     // MARK: - Upload Image Section
     private var uploadImageSection: some View {
-        VStack {
+        VStack(alignment: .leading) {
             Text("Sell your Snowflake")
                 .font(Font.custom("Lato", size: 22).weight(.medium))
                 .foregroundColor(.black)
@@ -208,33 +274,117 @@ struct ShopDetailsPlayerView: View {
                             .stroke(Color.black, lineWidth: 0.25)
                     )
                 
-                if let image = selectedImage {
+                if let image = croppedImage {
                     Image(uiImage: image)
                         .resizable()
-                        .scaledToFit()
+                        .scaledToFill()
+                        .frame(width: 199, height: 238)
+                        .cornerRadius(20)
+                } else if let image = selectedImage {
+                    Image(uiImage: image)
+                        .resizable()
+                        .scaledToFill()
                         .frame(width: 199, height: 238)
                         .cornerRadius(20)
                 } else {
-                    Image(systemName: "photo.fill")
+                    Image(systemName: "photo")
                         .resizable()
                         .scaledToFit()
-                        .frame(width: 50, height: 50)
+                        .frame(width: 30, height: 30)
                         .foregroundColor(.gray)
                 }
             }
             .onTapGesture {
                 showImagePicker = true
             }
+            
+            Button(action: {
+                if let image = croppedImage {
+                    uploadImageVM.uploadImage(image, teamId: "67a274ae714f51d4009c54a3") // Use actual teamId
+                }
+            }) {
+                Text(uploadImageVM.isUploading ? "Uploading..." : "Upload Image")
+                    .font(.custom("Lato-Bold", size: 16))
+                    .foregroundColor(.white)
+                    .padding()
+                    .background(uploadImageVM.uploadSuccess ? Color.green : Color.blue)
+                    .cornerRadius(10)
+            }
+            .padding(.top, 10)
+            .disabled(uploadImageVM.isUploading)
+            
+            // Show Upload Result
+            if let errorMessage = uploadImageVM.errorMessage {
+                Text(errorMessage)
+                    .foregroundColor(.red)
+                    .font(.caption)
+            }
+            if uploadImageVM.uploadSuccess {
+                Text("Upload Successful!")
+                    .foregroundColor(.green)
+                    .font(.caption)
+            }
         }
         .sheet(isPresented: $showImagePicker) {
             ImagePicker(selectedImage: $selectedImage, showImagePicker: $showImagePicker, showImageCropper: $showImageCropper)
         }
         .fullScreenCover(isPresented: $showImageCropper) {
-            if let image = selectedImage {
-                ImageCropper(image: image, croppedImage: $croppedImage, isPresented: $showImageCropper)
+            if let imageToCrop = selectedImage {
+                ImageCropper(image: imageToCrop, croppedImage: $croppedImage, isPresented: $showImageCropper)
             }
         }
+        .padding(.horizontal, 10)
     }
+//    private var uploadImageSection: some View {
+//        VStack(alignment: .leading) {
+//            Text("Sell your Snowflake")
+//                .font(Font.custom("Lato", size: 22).weight(.medium))
+//                .foregroundColor(.black)
+//            ZStack {
+//                Rectangle()
+//                    .foregroundColor(.clear)
+//                    .frame(width: 199, height: 238)
+//                    .background(Color.white.opacity(0.50))
+//                    .cornerRadius(20)
+//                    .overlay(
+//                        RoundedRectangle(cornerRadius: 20)
+//                            .stroke(Color.black, lineWidth: 0.25)
+//                    )
+//                
+//                if let image = croppedImage {
+//                    Image(uiImage: image)
+//                        .resizable()
+//                        .scaledToFill()
+//                        .frame(width: 199, height: 238)
+//                        .cornerRadius(20)
+//                } else if let image = selectedImage {
+//                    Image(uiImage: image)
+//                        .resizable()
+//                        .scaledToFill()
+//                        .frame(width: 199, height: 238)
+//                        .cornerRadius(20)
+//                } else {
+//                    Image(.upload)
+//                        .resizable()
+//                        .scaledToFit()
+//                        .frame(width: 30, height: 30)
+//                        .foregroundColor(.gray)
+//                }
+//            }
+//            .onTapGesture {
+//                showImagePicker = true
+//            }
+//        }
+//        .sheet(isPresented: $showImagePicker) {
+//            ImagePicker(selectedImage: $selectedImage, showImagePicker: $showImagePicker, showImageCropper: $showImageCropper)
+//        }
+//        .fullScreenCover(isPresented: $showImageCropper) {
+//            if let imageToCrop = selectedImage {
+//                ImageCropper(image: imageToCrop, croppedImage: $croppedImage, isPresented: $showImageCropper)
+//            }
+//        }
+//        .padding(.horizontal, 10)
+//    }
 }
 
 // MARK: - Image Picker (Select from Photo Library)
@@ -356,5 +506,6 @@ struct ImageCropper: UIViewControllerRepresentable {
 
 
 #Preview {
-    ShopDetailsPlayerView(playerRoomCode: "ABCDEF")
+    ShopDetailsPlayerView(playerRoomCode: "ABCDEF", roundNumber: 4)
 }
+

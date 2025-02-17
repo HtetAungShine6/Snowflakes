@@ -13,7 +13,8 @@ struct PlayerShopItemView: View {
     var title: String
     var width: CGFloat = 130
     var height: CGFloat = 165
-
+    var onTap: () -> Void
+    
     var body: some View {
         VStack {
             Image(imageName)
@@ -29,6 +30,9 @@ struct PlayerShopItemView: View {
         .padding()
         .background(AppColors.frostBlue)
         .cornerRadius(20)
+        .onTapGesture {
+            onTap()
+        }
     }
 }
 

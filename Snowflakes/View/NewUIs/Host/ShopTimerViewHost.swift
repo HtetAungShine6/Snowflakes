@@ -15,6 +15,7 @@ struct ShopTimerViewHost: View {
     @StateObject private var getPlaygroundVM = GetPlaygroundViewModel()
     @StateObject private var updateGameStateViewModel = UpdateGameStateViewModel()
     @StateObject private var getGameStateViewModel = GetGameStateViewModel()
+    @StateObject private var createLeaderboardVM = CreateLeaderboardViewModel()
     
     @State private var timerValueFromSocket: String = ""
     @State private var sendMessageText: String = ""
@@ -61,7 +62,7 @@ struct ShopTimerViewHost: View {
         .onReceive(webSocketManager.$currentGameState) { currentGameState in
             if currentGameState == "SnowFlakeCreation" && !hasNavigated {
                 if getGameStateViewModel.currentRoundNumber == navigationManager.totalRound {
-                    navigationManager.navigateTo(Destination.leaderboard)
+                    navigationManager.navigateTo(Destination.leaderboard(roomCode: roomCode))
                 } else {
                     navigationManager.navigateTo(Destination.hostTimerView(roomCode: roomCode))
                     getGameStateViewModel.currentRoundNumber += 1
@@ -89,7 +90,7 @@ struct ShopTimerViewHost: View {
             }
             Spacer()
             Button {
-                navigationManager.navigateTo(Destination.hostShopView(hostRoomCode: roomCode))
+                navigationManager.navigateTo(Destination.hostShopView(hostRoomCode: roomCode, roundNumber: getGameStateViewModel.currentRoundNumber))
             }label: {
                 Image("shop2")
                     .resizable()
@@ -249,6 +250,7 @@ struct ShopTimerViewHost: View {
                             updateGameStateViewModel.hostRoomCode = roomCode
                             updateGameStateViewModel.currentGameState = GameState.Leaderboard
                             updateGameStateViewModel.updateGameState()
+                            createLeaderboardVM.createLeaderboard(hostRoomCode: roomCode)
                         }
                     }
                 }

@@ -72,7 +72,7 @@ struct PlayerShopTimerView: View {
         .onReceive(webSocketManager.$currentGameState) { currentGameState in
             if currentGameState == "SnowFlakeCreation" && !hasNavigated {
                 if getGameStateViewModel.currentRoundNumber == navigationManager.totalRound {
-                    navigationManager.navigateTo(Destination.leaderboard)
+                    navigationManager.navigateTo(Destination.leaderboard(roomCode: playerRoomCode))
                 } else {
                     getGameStateViewModel.currentRoundNumber += 1
                     navigationManager.navigateTo(Destination.playerTimerView(hostRoomCode: hostRoomCode, playerRoomCode: playerRoomCode))
@@ -94,7 +94,7 @@ struct PlayerShopTimerView: View {
             }
             Spacer()
             Button {
-                navigationManager.navigateTo(Destination.shopDetailPlayerView(playerRoomCode: playerRoomCode))
+                navigationManager.navigateTo(Destination.shopDetailPlayerView(playerRoomCode: playerRoomCode, roundNumber: getGameStateViewModel.currentRoundNumber))
             }label: {
                 Image("shop2")
                     .resizable()

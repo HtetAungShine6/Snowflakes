@@ -9,25 +9,36 @@ import SwiftUI
 
 struct LeaderboardView: View {
     
-    let teams: [LeaderboardMockUp] = leaderboardMockUp.sorted { lhs, rhs in
-        // define with or without LeaderboardView (both works but how?)
-        LeaderboardView.rankOrder(lhs.rank) < LeaderboardView.rankOrder(rhs.rank)
-    }
+    @StateObject private var getLeaderboardVM = GetLeaderboardViewModel()
+    @State private var leaderboard: [LeaderboardMessage] = []
+    
+    let roomCode: String
     
     var body: some View {
         VStack(alignment: .leading) {
             navBar
             ScrollView {
                 VStack(alignment: .leading) {
-                    ForEach(teams, id: \.teamNumber) { team in
-                        teamCardView(team: team)
-                            .padding(.bottom, 8)
+                    if !leaderboard.isEmpty {
+                        ForEach(leaderboard, id: \.teamNumber) { team in
+                            teamCardView(team: team)
+                                .padding(.bottom, 8)
+                        }
                     }
                 }
                 .padding()
             }
+            .refreshable {
+                getLeaderboardVM.fetchLeaderboard(hostRoomCode: roomCode)
+            }
         }
         .navigationBarBackButtonHidden()
+        .onAppear {
+            getLeaderboardVM.fetchLeaderboard(hostRoomCode: roomCode)
+        }
+        .onReceive(getLeaderboardVM.$leaderboard) { leaderboard in
+            self.leaderboard = leaderboard
+        }
     }
     
     private var navBar: some View {
@@ -46,30 +57,38 @@ struct LeaderboardView: View {
         .padding(.horizontal)
     }
     
-    private func teamCardView(team: LeaderboardMockUp) -> some View {
+    private func teamCardView(team: LeaderboardMessage) -> some View {
         VStack(alignment: .leading, spacing: 10) {
             HStack {
                 Text("Team: \(team.teamNumber)")
                     .font(.custom("Lato-Regular", size: 20))
-                Text("(\(team.playersCount) Players)")
+                Text("(\(team.players.count) Players)")
                     .font(.custom("Lato-Regular", size: 16))
                     .foregroundStyle(Color.gray)
                 Spacer()
-                Text("\(team.rank)")
+                Text("\(team.teamRank)")
                     .font(.custom("Lato-Regular", size: 16))
             }
             
             HStack(spacing: 10) {
-                ForEach(["Scissor", "Paper", "Pen"], id: \.self) { itemName in
-                    if let count = team.items[itemName] {
-                        VStack {
-                            Image(itemName)
-                                .resizable()
-                                .frame(width: 40, height: 40)
-                            Text("\(count)x")
-                                .font(.custom("Lato-Regular", size: 16))
-                                .foregroundStyle(Color.gray)
-                        }
+                ForEach(team.stocks, id: \.productName) { item in
+                    //                    if let count = team.stocks.count {
+                    //                        VStack {
+                    //                            Image(item.productName)
+                    //                                .resizable()
+                    //                                .frame(width: 40, height: 40)
+                    //                            Text("\(count)x")
+                    //                                .font(.custom("Lato-Regular", size: 16))
+                    //                                .foregroundStyle(Color.gray)
+                    //                        }
+                    //                    }
+                    VStack {
+                        Image(item.productName)
+                            .resizable()
+                            .frame(width: 40, height: 40)
+                        Text("\(item.remainingStock)x")
+                            .font(.custom("Lato-Regular", size: 16))
+                            .foregroundStyle(Color.gray)
                     }
                 }
                 Spacer()
@@ -78,7 +97,7 @@ struct LeaderboardView: View {
                         .resizable()
                         .scaledToFit()
                         .frame(height: 35)
-                    Text("\(team.tokens) tokens")
+                    Text("\(team.remainingTokens) tokens")
                         .font(.custom("Lato-Regular", size: 16))
                 }
             }
@@ -88,7 +107,7 @@ struct LeaderboardView: View {
                     .font(.footnote)
                     .bold()
                     .foregroundStyle(.black)
-                Text("\(team.members.joined(separator: ", "))")
+                Text("\(team.players.joined(separator: ", "))")
                     .font(.footnote)
                     .foregroundStyle(.gray)
             }
@@ -107,6 +126,6 @@ struct LeaderboardView: View {
     }
 }
 
-#Preview {
-    LeaderboardView()
-}
+//#Preview {
+//    LeaderboardView()
+//}
