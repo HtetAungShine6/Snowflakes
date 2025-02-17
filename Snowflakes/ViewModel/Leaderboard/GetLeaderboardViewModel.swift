@@ -15,9 +15,13 @@ class GetLeaderboardViewModel: ObservableObject {
     @Published var isLoading: Bool = false
     @Published var isSuccess: Bool = false
     
-    func fetchLeaderboard(hostRoomCode: String) {
+    func fetchLeaderboard(hostRoomCode: String? = nil, playerRoomCode: String? = nil) {
         
-        let getLeaderboardManager = LeaderboardUseCase(hostRoomCode: hostRoomCode)
+        let getLeaderboardManager = LeaderboardUseCase(
+            hostRoomCode: hostRoomCode,
+            playerRoomCode: playerRoomCode
+        )
+        
         errorMessage = nil
         isLoading = true
         

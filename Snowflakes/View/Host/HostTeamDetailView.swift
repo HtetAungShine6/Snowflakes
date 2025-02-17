@@ -6,14 +6,19 @@
 //
 
 import SwiftUI
+import Kingfisher
 
 struct HostTeamDetailView: View {
     
     @EnvironmentObject var navigationManager: NavigationManager
     @StateObject private var getTeamDetailVM = GetTeamDetailByRoomCode()
     @StateObject private var getTransactionVM = GetTransactionViewModel()
+    @StateObject private var buyImageVM = BuyImageViewModel()
     @State private var team: Team? = nil
     @State private var transactions: [TransactionMessage] = []
+    @State private var selectedImage: String?
+    @State private var price: String = ""
+    @State private var showImageBuyAlert: Bool = false
     
     var teamNumber: Int
     var hostRoomCode: String
@@ -110,31 +115,67 @@ struct HostTeamDetailView: View {
         VStack(alignment: .leading) {
             Text("Transfer")
                 .font(.custom("Lato-Regular", size: 22))
+                .padding(.horizontal)
             Text("Tap image to transfer tokens")
                 .font(.custom("Poppins-Regular", size: 15))
                 .foregroundStyle(Color.gray.opacity(0.75))
+                .padding(.horizontal)
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack{
-                    ForEach(0..<4, id: \.self) { _ in
-                        Image("MockSnowflake")
-                            .resizable()
-                            .scaledToFit()
-                            .frame(width: 300, height: 250)
+                    if let images = team?.images {
+                        ForEach(images, id: \.self) { imageUrl in
+                            KFImage(URL(string: imageUrl))
+                                .resizable()
+                                .scaledToFill()
+                                .frame(width: 300, height: 250)
+                                .clipShape(RoundedRectangle(cornerRadius: 10))
+                                .onTapGesture {
+                                    selectedImage = imageUrl
+                                    showImageBuyAlert = true
+                                }
+                        }
+                    } else {
+                        Text("No Images yet to be found.")
+                            .font(.custom("Poppins-Regular", size: 15))
+                            .foregroundStyle(Color.gray.opacity(0.75))
+                            .padding(.horizontal)
                     }
                 }
             }
+            .alert("Do you want to buy this Snowflake?", isPresented: $showImageBuyAlert) {
+                VStack {
+                    TextField("Name a price", text: $price)
+                        .keyboardType(.numberPad)
+                }
+                Button("Buy", action: {
+                    if let image = selectedImage, let price = Int(price) {
+                        buyImageVM.isBuyingConfirmed = true
+                        buyImageVM.hostRoomCode = hostRoomCode
+                        buyImageVM.playerRoomCode = team?.playerRoomCode ?? ""
+                        buyImageVM.roundNumber = roundNumber
+                        buyImageVM.teamNumber = teamNumber
+                        buyImageVM.imageUrl = image
+                        buyImageVM.price = price
+                        buyImageVM.buy()
+                    }
+                    showImageBuyAlert = false
+                })
+                
+                Button("Cancel", role: .cancel) {}
+            }
         }
-        .padding(.horizontal)
     }
     
     private var notificationView: some View {
-        VStack {
+        VStack(alignment: .leading) {
             Text("Notifications")
                 .font(.custom("Lato-Regular", size: 22))
             if transactions.isEmpty {
-                Text("No transactions available")
-                    .font(.custom("Lato-Regular", size: 16))
-                    .foregroundStyle(Color.gray.opacity(0.75))
+                VStack {
+                    Text("No transactions available")
+                        .font(.custom("Lato-Regular", size: 16))
+                        .foregroundStyle(Color.gray.opacity(0.75))
+                }
             } else {
                 ForEach(transactions, id: \.productId) { transaction in
                     HStack {
@@ -146,7 +187,7 @@ struct HostTeamDetailView: View {
                         VStack(alignment: .leading) {
                             Text("\(transaction.productName)")
                                 .font(.custom("Lato-Bold", size: 18))
-                            Text("Qty: \(transaction.quantity) - Total: \(transaction.total) tokens")
+                            Text("Quantity: \(transaction.quantity) - Total: \(transaction.total) tokens")
                                 .font(.custom("Lato-Regular", size: 14))
                                 .foregroundStyle(Color.gray)
                         }
@@ -156,5 +197,10 @@ struct HostTeamDetailView: View {
                 }
             }
         }
+        .padding(.horizontal, 10)
     }
+}
+
+#Preview{
+    HostTeamDetailView(teamNumber: 1, hostRoomCode: "ABCDEF", roundNumber: 2)
 }

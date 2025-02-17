@@ -22,4 +22,5 @@ enum Destination: Hashable {
     case shopDetailPlayerView(playerRoomCode: String, roundNumber: Int)
     case hostTeamDetailView(hostRoomCode: String, teamNumber: Int, roundNumber: Int)
     case addToCartView(playerRoomCode: String, teamNumber: Int, roundNumber: Int, hostRoomCode: String)
+    case galleryView(teamNumber: Int, roomCode: String)
 }

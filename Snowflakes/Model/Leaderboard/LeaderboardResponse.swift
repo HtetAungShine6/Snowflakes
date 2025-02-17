@@ -17,5 +17,5 @@ struct LeaderboardMessage: Codable {
     let totalSales: Int
     let players: [String]
     let stocks: [ShopItem]
-    let soldImages: String?
+    let soldImages: [String]
 }

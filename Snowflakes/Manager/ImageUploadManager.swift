@@ -32,8 +32,8 @@ class UploadImageViewModel: ObservableObject {
 
         // Construct the multipart request body
         var body = Data()
-        let fileName = "uploaded_image.jpg"
-        
+        let fileName = "\(UUID().uuidString).jpg"
+
         body.append("--\(boundary)\r\n".data(using: .utf8)!)
         body.append("Content-Disposition: form-data; name=\"file\"; filename=\"\(fileName)\"\r\n".data(using: .utf8)!)
         body.append("Content-Type: image/jpeg\r\n\r\n".data(using: .utf8)!)

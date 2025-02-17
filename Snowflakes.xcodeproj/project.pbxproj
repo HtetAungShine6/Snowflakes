@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		B3099BCF2D5BAA4D00EC7024 /* Mantis in Frameworks */ = {isa = PBXBuildFile; productRef = B3099BCE2D5BAA4D00EC7024 /* Mantis */; };
+		B3099C172D638A9800EC7024 /* Kingfisher in Frameworks */ = {isa = PBXBuildFile; productRef = B3099C162D638A9800EC7024 /* Kingfisher */; };
 		B3832B502D0EDDC70016154B /* Starscream in Frameworks */ = {isa = PBXBuildFile; productRef = B3832B4F2D0EDDC70016154B /* Starscream */; };
 		B38947A72D4E288500F4B0C4 /* IQKeyboardManagerSwift in Frameworks */ = {isa = PBXBuildFile; productRef = B38947A62D4E288500F4B0C4 /* IQKeyboardManagerSwift */; };
 		B38947AA2D4E2A7600F4B0C4 /* IQKeyboardToolbarManager in Frameworks */ = {isa = PBXBuildFile; productRef = B38947A92D4E2A7600F4B0C4 /* IQKeyboardToolbarManager */; };
@@ -47,6 +48,7 @@
 				B3832B502D0EDDC70016154B /* Starscream in Frameworks */,
 				B3099BCF2D5BAA4D00EC7024 /* Mantis in Frameworks */,
 				B38947A72D4E288500F4B0C4 /* IQKeyboardManagerSwift in Frameworks */,
+				B3099C172D638A9800EC7024 /* Kingfisher in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -101,6 +103,7 @@
 				B38947A62D4E288500F4B0C4 /* IQKeyboardManagerSwift */,
 				B38947A92D4E2A7600F4B0C4 /* IQKeyboardToolbarManager */,
 				B3099BCE2D5BAA4D00EC7024 /* Mantis */,
+				B3099C162D638A9800EC7024 /* Kingfisher */,
 			);
 			productName = Snowflakes;
 			productReference = B3D468892CD899C9001F1147 /* Snowflakes.app */;
@@ -135,6 +138,7 @@
 				B38947A52D4E288500F4B0C4 /* XCRemoteSwiftPackageReference "IQKeyboardManager" */,
 				B38947A82D4E2A7600F4B0C4 /* XCRemoteSwiftPackageReference "IQKeyboardToolbarManager" */,
 				B3099BCD2D5BAA4D00EC7024 /* XCRemoteSwiftPackageReference "Mantis" */,
+				B3099C152D638A9800EC7024 /* XCRemoteSwiftPackageReference "Kingfisher" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = B3D4688A2CD899C9001F1147 /* Products */;
@@ -390,6 +394,14 @@
 				minimumVersion = 1.7.5;
 			};
 		};
+		B3099C152D638A9800EC7024 /* XCRemoteSwiftPackageReference "Kingfisher" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/onevcat/Kingfisher.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 8.2.0;
+			};
+		};
 		B3832B4E2D0EDDC70016154B /* XCRemoteSwiftPackageReference "Starscream" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/daltoniam/Starscream";
@@ -421,6 +433,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = B3099BCD2D5BAA4D00EC7024 /* XCRemoteSwiftPackageReference "Mantis" */;
 			productName = Mantis;
+		};
+		B3099C162D638A9800EC7024 /* Kingfisher */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = B3099C152D638A9800EC7024 /* XCRemoteSwiftPackageReference "Kingfisher" */;
+			productName = Kingfisher;
 		};
 		B3832B4F2D0EDDC70016154B /* Starscream */ = {
 			isa = XCSwiftPackageProductDependency;

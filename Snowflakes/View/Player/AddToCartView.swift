@@ -60,6 +60,7 @@ struct AddToCartView: View {
             .padding()
 
             Button(action: {
+                exchangeStocksVM.cartIds = cartItems.map { item in item.id }
                 exchangeStocksVM.hostRoomCode = hostRoomCode
                 exchangeStocksVM.playerRoomCode = playerRoomCode
                 exchangeStocksVM.roundNumber = roundNumber
@@ -68,7 +69,6 @@ struct AddToCartView: View {
                     ProductDTO(productName: item.productName, quantity: item.quantity)
                 }
                 exchangeStocksVM.exchangeStocks()
-                print("🦊 \(exchangeStocksVM.hostRoomCode), \(exchangeStocksVM.playerRoomCode), \(exchangeStocksVM.roundNumber), \(exchangeStocksVM.teamNumber), \(exchangeStocksVM.products)")
             }) {
                 Text("Checkout")
                     .font(.headline)
