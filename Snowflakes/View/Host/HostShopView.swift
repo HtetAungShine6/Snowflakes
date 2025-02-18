@@ -103,8 +103,8 @@ struct HostShopView: View {
                 Text("Team: \(team.teamNumber)")
                     .font(.custom("Lato-Regular", size: 20))
                 Spacer()
-                if let member = team.members {
-                    Text("Players: \(String(describing: member.count)) players")
+                if !team.members.isEmpty {
+                    Text("Players: \(String(describing: team.members.count)) players")
                         .font(.custom("Lato-Regular", size: 20))
                 } else {
                     Text("No player found")
@@ -140,7 +140,7 @@ struct HostShopView: View {
     
     private var totalPlayerCount: Int {
         teams.reduce(0) { total, team in
-            total + (team.members?.count ?? 0)
+            total + (team.members.count)
         }
     }
     

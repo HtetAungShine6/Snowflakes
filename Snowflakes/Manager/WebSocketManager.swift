@@ -271,4 +271,3 @@ class WebSocketManager: ObservableObject, WebSocketDelegate {
         print("Sent handshake: \(handshakeMessage)")
     }
 }
-

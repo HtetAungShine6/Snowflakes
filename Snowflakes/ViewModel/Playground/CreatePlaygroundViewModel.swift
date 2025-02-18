@@ -46,20 +46,17 @@ class CreatePlaygroundViewModel: ObservableObject {
         let createPlaygroundManager = CreatePlaygroundUseCase()
         errorMessage = nil
         isLoading = true
-        isSuccess = false
-        print("Before execute: \(isLoading)")
+//        isSuccess = false
         
         createPlaygroundManager.execute(data: newPlayground, getMethod: "POST", token: nil) { [weak self] result in
             DispatchQueue.main.async {
                 self?.isLoading = false
                 switch result {
-                case .success(let data):
+                case .success( _):
                     self?.isSuccess = true
-//                    print("RESPONSE: \(data)")
                 case .failure(let error):
                     self?.isSuccess = false
                     self?.errorMessage = "Failed to create team: \(error.localizedDescription)"
-//                    print("\(error.localizedDescription )")
                 }
             }
         }

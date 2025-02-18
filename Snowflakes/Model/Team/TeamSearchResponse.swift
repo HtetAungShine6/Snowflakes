@@ -16,7 +16,7 @@ struct Team: Codable, Hashable {
     let hostRoomCode: String
     let playerRoomCode: String
     let tokens: Int
-    let members: [String]?
+    let members: [String]
     let teamStocks: [ShopItem]
     let images: [String]
 }

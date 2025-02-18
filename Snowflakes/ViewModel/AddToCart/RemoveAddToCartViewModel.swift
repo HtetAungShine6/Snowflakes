@@ -18,8 +18,8 @@ class RemoveAddToCartViewModel: ObservableObject {
     func removeCart(id: String) {
         
         let removeCartManager = RemoveCartUseCase(id: id)
-        errorMessage = nil
-        isLoading = true
+//        errorMessage = nil
+//        isLoading = true
         
         removeCartManager.execute(getMethod: "DELETE", token: nil) { [weak self] result in
             DispatchQueue.main.async {

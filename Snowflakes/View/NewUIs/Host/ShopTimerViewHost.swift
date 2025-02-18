@@ -85,8 +85,12 @@ struct ShopTimerViewHost: View {
                 Text("Snowflake")
                     .font(.custom("Montserrat-Medium", size: 32))
                     .foregroundStyle(Color.black)
-                Text("Shop Round")
-                    .foregroundStyle(Color.gray)
+                HStack {
+                    Text("Shop Round")
+                        .foregroundStyle(Color.gray)
+                    Text("(\(getGameStateViewModel.currentRoundNumber)/\(navigationManager.totalRound))")
+                        .foregroundStyle(Color.gray)
+                }
             }
             Spacer()
             Button {
@@ -167,23 +171,6 @@ struct ShopTimerViewHost: View {
         }
     }
     
-//    private var shopLabel: some View {
-//        VStack {
-//            (Text("It is time to ")
-//                .font(.custom("Roboto-Regular", size: 32))
-//                .foregroundColor(.primary) +
-//             Text("sell")
-//                .font(.custom("Roboto-Regular", size: 32))
-//                .foregroundColor(.red) +
-//             Text(" a \n snow flake")
-//                .font(.custom("Roboto-Regular", size: 32))
-//                .foregroundColor(.primary))
-//            .lineLimit(2)
-//            .multilineTextAlignment(.leading)
-//            .fixedSize(horizontal: false, vertical: true)
-//        }
-//        .frame(maxWidth: .infinity)
-//    }
     private var sendMessageField: some View {
         VStack {
             HStack {

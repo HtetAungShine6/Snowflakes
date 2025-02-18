@@ -12,6 +12,11 @@ protocol APIManager: AnyObject {
     var methodPath: String { get }
 }
 
+struct ErrorResponse: Codable, Error {
+    let message: String
+}
+
+
 extension APIManager {
     
     // MARK: - Adding a route to a Default Main Route of an API
@@ -61,8 +66,21 @@ extension APIManager {
                 return
             }
             
+            //            if !(200...299).contains(httpResponse.statusCode) {
+            //                completion(.failure(URLError(.badServerResponse)))
+            //                return
+            //            }
             if !(200...299).contains(httpResponse.statusCode) {
-                completion(.failure(URLError(.badServerResponse)))
+                if let responseData = data {
+                    do {
+                        let errorResponse = try JSONDecoder().decode(ErrorResponse.self, from: responseData)
+                        completion(.failure(errorResponse))
+                    } catch {
+                        completion(.failure(URLError(.badServerResponse)))
+                    }
+                } else {
+                    completion(.failure(URLError(.badServerResponse))) 
+                }
                 return
             }
             
@@ -72,7 +90,7 @@ extension APIManager {
                     let decodeData = try JSONDecoder().decode(ModelType.self, from: responseData)
                     completion(.success(decodeData))
                 } catch {
-                    completion(.failure(error))
+                    
                 }
             } else if getMethod == "DELETE" && (200...299).contains(httpResponse.statusCode) {
                 do {

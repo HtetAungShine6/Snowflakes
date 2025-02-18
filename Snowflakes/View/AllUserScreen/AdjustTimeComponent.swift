@@ -24,7 +24,8 @@ struct AdjustTimeComponent: View {
                     .scaledToFit()
                     .frame(width: 20, height: 20)
             }
-            .frame(width: 30, height: 30)
+            .frame(width: 25, height: 25)
+            .contentShape(Circle())
             .foregroundColor(AppColors.glacialBlue)
             .padding()
             .background(Color.white)
@@ -49,7 +50,8 @@ struct AdjustTimeComponent: View {
                     .scaledToFit()
                     .frame(width: 20, height: 20)
             }
-            .frame(width: 30, height: 30)
+            .frame(width: 25, height: 25)
+            .contentShape(Circle())
             .foregroundColor(AppColors.glacialBlue)
             .padding()
             .background(Color.white)

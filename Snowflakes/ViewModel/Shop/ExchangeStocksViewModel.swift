@@ -40,7 +40,7 @@ class ExchangeStocksViewModel: ObservableObject {
         )
         
         let exchangeStocksManager = ShopExchangeUseCase()
-        errorMessage = nil
+//        errorMessage = nil
         isLoading = true
         
         exchangeStocksManager.execute(data: newExchangeStocks, getMethod: "PUT", token: nil) { [weak self] result in
@@ -51,10 +51,17 @@ class ExchangeStocksViewModel: ObservableObject {
                     print("Exchange Stocks Successful: \(exchangeStockItem.message)")
                     self?.isSuccess = true
                 case .failure(let error):
-                    self?.errorMessage = "Failed to exchange stocks: \(error.localizedDescription)"
-                    print(error.localizedDescription)
+                    //                    self?.errorMessage = "Failed to exchange stocks: \(error.localizedDescription)"
+                    //                    print(error.localizedDescription)
+                    if let apiError = error as? ErrorResponse {
+                        self?.errorMessage = apiError.message
+                    } else {
+                        self?.errorMessage = "An unexpected error occurred."
+                    }
+                    print(self?.errorMessage ?? "Unknown error")
                 }
             }
         }
     }
 }
+

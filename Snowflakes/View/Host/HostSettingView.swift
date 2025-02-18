@@ -13,7 +13,6 @@ struct HostSettingView: View {
     @EnvironmentObject private var webSocketManager: WebSocketManager
     
     @StateObject private var createPlaygroundVM = CreatePlaygroundViewModel()
-    @ObservedObject private var getTeamsByRoomCodeVM = GetTeamsByRoomCode()
     @StateObject private var createGameStateVM = CreateGameStateViewModel()
     
     @StateObject private var scissorsVM = ShopItemViewModel(productName: "Scissor", price: 5, remainingStock: 1)
@@ -41,8 +40,10 @@ struct HostSettingView: View {
     @State private var scissors: Int = 1
     @State private var paper: Int = 1
     @State private var pen: Int = 1
+    @State private var errorPlaygroundCreateMessage: String = ""
     
     @State private var showAlertView: Bool = false
+    @State private var showErrorAlertView: Bool = false
     
     var body: some View {
         
@@ -57,10 +58,10 @@ struct HostSettingView: View {
                             .progressViewStyle(CircularProgressViewStyle(tint: .white))
                             .scaleEffect(2)
                         Text("Creating your Playground...")
-                            .font(.custom("Lato-Bold", size: 20))
+                            .font(.custom("Lato-Bold", size: UIFont.preferredFont(forTextStyle: .title2).pointSize))
                             .foregroundColor(.white)
                         Text("This may take a few seconds.")
-                            .font(.custom("Lato-Regular", size: 16))
+                            .font(.custom("Lato-Regular", size: UIFont.preferredFont(forTextStyle: .title3).pointSize))
                             .foregroundColor(.white.opacity(0.8))
                     }
                     .padding(40)
@@ -97,7 +98,8 @@ struct HostSettingView: View {
                 createGameStateVM.currentRoundNumber = 1
                 createGameStateVM.createGameState()
             } else {
-                print("Need to handle isSuccess false error.")
+                errorPlaygroundCreateMessage = createPlaygroundVM.errorMessage ?? ""
+                showErrorAlertView = true
             }
         })
         .onChange(of: createGameStateVM.isSuccess, { _, newValue in
@@ -105,34 +107,41 @@ struct HostSettingView: View {
                 webSocketManager.joinGroup(roomCode: hostRoomCode)
                 navigationManager.navigateTo(Destination.teamListView(hostRoomCode: hostRoomCode))
             } else {
-                print("Need to handle isSuccess false error.")
+                errorPlaygroundCreateMessage = createGameStateVM.errorMessage ?? ""
+                showErrorAlertView = true
             }
         })
-//        .onReceive(getTeamsByRoomCodeVM.$teams) { teams in
-//            if !teams.isEmpty {
-//                webSocketManager.joinGroup(roomCode: hostRoomCode)
-//                navigationManager.navigateTo(Destination.teamListView(hostRoomCode: hostRoomCode)) 
-//            }
-//        }
-//        .onReceive(getTeamsByRoomCodeVM.$errorMessage) { errorMessage in
-//            if let errorMessage = errorMessage {
-//                print("Error: \(errorMessage)")
-//            }
-//        }
+        .onReceive(createPlaygroundVM.$errorMessage) { errorMessage in
+            if let errorMessage = errorMessage {
+                errorPlaygroundCreateMessage = errorMessage
+                showErrorAlertView = true
+            }
+        }
+        .onReceive(createGameStateVM.$errorMessage){ errorMessage in
+            if let errorMessage = errorMessage {
+                errorPlaygroundCreateMessage = errorMessage
+                showErrorAlertView = true
+            }
+        }
+        .alert("Error", isPresented: $showErrorAlertView, presenting: errorPlaygroundCreateMessage) { message in
+            Button("OK", role: .cancel) { }
+        } message: { message in
+            Text(message)
+        }
     }
     
     //MARK: - Setting Bar
     private var navBar: some View {
         HStack {
             Text("Settings")
-                .font(.custom("Montserrat-SemiBold", size: 23))
+                .font(.custom("Montserrat-SemiBold", size: UIFont.preferredFont(forTextStyle: .title1).pointSize))
                 .foregroundStyle(AppColors.polarBlue)
             Spacer()
             VStack(alignment: .leading) {
                 Text("Host Room Code: \(formattedHostRoomCode)")
-                    .font(.custom("Lato-Regular", size: 16))
+                    .font(.custom("Lato-Regular", size: UIFont.preferredFont(forTextStyle: .headline).pointSize))
                 Text("Player Room Code: \(formattedPlayerRoomCode)")
-                    .font(.custom("Lato-Regular", size: 16))
+                    .font(.custom("Lato-Regular", size: UIFont.preferredFont(forTextStyle: .headline).pointSize))
             }
         }
         .padding(.horizontal)
@@ -156,13 +165,13 @@ struct HostSettingView: View {
                     .scaledToFit()
                     .frame(height: 30)
                 Text("Playground")
-                    .font(.custom("Lato-Bold", size: 20))
+                    .font(.custom("Lato-Bold", size: UIFont.preferredFont(forTextStyle: .title3).pointSize))
                     .foregroundStyle(AppColors.polarBlue)
             }
             
             HStack {
                 Text("Playground Round")
-                    .font(.custom("Lato-Bold", size: 20))
+                    .font(.custom("Lato-Bold", size: UIFont.preferredFont(forTextStyle: .body).pointSize))
                 Spacer()
                 Button(action: {
                     if playgroundRound > 1 {
@@ -200,7 +209,7 @@ struct HostSettingView: View {
                     .scaledToFit()
                     .frame(height: 30)
                 Text("Duration")
-                    .font(.custom("Lato-Bold", size: 20))
+                    .font(.custom("Lato-Bold", size: UIFont.preferredFont(forTextStyle: .title3).pointSize))
                     .foregroundStyle(AppColors.polarBlue)
             }
             ForEach(0..<playgroundRound, id: \.self) { roundNumber in
@@ -214,7 +223,7 @@ struct HostSettingView: View {
         
         HStack {
             Text("Round \(roundNumber)")
-                .font(.custom("Lato-Bold", size: 20))
+                .font(.custom("Lato-Bold", size: UIFont.preferredFont(forTextStyle: .body).pointSize))
             Spacer()
             Button(action: {
                 if duration.wrappedValue > 60 {
@@ -274,12 +283,12 @@ struct HostSettingView: View {
                     .scaledToFit()
                     .frame(height: 30)
                 Text("Team")
-                    .font(.custom("Lato-Bold", size: 20))
+                    .font(.custom("Lato-Bold", size: UIFont.preferredFont(forTextStyle: .title3).pointSize))
                     .foregroundStyle(AppColors.polarBlue)
             }
             HStack {
                 Text("Team Number")
-                    .font(.custom("Lato-Bold", size: 20))
+                    .font(.custom("Lato-Bold", size: UIFont.preferredFont(forTextStyle: .body).pointSize))
                 Spacer()
                 Button(action: {
                     if teamNumber > 1 {
@@ -304,7 +313,7 @@ struct HostSettingView: View {
             }
             HStack {
                 Text("Team Token")
-                    .font(.custom("Lato-Bold", size: 20))
+                    .font(.custom("Lato-Bold", size: UIFont.preferredFont(forTextStyle: .body).pointSize))
                 Spacer()
                 Button(action: {
                     if teamToken > 1 {
@@ -340,7 +349,7 @@ struct HostSettingView: View {
                     .scaledToFit()
                     .frame(height: 30)
                 Text("Shop")
-                    .font(.custom("Lato-Bold", size: 20))
+                    .font(.custom("Lato-Bold", size: UIFont.preferredFont(forTextStyle: .title3).pointSize))
                     .foregroundStyle(AppColors.polarBlue)
             }
             
@@ -360,7 +369,7 @@ struct HostSettingView: View {
                 navigationManager.pop()
             }) {
                 Text("Back")
-                    .font(.custom("Lato-Bold", size: 20))
+                    .font(.custom("Lato-Bold", size: UIFont.preferredFont(forTextStyle: .title3).pointSize))
                     .foregroundStyle(Color.secondary)
                     .frame(width: 144, height: 54)
                     .background(Color.clear)
@@ -400,7 +409,7 @@ struct HostSettingView: View {
                 }
             }) {
                 Text("Confirm")
-                    .font(.custom("Lato-Bold", size: 20))
+                    .font(.custom("Lato-Bold", size: UIFont.preferredFont(forTextStyle: .title3).pointSize))
                     .frame(width: 144, height: 54)
                     .background(AppColors.frostBlue)
                     .foregroundColor(.black)
@@ -412,15 +421,6 @@ struct HostSettingView: View {
     }
 }
 
-
-//        .onReceive(webSocketManager.$isConnected) { isConnected in
-//            if isConnected {
-//                isReadyToJoin = true
-//            }
-//        }
-//        .onChange(of: isReadyToJoin) { _, newValue in
-//            if newValue {
-//                webSocketManager.joinGroup(roomCode: hostRoomCode)
-//                isReadyToJoin = false
-//            }
-//        }
+#Preview{
+    HostSettingView()
+}

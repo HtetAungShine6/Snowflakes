@@ -17,7 +17,7 @@ struct ShopItemRow: View {
                 .scaledToFit()
                 .frame(height: 30)
             Text(item.productName)
-                .font(.custom("Lato-Bold", size: 20))
+                .font(.custom("Lato-Bold", size: UIFont.preferredFont(forTextStyle: .body).pointSize))
             Spacer()
             Button(action: {
                 if item.remainingStock > 1 {
