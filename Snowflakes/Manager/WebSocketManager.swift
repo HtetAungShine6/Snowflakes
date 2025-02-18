@@ -241,7 +241,7 @@ class WebSocketManager: ObservableObject, WebSocketDelegate {
                         switch target {
                         case "ReceivedMessage":
                             print("ReceivedMessage passed✅")
-                        case "JoinUser   Group":
+                        case "JoinUserGroup":
                             self.userJoined = true
                             print("JoinUser   Group passed✅")
                         case "ReceiveMessage":
@@ -270,12 +270,6 @@ class WebSocketManager: ObservableObject, WebSocketDelegate {
                                 DispatchQueue.main.async {
                                     self.countdown = countdownValue
                                     print("Countdown updated to: \(self.countdown)")
-                                    
-                                    // Play custom sound when countdown reaches "00:00"
-                                    if self.countdown == "00:00" {
-                                        self.playSound(named: "snowflake_alert") // Play sound from assets
-                                        print("Testing: Custom sound played✅")
-                                    }
                                 }
                             }
                         case "TimerPaused":
@@ -292,8 +286,8 @@ class WebSocketManager: ObservableObject, WebSocketDelegate {
                             print("TimerStopped passed✅")
                             self.timerStarted = false
                         case "CountdownCompleted":
+                            self.playSound(named: "snowflake_alert")
                             print("CountdownCompleted passed✅")
-                            // Handle countdown completion logic here
                         default:
                             print("Unhandled target❌: \(target)")
                         }

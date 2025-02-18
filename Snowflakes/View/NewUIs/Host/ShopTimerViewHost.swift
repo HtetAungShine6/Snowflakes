@@ -24,6 +24,7 @@ struct ShopTimerViewHost: View {
     @State private var hasNavigated: Bool = false
     
     @State private var gameState: String = ""
+    @State private var keyboardIsVisible: Bool = false
     
     let roomCode: String
     
@@ -32,19 +33,34 @@ struct ShopTimerViewHost: View {
             navBar
             VStack(alignment: .center) {
                 timer
-                timerImage
-                controlButton
+                //                timerImage
+                if !keyboardIsVisible {
+                    timerImage
+                    controlButton
+                        .animation(.easeIn(duration: 0.5), value: keyboardIsVisible)
+                }
             }
             .frame(maxWidth: .infinity, alignment: .top)
             Spacer()
-            adjustTimeField
+            
+            if !keyboardIsVisible {
+                adjustTimeField
+                    .animation(.easeIn(duration: 0.5), value: keyboardIsVisible)
+            }
+            
             Spacer()
+            
             sendMessageField
+                .animation(.easeIn(duration: 0.5), value: keyboardIsVisible)
             Spacer()
-            VStack {
-                nextRoundButton
+            
+            if !keyboardIsVisible {
+                VStack {
+                    nextRoundButton
+                        .animation(.easeIn(duration: 0.5), value: keyboardIsVisible)
+                }
+                .frame(maxWidth: .infinity, alignment: .top)
             }
-            .frame(maxWidth: .infinity, alignment: .top)
             Spacer()
         }
         .background(
@@ -77,6 +93,22 @@ struct ShopTimerViewHost: View {
                 isPlaying = true
             }
         }
+        .onReceive(NotificationCenter.default.publisher(for: UIResponder.keyboardWillShowNotification)) { _ in
+            withAnimation {
+                keyboardIsVisible = true
+            }
+        }
+        .onReceive(NotificationCenter.default.publisher(for: UIResponder.keyboardWillHideNotification)) { _ in
+            withAnimation {
+                keyboardIsVisible = false
+            }
+        }
+        .onTapGesture {
+            hideKeyboard()
+        }
+    }
+    private func hideKeyboard() {
+        UIApplication.shared.dismissKeyboard()
     }
     
     private var navBar: some View {
@@ -245,7 +277,11 @@ struct ShopTimerViewHost: View {
         }
     }
 }
-
+extension UIApplication {
+    func dismissKeyboard() {
+        self.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
+    }
+}
 
 //    private var controlButton: some View {
 //        Button{

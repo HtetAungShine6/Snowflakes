@@ -21,6 +21,7 @@ struct AddToCartView: View {
     @State private var showRemoveAlert: Bool = false
     @State private var showExchangeAlert: Bool = false
     @State private var showExchangeAlertError: Bool = false
+    @State private var hasCheckedOut: Bool = false
     
     let playerRoomCode: String
     let teamNumber: Int
@@ -30,42 +31,75 @@ struct AddToCartView: View {
     var body: some View {
        
         VStack {
+            // Title
             Text("Your Cart")
                 .font(.title)
                 .bold()
                 .padding()
+                .frame(maxWidth: .infinity, alignment: .center)
+                .background(AppColors.frostBlue)
+                .cornerRadius(10)
+                .foregroundColor(.white)
             
-            List {
-                ForEach(cartItems, id: \.id) { item in
-                    HStack {
-                        Text("\(item.productName)")
-                        Spacer()
-                        Text("$\(item.price) x \(item.quantity)")
-                            .foregroundColor(.gray)
-                        Image(systemName: "trash")
-                            .onTapGesture {
-                                selectedItemId = item.id
-                                selectedItem = item.productName
-                                showDeleteAlert = true
+            // Cart List (Hide items after checkout)
+            VStack {
+                if !hasCheckedOut {
+                    List {
+                        ForEach(cartItems, id: \.id) { item in
+                            HStack {
+                                Text("\(item.productName)")
+                                    .font(.headline)
+                                    .foregroundColor(.black)
+                                
+                                Spacer()
+                                
+                                Text("$\(item.price) x \(item.quantity)")
+                                    .font(.subheadline)
+                                    .foregroundColor(.gray)
+                                
+                                // Trash Icon for item removal
+                                Image(systemName: "trash")
+                                    .foregroundColor(.red)
+                                    .onTapGesture {
+                                        selectedItemId = item.id
+                                        selectedItem = item.productName
+                                        showDeleteAlert = true
+                                    }
                             }
+                            .padding()
+                            .background(RoundedRectangle(cornerRadius: 10).fill(Color.white).shadow(radius: 5))
+                            .padding(.vertical, 4)
+                        }
                     }
+                    .refreshable {
+                        getAddToCartItems.fetchItems(playerRoomCode: playerRoomCode, teamNumber: teamNumber)
+                    }
+                    .padding()
+                } else {
+                    Color.clear
+                        .frame(height: CGFloat(cartItems.count * 60)) 
                 }
             }
-            .refreshable {
-                getAddToCartItems.fetchItems(playerRoomCode: playerRoomCode, teamNumber: teamNumber)
+            
+            // Total Price Section
+            VStack {
+                HStack {
+                    Text("Total: ")
+                        .font(.headline)
+                    Spacer()
+                    Text("$\(totalPrice)")
+                        .font(.title)
+                        .bold()
+                        .foregroundColor(.black)
+                }
+                .padding()
             }
+            .background(Color.white)
+            .cornerRadius(10)
+            .shadow(radius: 5)
             .padding()
 
-            HStack {
-                Text("Total: ")
-                    .font(.headline)
-                Spacer()
-                Text("$\(totalPrice)")
-                    .font(.headline)
-                    .bold()
-            }
-            .padding()
-
+            // Checkout Button
             Button(action: {
                 exchangeStocksVM.cartIds = cartItems.map { item in item.id }
                 exchangeStocksVM.hostRoomCode = hostRoomCode
@@ -79,11 +113,12 @@ struct AddToCartView: View {
             }) {
                 Text("Checkout")
                     .font(.headline)
-                    .foregroundColor(.black)
+                    .foregroundColor(.white)
                     .frame(maxWidth: .infinity)
                     .padding()
                     .background(AppColors.frostBlue)
                     .cornerRadius(10)
+                    .shadow(radius: 5)
             }
             .padding(.horizontal)
         }
@@ -109,16 +144,26 @@ struct AddToCartView: View {
             showRemoveAlert = success
         }
         .onReceive(exchangeStocksVM.$isSuccess) { success in
-            showExchangeAlert = success
+            if success {
+                hasCheckedOut = true
+                showExchangeAlert = true
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                    navigationManager.pop()
+                }
+            }
         }
         .onReceive(exchangeStocksVM.$errorMessage) { errorMessage in
             if errorMessage != nil {
                 showExchangeAlertError = true
             }
-         }
+        }
         .alert("Do you want to remove \(selectedItem)", isPresented: $showDeleteAlert) {
             Button("Remove", role: .destructive) {
                 removeCartVM.removeCart(id: selectedItemId)
+                // Remove the item from the list after successful deletion
+                if let index = cartItems.firstIndex(where: { $0.id == selectedItemId }) {
+                    cartItems.remove(at: index)
+                }
                 showDeleteAlert = false
             }
             Button("Cancel", role: .cancel) {}
