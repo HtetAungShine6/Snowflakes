@@ -141,8 +141,14 @@ struct PlayerShopTimerView: View {
     }
     
     private var hostMessage: some View {
-        Text("\(webSocketManager.messageFromHost)")
-            .font(.custom("Roboto-Regular", size: 36))
-            .foregroundColor(.primary)
+        if !webSocketManager.messageFromHost.isEmpty {
+            Text("\(webSocketManager.messageFromHost)")
+                .font(.custom("Roboto-Regular", size: 36))
+                .foregroundColor(.primary)
+        } else {
+            Text("Host is not sending message for now.")
+                .font(.custom("Roboto-Regular", size: 36))
+                .foregroundColor(.primary)
+        }
     }
 }

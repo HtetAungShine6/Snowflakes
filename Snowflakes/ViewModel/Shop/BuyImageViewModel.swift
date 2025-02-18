@@ -16,6 +16,7 @@ class BuyImageViewModel: ObservableObject {
     @Published var teamNumber: Int
     @Published var imageUrl: String
     @Published var price: Int
+    @Published var message: String = ""
     
     @Published var errorMessage: String? = nil
     @Published var isLoading: Bool = false
@@ -52,11 +53,10 @@ class BuyImageViewModel: ObservableObject {
                 self?.isLoading = false
                 switch result {
                 case .success(let buyImage):
-                    print("Exchange Stocks Successful: \(buyImage.message)")
                     self?.isSuccess = true
+                    self?.message = buyImage.message
                 case .failure(let error):
                     self?.errorMessage = "Failed to exchange stocks: \(error.localizedDescription)"
-                    print(error.localizedDescription)
                 }
             }
         }
