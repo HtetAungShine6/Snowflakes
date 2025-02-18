@@ -53,16 +53,16 @@ struct TeamDetailsPlayerView: View {
         HStack {
             VStack(alignment: .leading) {
                 Text("Team: \(team.teamNumber)")
-                    .font(.custom("Lato-Bold", size: 20))
+                    .font(.custom("Lato-Bold", size: UIFont.preferredFont(forTextStyle: .body).pointSize))
                 HStack {
                     Text("Balance: ")
-                        .font(.custom("Lato-Regular", size: 15))
+                        .font(.custom("Lato-Regular", size: UIFont.preferredFont(forTextStyle: .callout).pointSize))
                     Image("tokenCoin")
                         .resizable()
                         .scaledToFit()
                         .frame(height: 20)
                     Text("\(team.tokens) tokens")
-                        .font(.custom("Lato-Regular", size: 15))
+                        .font(.custom("Lato-Regular", size: UIFont.preferredFont(forTextStyle: .callout).pointSize))
                 }
             }
             Spacer()
@@ -73,7 +73,7 @@ struct TeamDetailsPlayerView: View {
                         .scaledToFit()
                         .frame(width: 30, height: 30)
                     Text("\(team.items[itemName] ?? 0)x")
-                        .font(.custom("Lato-Regular", size: 16))
+                        .font(.custom("Lato-Regular", size: UIFont.preferredFont(forTextStyle: .callout).pointSize))
                         .foregroundStyle(Color.gray)
                 }
             }
@@ -105,11 +105,11 @@ struct TeamDetailsPlayerView: View {
                         }
                         
                         Text("Player \(playerNumber)")
-                            .font(Font.custom("Inter", size: 16).weight(.bold))
+                            .font(Font.custom("Inter", size: UIFont.preferredFont(forTextStyle: .callout).pointSize).weight(.bold))
                             .foregroundColor(Color(red: 0.27, green: 0.27, blue: 0.27))
                         
                         Text(playerName)
-                            .font(Font.custom("Inter", size: 10).weight(.medium))
+                            .font(Font.custom("Inter", size: UIFont.preferredFont(forTextStyle: .footnote).pointSize).weight(.medium))
                             .foregroundColor(Color(red: 0.27, green: 0.27, blue: 0.27))
                     }
                 )

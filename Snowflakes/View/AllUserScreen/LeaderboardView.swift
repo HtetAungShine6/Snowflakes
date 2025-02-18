@@ -50,10 +50,10 @@ struct LeaderboardView: View {
         HStack {
             VStack(alignment: .leading) {
                 Text("Leaderboard")
-                    .font(.custom("Montserrat-SemiBold", size: 23))
+                    .font(.custom("Montserrat-SemiBold", size: UIFont.preferredFont(forTextStyle: .body).pointSize))
                     .foregroundStyle(AppColors.polarBlue)
                 Text("Tap Each team list to check gallery")
-                    .font(.custom("Poppins-Regular", size: 12))
+                    .font(.custom("Poppins-Regular", size: UIFont.preferredFont(forTextStyle: .callout).pointSize))
                     .foregroundStyle(Color.gray.opacity(0.8))
             }
             Spacer()
@@ -66,33 +66,23 @@ struct LeaderboardView: View {
         VStack(alignment: .leading, spacing: 10) {
             HStack {
                 Text("Team: \(team.teamNumber)")
-                    .font(.custom("Lato-Regular", size: 20))
+                    .font(.custom("Lato-Regular", size: UIFont.preferredFont(forTextStyle: .body).pointSize))
                 Text("(\(team.players.count) Players)")
-                    .font(.custom("Lato-Regular", size: 16))
+                    .font(.custom("Lato-Regular", size: UIFont.preferredFont(forTextStyle: .callout).pointSize))
                     .foregroundStyle(Color.gray)
                 Spacer()
                 Text("\(team.teamRank)")
-                    .font(.custom("Lato-Regular", size: 16))
+                    .font(.custom("Lato-Regular", size: UIFont.preferredFont(forTextStyle: .callout).pointSize))
             }
             
             HStack(spacing: 10) {
                 ForEach(team.stocks, id: \.productName) { item in
-                    //                    if let count = team.stocks.count {
-                    //                        VStack {
-                    //                            Image(item.productName)
-                    //                                .resizable()
-                    //                                .frame(width: 40, height: 40)
-                    //                            Text("\(count)x")
-                    //                                .font(.custom("Lato-Regular", size: 16))
-                    //                                .foregroundStyle(Color.gray)
-                    //                        }
-                    //                    }
                     VStack {
                         Image(item.productName)
                             .resizable()
                             .frame(width: 40, height: 40)
                         Text("\(item.remainingStock)x")
-                            .font(.custom("Lato-Regular", size: 16))
+                            .font(.custom("Lato-Regular", size: UIFont.preferredFont(forTextStyle: .callout).pointSize))
                             .foregroundStyle(Color.gray)
                     }
                 }
@@ -103,7 +93,7 @@ struct LeaderboardView: View {
                         .scaledToFit()
                         .frame(height: 35)
                     Text("\(team.remainingTokens) tokens")
-                        .font(.custom("Lato-Regular", size: 16))
+                        .font(.custom("Lato-Regular", size: UIFont.preferredFont(forTextStyle: .callout).pointSize))
                 }
             }
             
@@ -118,7 +108,7 @@ struct LeaderboardView: View {
             }
         }
         .padding()
-        .background(RoundedRectangle(cornerRadius: 8).stroke(Color.black))
+        .background(RoundedRectangle(cornerRadius: 8).stroke(Color.secondary))
     }
     
     private static func rankOrder(_ rank: String) -> Int {

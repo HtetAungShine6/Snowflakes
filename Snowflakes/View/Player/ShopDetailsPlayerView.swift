@@ -37,32 +37,46 @@ struct ShopDetailsPlayerView: View {
     ]
     
     var body: some View {
-        VStack(alignment: .leading, spacing: 20) {
-            backButton
-            
-            ScrollView {
-                VStack(alignment: .leading, spacing: 20) {
-                    teamLabel
-                    
-                    items
-                    
-//                    notificationList
-                    
-                    uploadImageSection
-                    
-                    Spacer()
-                }
-                .frame(maxWidth: .infinity, alignment: .top)
-                .background(Color.white)
+        
+        
+        ScrollView {
+            VStack(alignment: .leading, spacing: 20) {
+                teamLabel
+                
+                items
+                
+                //                    notificationList
+                
+                uploadImageSection
+                
+                Spacer()
             }
-            .refreshable {
-                if let teamNumber = UserDefaults.standard.value(forKey: "TeamDetail-\(playerRoomCode)") as? Int {
-                    getTeamDetailVM.fetchTeams(playerRoomCode: playerRoomCode, teamNumber: teamNumber)
-                    self.teamNumber = teamNumber
+            .frame(maxWidth: .infinity, alignment: .top)
+        }
+        .refreshable {
+            if let teamNumber = UserDefaults.standard.value(forKey: "TeamDetail-\(playerRoomCode)") as? Int {
+                getTeamDetailVM.fetchTeams(playerRoomCode: playerRoomCode, teamNumber: teamNumber)
+                self.teamNumber = teamNumber
+            }
+        }
+        .toolbar {
+            ToolbarItem(placement: .topBarLeading) {
+                Button(action: {
+                    navigationManager.pop()
+                }) {
+                    Image(systemName: "chevron.left")
+                        .foregroundColor(.primary)
+                }
+            }
+            ToolbarItem(placement: .topBarTrailing) {
+                Button(action: {
+                    navigationManager.navigateTo(Destination.addToCartView(playerRoomCode: playerRoomCode, teamNumber: teamNumber, roundNumber: roundNumber, hostRoomCode: team?.hostRoomCode ?? ""))
+                }) {
+                    Image(systemName: "cart.badge.plus")
+                        .foregroundColor(.primary)
                 }
             }
         }
-        .background(Color.white)
         .navigationBarBackButtonHidden()
         .onAppear {
             if let teamNumber = UserDefaults.standard.value(forKey: "TeamDetail-\(playerRoomCode)") as? Int {
@@ -86,51 +100,35 @@ struct ShopDetailsPlayerView: View {
         }
     }
     
-    // MARK: - Back Button (Private Function)
-    private var backButton: some View {
-        HStack {
-            Button(action: {
-                navigationManager.pop()
-            }) {
-                Image(systemName: "arrow.left")
-                    .foregroundColor(.black)
-            }
-            Spacer()
-            Button(action: {
-                navigationManager.navigateTo(Destination.addToCartView(playerRoomCode: playerRoomCode, teamNumber: teamNumber, roundNumber: roundNumber, hostRoomCode: team?.hostRoomCode ?? ""))
-            }) {
-                Image(systemName: "cart.badge.plus")
-                    .foregroundColor(.black)
-            }
-        }
-        .padding(.horizontal, 10)
-        .padding(.top, 10)
-    }
-    
     // MARK: - Team Label (Private Function)
     private var teamLabel: some View {
         HStack {
             VStack(alignment: .leading) {
                 if let teamNumber = team?.teamNumber {
                     Text("Team: \(teamNumber)")
-                        .font(.custom("Lato-Bold", size: 20))
+                        .font(.custom("Lato-Bold", size: UIFont.preferredFont(forTextStyle: .body).pointSize))
+                        .foregroundStyle(Color.primary)
                 } else {
                     Text("No Team Found")
-                        .font(.custom("Lato-Bold", size: 20))
+                        .font(.custom("Lato-Bold", size: UIFont.preferredFont(forTextStyle: .body).pointSize))
+                        .foregroundColor(.primary)
                 }
                 HStack {
                     Text("Balance: ")
-                        .font(.custom("Lato-Regular", size: 15))
+                        .font(.custom("Lato-Regular", size: UIFont.preferredFont(forTextStyle: .callout).pointSize))
+                        .foregroundColor(.primary)
                     Image("tokenCoin")
                         .resizable()
                         .scaledToFit()
                         .frame(height: 20)
                     if let tokens = team?.tokens {
                         Text("\(String(describing: tokens)) tokens")
-                            .font(.custom("Lato-Regular", size: 15))
+                            .font(.custom("Lato-Regular", size: UIFont.preferredFont(forTextStyle: .callout).pointSize))
+                            .foregroundColor(.primary)
                     } else {
                         Text("No tokens found")
-                            .font(.custom("Lato-Regular", size: 15))
+                            .font(.custom("Lato-Regular", size: UIFont.preferredFont(forTextStyle: .callout).pointSize))
+                            .foregroundColor(.primary)
                     }
                 }
             }
@@ -143,7 +141,7 @@ struct ShopDetailsPlayerView: View {
                             .scaledToFit()
                             .frame(width: 30, height: 30)
                         Text("\(item.remainingStock)x")
-                            .font(.custom("Lato-Regular", size: 16))
+                            .font(.custom("Lato-Regular", size: UIFont.preferredFont(forTextStyle: .callout).pointSize))
                             .foregroundStyle(Color.gray)
                     }
                 }
@@ -157,9 +155,10 @@ struct ShopDetailsPlayerView: View {
         VStack(alignment: .leading) {
             HStack {
                 Text("Buy")
-                    .font(.custom("Lato", size: 22).weight(.medium))
+                    .font(.custom("Lato", size: UIFont.preferredFont(forTextStyle: .body).pointSize).weight(.medium))
                 Spacer()
             }
+            .padding(.horizontal, 10)
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack {
                     if let shopItems = availableItemsFromShop?.shopStocks {
@@ -179,8 +178,8 @@ struct ShopDetailsPlayerView: View {
                     }
                 }
             }
+            .padding(.horizontal, 5)
         }
-        .padding(.horizontal)
         .alert("How many \(selectedItem ?? "Item cannot be found!") do you want to add to cart?", isPresented: $showAlert) {
             VStack {
                 TextField("Enter quantity", text: $quantity)
@@ -221,7 +220,7 @@ struct ShopDetailsPlayerView: View {
     private var notificationList: some View {
         VStack(alignment: .leading, spacing: 10) {
             Text("Notifications")
-                .font(Font.custom("Lato", size: 22).weight(.medium))
+                .font(Font.custom("Lato", size: UIFont.preferredFont(forTextStyle: .body).pointSize).weight(.medium))
                 .foregroundColor(.black)
                 .padding(.bottom, 10)
             
@@ -231,12 +230,12 @@ struct ShopDetailsPlayerView: View {
                     HStack {
                         VStack(alignment: .leading, spacing: 5) {
                             Text(notification.message)
-                                .font(Font.custom("Poppins", size: 13))
+                                .font(Font.custom("Poppins", size: UIFont.preferredFont(forTextStyle: .callout).pointSize))
                                 .foregroundColor(.black)
                                 .lineLimit(2)
                             
                             Text("Total amount: \(notification.amount) tokens")
-                                .font(Font.custom("Poppins", size: 10))
+                                .font(Font.custom("Poppins", size: UIFont.preferredFont(forTextStyle: .callout).pointSize))
                                 .tracking(1.5)
                                 .foregroundColor(.black)
                                 .opacity(0.65)
@@ -271,8 +270,8 @@ struct ShopDetailsPlayerView: View {
     private var uploadImageSection: some View {
         VStack(alignment: .leading) {
             Text("Sell your Snowflake")
-                .font(Font.custom("Lato", size: 22).weight(.medium))
-                .foregroundColor(.black)
+                .font(Font.custom("Lato", size: UIFont.preferredFont(forTextStyle: .body).pointSize).weight(.medium))
+                .foregroundColor(.primary)
             
             ZStack {
                 Rectangle()
@@ -319,7 +318,7 @@ struct ShopDetailsPlayerView: View {
                     }
                 }) {
                     Text(uploadImageVM.isUploading ? "Uploading..." : "Send Snowflake to Shop")
-                        .font(.custom("Lato-Bold", size: 16))
+                        .font(.custom("Lato-Bold", size: UIFont.preferredFont(forTextStyle: .callout).pointSize))
                         .foregroundColor(.black)
                         .frame(maxWidth: .infinity)
                         .padding()
@@ -359,7 +358,7 @@ struct ImagePicker: UIViewControllerRepresentable {
     @Binding var selectedImage: UIImage?
     @Binding var showImagePicker: Bool
     @Binding var showImageCropper: Bool
-
+    
     class Coordinator: NSObject, UINavigationControllerDelegate, UIImagePickerControllerDelegate {
         let parent: ImagePicker
         
@@ -399,14 +398,14 @@ struct ImageCropper: UIViewControllerRepresentable {
     var image: UIImage
     @Binding var croppedImage: UIImage?
     @Binding var isPresented: Bool
-
+    
     class Coordinator: NSObject, CropViewControllerDelegate {
         var parent: ImageCropper
-
+        
         init(parent: ImageCropper) {
             self.parent = parent
         }
-
+        
         // Called when cropping succeeds
         func cropViewControllerDidCrop(
             _ cropViewController: Mantis.CropViewController,
@@ -420,7 +419,7 @@ struct ImageCropper: UIViewControllerRepresentable {
                 print("Image cropped successfully") // Debugging log
             }
         }
-
+        
         // Called when cropping fails
         func cropViewControllerDidFailToCrop(
             _ cropViewController: Mantis.CropViewController,
@@ -431,7 +430,7 @@ struct ImageCropper: UIViewControllerRepresentable {
                 print("Failed to crop image") // Debugging log
             }
         }
-
+        
         // Called when the user cancels cropping
         func cropViewControllerDidCancel(
             _ cropViewController: Mantis.CropViewController,
@@ -442,12 +441,12 @@ struct ImageCropper: UIViewControllerRepresentable {
                 print("User canceled cropping") // Debugging log
             }
         }
-
+        
         // Called when resizing starts
         func cropViewControllerDidBeginResize(_ cropViewController: Mantis.CropViewController) {
             print("User started resizing the crop area") // Debugging log
         }
-
+        
         // Called when resizing ends
         func cropViewControllerDidEndResize(
             _ cropViewController: Mantis.CropViewController,
@@ -457,17 +456,17 @@ struct ImageCropper: UIViewControllerRepresentable {
             print("User finished resizing the crop area") // Debugging log
         }
     }
-
+    
     func makeCoordinator() -> Coordinator {
         return Coordinator(parent: self)
     }
-
+    
     func makeUIViewController(context: Context) -> Mantis.CropViewController {
         let cropViewController = Mantis.cropViewController(image: image)
         cropViewController.delegate = context.coordinator // Set the coordinator as delegate
         return cropViewController
     }
-
+    
     func updateUIViewController(_ uiViewController: Mantis.CropViewController, context: Context) {}
 }
 

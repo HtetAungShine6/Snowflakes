@@ -15,7 +15,7 @@ struct HostScreenView: View {
                     .padding(.bottom, -20)
                 
                 Text("Snowflake")
-                    .font(Font.custom("Futura-Medium", size: 40).weight(.medium))
+                    .font(Font.custom("Futura-Medium", size: UIFont.preferredFont(forTextStyle: .extraLargeTitle).pointSize).weight(.medium))
                     .foregroundColor(.black)
                     .padding(.top, -10)
                 
@@ -86,7 +86,7 @@ struct HostScreenView: View {
                     .padding(EdgeInsets(top: 6, leading: 9.5, bottom: 6, trailing: 9.5))
                 
                 Text("Create a room")
-                    .font(Font.custom("Lato-Regular", size: 24))
+                    .font(Font.custom("Lato-Regular", size: UIFont.preferredFont(forTextStyle: .title2).pointSize))
                     .foregroundColor(Color(red: 0.15, green: 0.15, blue: 0.15))
                 
                 Spacer()
@@ -117,7 +117,7 @@ struct HostScreenView: View {
                     .padding(EdgeInsets(top: 6, leading: 9.5, bottom: 6, trailing: 9.5))
                 
                 Text("Join a room")
-                    .font(Font.custom("Lato-Regular", size: 24))
+                    .font(Font.custom("Lato-Regular", size: UIFont.preferredFont(forTextStyle: .title2).pointSize))
                     .foregroundColor(Color(red: 0.15, green: 0.15, blue: 0.15))
                 
                 Spacer()

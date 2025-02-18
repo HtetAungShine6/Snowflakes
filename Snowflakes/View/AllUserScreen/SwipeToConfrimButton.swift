@@ -34,7 +34,7 @@ struct SwipeToConfirmButton: View {
                 .shadow(radius: 3)
                 .overlay(
                     Text("Next Round")
-                        .font(.custom("Roboto-Regular", size: 18))
+                        .font(.custom("Roboto-Regular", size: UIFont.preferredFont(forTextStyle: .headline).pointSize))
                         .foregroundColor(.black)
                 )
                 .offset(x: offset) // Control the position of the draggable rectangle

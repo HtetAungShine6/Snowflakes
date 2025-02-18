@@ -115,7 +115,7 @@ struct ShopTimerViewHost: View {
         HStack() {
             VStack(alignment: .leading) {
                 Text("Snowflake")
-                    .font(.custom("Montserrat-Medium", size: 32))
+                    .font(.custom("Montserrat-Medium", size: UIFont.preferredFont(forTextStyle: .title1).pointSize))
                     .foregroundStyle(Color.black)
                 HStack {
                     Text("Shop Round")
@@ -142,11 +142,11 @@ struct ShopTimerViewHost: View {
             Spacer()
             if !webSocketManager.countdown.isEmpty {
                 Text("\(webSocketManager.countdown)")
-                    .font(.custom("Montserrat-Medium", size: 40))
+                    .font(.custom("Montserrat-Medium", size: UIFont.preferredFont(forTextStyle: .largeTitle).pointSize))
                     .foregroundColor(.black)
             } else {
-                Text("Timer has not started yet")
-                    .font(.custom("Montserrat-Medium", size: 40))
+                Text("00:00")
+                    .font(.custom("Montserrat-Medium", size: UIFont.preferredFont(forTextStyle: .largeTitle).pointSize))
                     .foregroundColor(.black)
             }
             Spacer()
@@ -193,7 +193,7 @@ struct ShopTimerViewHost: View {
         VStack {
             HStack {
                 Text("Adjust Time")
-                    .font(.custom("Roboto-Regular", size: 24))
+                    .font(.custom("Roboto-Regular", size: UIFont.preferredFont(forTextStyle: .body).pointSize))
                     .foregroundStyle(Color.black)
                 Spacer()
             }
@@ -213,7 +213,7 @@ struct ShopTimerViewHost: View {
         VStack {
             HStack {
                 Text("Send a message")
-                    .font(.custom("Roboto-Regular", size: 24))
+                    .font(.custom("Roboto-Regular", size: UIFont.preferredFont(forTextStyle: .headline).pointSize))
                     .foregroundStyle(Color.black)
                 Spacer()
             }
@@ -288,25 +288,3 @@ extension UIApplication {
         self.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
     }
 }
-
-//    private var controlButton: some View {
-//        Button{
-//            isPlaying.toggle()
-//            if isPlaying {
-//                webSocketManager.resumeCountdown(roomCode: roomCode)
-//            } else {
-//                webSocketManager.pauseCountdown(roomCode: roomCode)
-//            }
-//        } label: {
-//            Image(systemName: isPlaying ? "pause.fill" : "play.fill")
-//                .resizable()
-//                .scaledToFit()
-//                .frame(width: 25, height: 25)
-//        }
-//        .frame(width: 40, height: 40)
-//        .foregroundColor(.white)
-//        .padding()
-//        .background(AppColors.glacialBlue)
-//        .clipShape(Circle())
-//        .shadow(color: AppColors.glacialBlue, radius: 5, x: 0, y: 1)
-//    }

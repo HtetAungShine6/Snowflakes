@@ -31,96 +31,10 @@ struct AddToCartView: View {
     var body: some View {
        
         VStack {
-            // Title
-            Text("Your Cart")
-                .font(.title)
-                .bold()
-                .padding()
-                .frame(maxWidth: .infinity, alignment: .center)
-                .background(AppColors.frostBlue)
-                .cornerRadius(10)
-                .foregroundColor(.white)
             
-            // Cart List (Hide items after checkout)
-            VStack {
-                if !hasCheckedOut {
-                    List {
-                        ForEach(cartItems, id: \.id) { item in
-                            HStack {
-                                Text("\(item.productName)")
-                                    .font(.headline)
-                                    .foregroundColor(.black)
-                                
-                                Spacer()
-                                
-                                Text("$\(item.price) x \(item.quantity)")
-                                    .font(.subheadline)
-                                    .foregroundColor(.gray)
-                                
-                                // Trash Icon for item removal
-                                Image(systemName: "trash")
-                                    .foregroundColor(.red)
-                                    .onTapGesture {
-                                        selectedItemId = item.id
-                                        selectedItem = item.productName
-                                        showDeleteAlert = true
-                                    }
-                            }
-                            .padding()
-                            .background(RoundedRectangle(cornerRadius: 10).fill(Color.white).shadow(radius: 5))
-                            .padding(.vertical, 4)
-                        }
-                    }
-                    .refreshable {
-                        getAddToCartItems.fetchItems(playerRoomCode: playerRoomCode, teamNumber: teamNumber)
-                    }
-                    .padding()
-                } else {
-                    Color.clear
-                        .frame(height: CGFloat(cartItems.count * 60)) 
-                }
-            }
-            
-            // Total Price Section
-            VStack {
-                HStack {
-                    Text("Total: ")
-                        .font(.headline)
-                    Spacer()
-                    Text("$\(totalPrice)")
-                        .font(.title)
-                        .bold()
-                        .foregroundColor(.black)
-                }
-                .padding()
-            }
-            .background(Color.white)
-            .cornerRadius(10)
-            .shadow(radius: 5)
-            .padding()
-
-            // Checkout Button
-            Button(action: {
-                exchangeStocksVM.cartIds = cartItems.map { item in item.id }
-                exchangeStocksVM.hostRoomCode = hostRoomCode
-                exchangeStocksVM.playerRoomCode = playerRoomCode
-                exchangeStocksVM.roundNumber = roundNumber
-                exchangeStocksVM.teamNumber = teamNumber
-                exchangeStocksVM.products = cartItems.map { item in
-                    ProductDTO(productName: item.productName, quantity: item.quantity)
-                }
-                exchangeStocksVM.exchangeStocks()
-            }) {
-                Text("Checkout")
-                    .font(.headline)
-                    .foregroundColor(.white)
-                    .frame(maxWidth: .infinity)
-                    .padding()
-                    .background(AppColors.frostBlue)
-                    .cornerRadius(10)
-                    .shadow(radius: 5)
-            }
-            .padding(.horizontal)
+            title
+            cartList
+            checkoutButton
         }
         .toolbar {
             ToolbarItem(placement: .navigationBarLeading) {
@@ -128,7 +42,7 @@ struct AddToCartView: View {
                     navigationManager.pop()
                 }) {
                     Image(systemName: "chevron.left")
-                        .foregroundColor(.black)
+                        .foregroundColor(.primary)
                 }
             }
         }
@@ -188,7 +102,107 @@ struct AddToCartView: View {
         }
     }
     
+    private var title: some View {
+        // Title
+        Text("Your Cart")
+            .font(.title)
+            .bold()
+            .padding()
+            .frame(maxWidth: .infinity, alignment: .center)
+            .background(AppColors.frostBlue)
+            .cornerRadius(10)
+            .foregroundColor(.primary)
+    }
+    
+    private var cartList: some View {
+        // Cart List (Hide items after checkout)
+        VStack {
+            if !hasCheckedOut {
+                List {
+                    ForEach(cartItems, id: \.id) { item in
+                        HStack {
+                            Text("\(item.productName)")
+                                .font(.headline)
+                                .foregroundColor(.primary)
+                            
+                            Spacer()
+                            
+                            Text("$\(item.price) x \(item.quantity)")
+                                .font(.subheadline)
+                                .foregroundColor(.secondary)
+                            
+                            // Trash Icon for item removal
+                            Image(systemName: "trash")
+                                .foregroundColor(.red)
+                                .onTapGesture {
+                                    selectedItemId = item.id
+                                    selectedItem = item.productName
+                                    showDeleteAlert = true
+                                }
+                        }
+                        .padding()
+                        .background(RoundedRectangle(cornerRadius: 10).fill(Color(UIColor.systemBackground)).shadow(radius: 5))
+                        .padding(.vertical, 4)
+                    }
+                }
+                .refreshable {
+                    getAddToCartItems.fetchItems(playerRoomCode: playerRoomCode, teamNumber: teamNumber)
+                }
+                .padding()
+            } else {
+                Color.clear
+                    .frame(height: CGFloat(cartItems.count * 60))
+            }
+        }
+    }
+    
+    private var totalPriceSection: some View {
+        // Total Price Section
+        VStack {
+            HStack {
+                Text("Total: ")
+                    .font(.headline)
+                    .foregroundColor(.primary)
+                Spacer()
+                Text("$\(totalPrice)")
+                    .font(.title)
+                    .bold()
+                    .foregroundColor(.primary)
+            }
+            .padding()
+        }
+        .background(Color(UIColor.systemBackground))
+        .cornerRadius(10)
+        .shadow(radius: 5)
+        .padding()
+    }
+    
     private var totalPrice: Int {
         cartItems.reduce(0) { $0 + ($1.price * Int($1.quantity)) }
+    }
+    
+    private var checkoutButton: some View {
+        // Checkout Button
+        Button(action: {
+            exchangeStocksVM.cartIds = cartItems.map { item in item.id }
+            exchangeStocksVM.hostRoomCode = hostRoomCode
+            exchangeStocksVM.playerRoomCode = playerRoomCode
+            exchangeStocksVM.roundNumber = roundNumber
+            exchangeStocksVM.teamNumber = teamNumber
+            exchangeStocksVM.products = cartItems.map { item in
+                ProductDTO(productName: item.productName, quantity: item.quantity)
+            }
+            exchangeStocksVM.exchangeStocks()
+        }) {
+            Text("Checkout")
+                .font(.headline)
+                .foregroundColor(.white)
+                .frame(maxWidth: .infinity)
+                .padding()
+                .background(AppColors.frostBlue)
+                .cornerRadius(10)
+                .shadow(radius: 5)
+        }
+        .padding(.horizontal)
     }
 }

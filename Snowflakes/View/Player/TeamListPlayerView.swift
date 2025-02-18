@@ -81,12 +81,12 @@ struct TeamListPlayerView: View {
     private var navBar: some View {
         HStack {
             Text("Team List")
-                .font(.custom("Montserrat-SemiBold", size: 23))
+                .font(.custom("Montserrat-SemiBold", size: UIFont.preferredFont(forTextStyle: .body).pointSize))
                 .foregroundStyle(AppColors.polarBlue)
             Spacer()
             if let roomCode = teams.first?.playerRoomCode {
                 Text("Room Code: \(roomCode)")
-                    .font(.custom("Lato-Regular", size: 16))
+                    .font(.custom("Lato-Regular", size: UIFont.preferredFont(forTextStyle: .callout).pointSize))
             }
         }
         .padding(.horizontal)
@@ -99,9 +99,9 @@ struct TeamListPlayerView: View {
         return VStack(alignment: .leading, spacing: 10) {
             HStack {
                 Text("Team: \(team.teamNumber)")
-                    .font(.custom("Lato-Regular", size: 20))
+                    .font(.custom("Lato-Regular", size: UIFont.preferredFont(forTextStyle: .body).pointSize))
                 Text("(\(team.members.count) Players)")
-                    .font(.custom("Lato-Regular", size: 16))
+                    .font(.custom("Lato-Regular", size: UIFont.preferredFont(forTextStyle: .callout).pointSize))
                     .foregroundStyle(Color.gray)
                 Spacer()
                 
@@ -111,14 +111,14 @@ struct TeamListPlayerView: View {
                     }
                 }) {
                     Text(isJoined ? "Leave" : "Join")
-                        .font(.custom("Lato-Regular", size: 16))
+                        .font(.custom("Lato-Regular", size: UIFont.preferredFont(forTextStyle: .callout).pointSize))
                         .padding(.horizontal)
                         .padding(.vertical, 4)
                         .background(.white)
                         .foregroundColor(isJoined ? .red : .green)
                         .overlay(
                             RoundedRectangle(cornerRadius: 15)
-                                .stroke(isJoined ? Color.green : Color.black, lineWidth: 2) // Change border color based on membership
+                                .stroke(isJoined ? Color.green : Color.secondary, lineWidth: 2) // Change border color based on membership
                         )
                 }
                 .disabled(isDisabled)

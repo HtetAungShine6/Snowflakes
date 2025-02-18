@@ -21,7 +21,7 @@ struct GalleryView: View {
  
             HStack {
                 Text("Gallery")
-                    .font(Font.custom("Lato", size: 22).weight(.medium))
+                    .font(Font.custom("Lato", size: UIFont.preferredFont(forTextStyle: .body).pointSize).weight(.medium))
                     .foregroundColor(.black)
                     .padding([.leading, .top], 10)
                 
@@ -43,7 +43,22 @@ struct GalleryView: View {
                 }
             }
         }
-        .navigationBarTitle("Team : \(teamNumber < 10 ? "0\(teamNumber)" : "\(teamNumber)")", displayMode: .inline)
+        .toolbar {
+            ToolbarItem(placement: .navigationBarLeading) {
+                Button(action: {
+                    navigationManager.pop()
+                }) {
+                    Image(systemName: "chevron.left")
+                        .foregroundColor(.primary)
+                }
+            }
+            ToolbarItem(placement: .principal) {
+                Text("Team : \(teamNumber < 10 ? "0\(teamNumber)" : "\(teamNumber)")")
+                    .font(.custom("Montserrat-SemiBold", size: 24))
+            }
+        }
+        .navigationBarBackButtonHidden()
+        .navigationBarTitleDisplayMode(.inline)
         .onAppear {
             getLeaderboardVM.fetchLeaderboard(hostRoomCode: roomCode)
         }
