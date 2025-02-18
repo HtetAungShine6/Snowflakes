@@ -18,6 +18,9 @@ struct AddToCartView: View {
     @State private var showDeleteAlert: Bool = false
     @State private var selectedItemId: String = ""
     @State private var selectedItem: String = ""
+    @State private var showRemoveAlert: Bool = false
+    @State private var showExchangeAlert: Bool = false
+    @State private var showExchangeAlertError: Bool = false
     
     let playerRoomCode: String
     let teamNumber: Int
@@ -25,12 +28,13 @@ struct AddToCartView: View {
     let hostRoomCode: String
 
     var body: some View {
+       
         VStack {
             Text("Your Cart")
                 .font(.title)
                 .bold()
                 .padding()
-
+            
             List {
                 ForEach(cartItems, id: \.id) { item in
                     HStack {
@@ -40,7 +44,6 @@ struct AddToCartView: View {
                             .foregroundColor(.gray)
                         Image(systemName: "trash")
                             .onTapGesture {
-//                                removeCartVM.removeCart(id: item.id)
                                 selectedItemId = item.id
                                 selectedItem = item.productName
                                 showDeleteAlert = true
@@ -48,6 +51,10 @@ struct AddToCartView: View {
                     }
                 }
             }
+            .refreshable {
+                getAddToCartItems.fetchItems(playerRoomCode: playerRoomCode, teamNumber: teamNumber)
+            }
+            .padding()
 
             HStack {
                 Text("Total: ")
@@ -98,10 +105,39 @@ struct AddToCartView: View {
             self.cartItems = addToCartItems
             print("Add To Cart: \(addToCartItems)")
         }
+        .onReceive(removeCartVM.$isSuccess) { success in
+            showRemoveAlert = success
+        }
+        .onReceive(exchangeStocksVM.$isSuccess) { success in
+            showExchangeAlert = success
+        }
+        .onReceive(exchangeStocksVM.$errorMessage) { errorMessage in
+            if errorMessage != nil {
+                showExchangeAlertError = true
+            }
+         }
         .alert("Do you want to remove \(selectedItem)", isPresented: $showDeleteAlert) {
-            Button("Remove", action: {
+            Button("Remove", role: .destructive) {
                 removeCartVM.removeCart(id: selectedItemId)
                 showDeleteAlert = false
+            }
+            Button("Cancel", role: .cancel) {}
+        }
+        .alert("\(removeCartVM.message)", isPresented: $showRemoveAlert) {
+            Button("OK", action: {
+                showRemoveAlert = false
+            })
+            Button("Cancel", role: .cancel) {}
+        }
+        .alert("Items Checkout successfully.", isPresented: $showExchangeAlert) {
+            Button("OK", action: {
+                showExchangeAlert = false
+            })
+            Button("Cancel", role: .cancel) {}
+        }
+        .alert("\(exchangeStocksVM.errorMessage ?? "Cannot Buy Items")", isPresented: $showExchangeAlertError) {
+            Button("OK", action: {
+                showExchangeAlertError = false
             })
             Button("Cancel", role: .cancel) {}
         }

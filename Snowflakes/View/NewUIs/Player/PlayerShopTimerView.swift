@@ -72,7 +72,7 @@ struct PlayerShopTimerView: View {
         .onReceive(webSocketManager.$currentGameState) { currentGameState in
             if currentGameState == "SnowFlakeCreation" && !hasNavigated {
                 if getGameStateViewModel.currentRoundNumber == navigationManager.totalRound {
-                    navigationManager.navigateTo(Destination.leaderboard(roomCode: playerRoomCode))
+                    navigationManager.navigateTo(Destination.leaderboard(roomCode: hostRoomCode))
                 } else {
                     getGameStateViewModel.currentRoundNumber += 1
                     navigationManager.navigateTo(Destination.playerTimerView(hostRoomCode: hostRoomCode, playerRoomCode: playerRoomCode))

@@ -37,17 +37,17 @@ class CreateGameStateViewModel: ObservableObject {
         let createGameStateManager = PostGameStateUseCase()
         errorMessage = nil
         isLoading = true
+//        isSuccess = false
         
         createGameStateManager.execute(data: newGameState, getMethod: "POST", token: nil) { [weak self] result in
             DispatchQueue.main.async {
                 self?.isLoading = false
                 switch result {
-                case .success(let gameState):
-//                    print("\(gameState.message)")
+                case .success( _):
                     self?.isSuccess = true
                 case .failure(let error):
                     self?.errorMessage = "Failed to create team: \(error.localizedDescription)"
-//                    print(error.localizedDescription)
+                    self?.isSuccess = false
                 }
             }
         }

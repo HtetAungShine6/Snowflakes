@@ -15,6 +15,7 @@ struct TimerViewHost: View {
     @StateObject private var getPlaygroundVM = GetPlaygroundViewModel()
     @StateObject private var updateGameStateViewModel = UpdateGameStateViewModel()
     @StateObject private var getGameStateViewModel = GetGameStateViewModel()
+    @State private var playerRoomCode: String = ""
     
     @State private var timerValueFromSocket: String = ""
     @State private var sendMessageText: String = ""
@@ -64,14 +65,10 @@ struct TimerViewHost: View {
             if let rounds = playgroundInfo?.rounds, !rounds.isEmpty {
                 navigationManager.totalRound = rounds.count
             }
-        }
-        .onChange(of: getPlaygroundVM.isLoading, { _, newValue in
-            if newValue {
-                // show alert
-            } else {
-                // hide alert
+            if let playerCode = playgroundInfo?.playerRoomCode {
+                playerRoomCode = playerCode
             }
-        })
+        }
         .onReceive(webSocketManager.$currentGameState) { currentGameState in
             if currentGameState == "ShopPeriod" && !hasNavigated {
                 navigationManager.navigateTo(Destination.hostShopTimerView(roomCode: roomCode))
@@ -99,8 +96,19 @@ struct TimerViewHost: View {
                     .foregroundStyle(Color.gray)
             }
             Spacer()
-            Text("Host Room Code: \(roomCode)")
-                .font(.custom("Lato-Regular", size: 16))
+            Menu {
+                HStack {
+                    Text("Host Code: \(roomCode)")
+                        .font(.custom("Lato-Regular", size: 16))
+                    Text("Player Code: \(playerRoomCode)")
+                        .font(.custom("Lato-Regular", size: 16))
+                }
+            } label: {
+                Image(systemName: "questionmark.circle.dashed")
+                    .resizable()
+                    .frame(width: 30, height: 30)
+                    .foregroundColor(.blue)
+            }
         }
         .padding(.horizontal)
     }

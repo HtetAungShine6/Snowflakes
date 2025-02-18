@@ -52,7 +52,7 @@ class AddToCartViewModel: ObservableObject {
                     print("\(addToCartItem.message)")
                     self?.isSuccess = true
                 case .failure(let error):
-                    self?.errorMessage = "Failed to create team: \(error.localizedDescription)"
+                    self?.errorMessage = "Failed Add to cart: \(error.localizedDescription)"
 //                    print(error.localizedDescription)
                 }
             }

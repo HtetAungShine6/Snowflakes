@@ -66,7 +66,7 @@ struct TeamListPlayerView: View {
     
     private var totalPlayerCount: Int {
         teams.reduce(0) { total, team in
-            total + (team.members?.count ?? 0)
+            total + (team.members.count)
         }
     }
     
@@ -100,7 +100,7 @@ struct TeamListPlayerView: View {
             HStack {
                 Text("Team: \(team.teamNumber)")
                     .font(.custom("Lato-Regular", size: 20))
-                Text("(\(team.members?.count ?? 0) Players)")
+                Text("(\(team.members.count) Players)")
                     .font(.custom("Lato-Regular", size: 16))
                     .foregroundStyle(Color.gray)
                 Spacer()
@@ -142,8 +142,8 @@ struct TeamListPlayerView: View {
                     .font(.footnote)
                     .bold()
                     .foregroundStyle(.secondary)
-                if let members = team.members {
-                    Text("\(members.joined(separator: ", "))")
+                if !team.members.isEmpty {
+                    Text("\(team.members.joined(separator: ", "))")
                         .font(.footnote)
                         .foregroundStyle(.gray)
                 } else {
@@ -176,7 +176,7 @@ struct TeamListPlayerView: View {
     private func updateJoinedTeams() {
         if let playerName = UserDefaults.standard.string(forKey: "\(playerRoomCode)") {
             for team in teams {
-                if team.members?.contains(playerName) == true {
+                if team.members.contains(playerName) == true {
                     joinedTeams[team.teamNumber] = true
                     joinedTeamNumber = team.teamNumber
                 }

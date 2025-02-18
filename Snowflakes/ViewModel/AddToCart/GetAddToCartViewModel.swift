@@ -32,7 +32,6 @@ class GetAddToCartViewModel: ObservableObject {
                 case .success(let addToCart):
                     self?.addToCartItems = addToCart.message
                     self?.isSuccess = true
-//                    print("Add To Cart Items: \(addToCart.message)")
                 case .failure(let error):
                     self?.errorMessage = "Cannot get Add To Cart Items: \(error.localizedDescription)"
                 }

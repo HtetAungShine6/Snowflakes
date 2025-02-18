@@ -26,7 +26,7 @@ struct ShopDetailsPlayerView: View {
     @State private var showImagePicker = false
     @State private var showImageCropper = false
     @State private var selectedImages: [UIImage] = []
-    
+    @State private var showAddToCartAlert: Bool = false
     let playerRoomCode: String
     var roundNumber: Int
     
@@ -78,6 +78,11 @@ struct ShopDetailsPlayerView: View {
         }
         .onReceive(getShopVM.$shopMessageResponse) { shopItems in
             self.availableItemsFromShop = shopItems
+        }
+        .onReceive(addToCartVM.$isSuccess) { success in
+            if success {
+                showAddToCartAlert = true
+            }
         }
     }
     
@@ -197,6 +202,12 @@ struct ShopDetailsPlayerView: View {
             
             Button("Cancel", role: .cancel) {}
         }
+        .alert("Added to cart successfully.", isPresented: $showAddToCartAlert) {
+            Button("OK", action: {
+                showAddToCartAlert = false
+            })
+            Button("Cancel", role: .cancel) {}
+        }
     }
     
     private var isBuyButtonDisabled: Bool {
@@ -266,9 +277,10 @@ struct ShopDetailsPlayerView: View {
             ZStack {
                 Rectangle()
                     .foregroundColor(.clear)
-                    .frame(width: .infinity, height: 238)
                     .background(Color.white.opacity(0.50))
                     .cornerRadius(20)
+                    .frame(maxWidth: .infinity)
+                    .frame(height: 238)
                     .overlay(
                         RoundedRectangle(cornerRadius: 20)
                             .stroke(Color.black, lineWidth: 0.25)
@@ -278,13 +290,13 @@ struct ShopDetailsPlayerView: View {
                     Image(uiImage: image)
                         .resizable()
                         .scaledToFill()
-                        .frame(width: 199, height: 238)
+                        .clipped()
                         .cornerRadius(20)
                 } else if let image = selectedImage {
                     Image(uiImage: image)
                         .resizable()
                         .scaledToFill()
-                        .frame(width: 199, height: 238)
+                        .clipped()
                         .cornerRadius(20)
                 } else {
                     Image(systemName: "photo")

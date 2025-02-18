@@ -23,6 +23,7 @@ struct LeaderboardView: View {
                     if !leaderboard.isEmpty {
                         ForEach(leaderboard, id: \.teamNumber) { team in
                             teamCardView(team: team)
+                                .contentShape(Rectangle())
                                 .onTapGesture {
                                     navigationManager.navigateTo(Destination.galleryView(teamNumber: team.teamNumber, roomCode: roomCode))
                                 }

@@ -35,10 +35,10 @@ struct TeamListView: View {
                             .progressViewStyle(CircularProgressViewStyle(tint: .white))
                             .scaleEffect(2)
                         Text("Loading your Playground...")
-                            .font(.custom("Lato-Bold", size: 20))
+                            .font(.custom("Lato-Bold", size: UIFont.preferredFont(forTextStyle: .title1).pointSize))
                             .foregroundColor(.white)
                         Text("This may take a few seconds.")
-                            .font(.custom("Lato-Regular", size: 16))
+                            .font(.custom("Lato-Regular", size: UIFont.preferredFont(forTextStyle: .title3).pointSize))
                             .foregroundColor(.white.opacity(0.8))
                     }
                     .padding(40)
@@ -94,25 +94,19 @@ struct TeamListView: View {
                 self.teams = teams
             }
         }
-    #warning("I put that because sometimes websocket connection cancelled which means that I have to reconnect it again. The error said peer closed due to an error, then socket disconnected.")
-//        .onChange(of: webSocketManager.isConnected) { _, newValue in
-//            if newValue {
-//                webSocketManager.connect()
-//            }
-//        }
     }
     
     private var navBar: some View {
         HStack {
             Text("Team List")
-                .font(.custom("Montserrat-SemiBold", size: 23))
+                .font(.custom("Montserrat-SemiBold", size: UIFont.preferredFont(forTextStyle: .title1).pointSize))
                 .foregroundStyle(AppColors.polarBlue)
             Spacer()
             VStack(alignment: .leading) {
                 Text("Host Room Code: \(hostRoomCode)")
-                    .font(.custom("Lato-Regular", size: 16))
+                    .font(.custom("Lato-Regular", size: UIFont.preferredFont(forTextStyle: .headline).pointSize))
                 Text("Player Room Code: \(playerRoomCode)")
-                    .font(.custom("Lato-Regular", size: 16))
+                    .font(.custom("Lato-Regular", size: UIFont.preferredFont(forTextStyle: .headline).pointSize))
             }
         }
         .padding(.horizontal)
@@ -124,16 +118,14 @@ struct TeamListView: View {
     
     private var totalPlayerCount: Int {
         teams.reduce(0) { total, team in
-            total + (team.members?.count ?? 0)
+            total + (team.members.count)
         }
     }
     
     private var totalNumberHostPlayer: some View{
         HStack {
             Text("Player: \(totalPlayerCount)") //call api
-                .font(.custom("Lato-Medium", size: 15))
-//            Text("Host: 2") //call api
-//                .font(.custom("Lato-Medium", size: 15))
+                .font(.custom("Lato-Medium", size: UIFont.preferredFont(forTextStyle: .callout).pointSize))
         }
         .padding(.horizontal)
     }
@@ -142,9 +134,9 @@ struct TeamListView: View {
         VStack(alignment: .leading, spacing: 10) {
             HStack {
                 Text("Team: \(team.teamNumber)")
-                    .font(.custom("Lato-Regular", size: 20))
-                Text("(\(team.members?.count ?? 0) Players)")
-                    .font(.custom("Lato-Regular", size: 16))
+                    .font(.custom("Lato-Regular", size: UIFont.preferredFont(forTextStyle: .title3).pointSize))
+                Text("(\(team.members.count ?? 0) Players)")
+                    .font(.custom("Lato-Regular", size: UIFont.preferredFont(forTextStyle: .headline).pointSize))
                     .foregroundStyle(Color.gray)
             }
             
@@ -155,7 +147,7 @@ struct TeamListView: View {
                             .resizable()
                             .frame(width: 40, height: 40)
                         Text("\(itemName.remainingStock)")
-                            .font(.custom("Lato-Regular", size: 16))
+                            .font(.custom("Lato-Regular", size: UIFont.preferredFont(forTextStyle: .headline).pointSize))
                             .foregroundStyle(Color.gray)
                     }
                 }
@@ -166,7 +158,7 @@ struct TeamListView: View {
                         .scaledToFit()
                         .frame(height: 35)
                     Text("\(team.tokens) tokens")
-                        .font(.custom("Lato-Regular", size: 16))
+                        .font(.custom("Lato-Regular", size: UIFont.preferredFont(forTextStyle: .headline).pointSize))
                 }
             }
             
@@ -175,12 +167,12 @@ struct TeamListView: View {
                     .font(.footnote)
                     .bold()
                     .foregroundStyle(.secondary)
-                if team.members != nil {
-                    Text("\(String(describing: team.members?.joined(separator: ", ")))")
+                if !team.members.isEmpty {
+                    Text("\(String(describing: team.members.joined(separator: ", ")))")
                         .font(.footnote)
                         .foregroundStyle(.gray)
                 } else {
-                    Text("No Member Here")
+                    Text("No Member Here Yet")
                         .font(.footnote)
                         .foregroundStyle(.gray)
                 }
@@ -216,7 +208,7 @@ struct TeamListView: View {
             }
         }) {
             Text("Start a playground")
-                .font(.custom("Lato-Bold", size: 20))
+                .font(.custom("Lato-Bold", size: UIFont.preferredFont(forTextStyle: .title3).pointSize))
                 .frame(maxWidth: .infinity)
                 .padding()
                 .background(AppColors.frostBlue)
@@ -225,3 +217,7 @@ struct TeamListView: View {
         }
     }
 }
+
+//#Preview {
+//    TeamListView(hostRoomCode: "ABCDEF")
+//}
