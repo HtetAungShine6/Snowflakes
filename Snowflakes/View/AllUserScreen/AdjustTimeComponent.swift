@@ -37,7 +37,7 @@ struct AdjustTimeComponent: View {
             
             // Display Time (MM:SS)
             Text(time)
-                .font(.custom("Roboto-Regular", size: 32))
+                .font(.custom("Roboto-Regular", size: UIFont.preferredFont(forTextStyle: .largeTitle).pointSize))
                 .foregroundStyle(Color.black)
                 .frame(minWidth: 80)
             

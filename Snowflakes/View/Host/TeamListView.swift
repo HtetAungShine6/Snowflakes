@@ -135,7 +135,7 @@ struct TeamListView: View {
             HStack {
                 Text("Team: \(team.teamNumber)")
                     .font(.custom("Lato-Regular", size: UIFont.preferredFont(forTextStyle: .title3).pointSize))
-                Text("(\(team.members.count ?? 0) Players)")
+                Text("(\(team.members.count) Players)")
                     .font(.custom("Lato-Regular", size: UIFont.preferredFont(forTextStyle: .headline).pointSize))
                     .foregroundStyle(Color.gray)
             }

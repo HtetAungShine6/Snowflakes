@@ -79,24 +79,24 @@ struct HostTeamDetailView: View {
             VStack(alignment: .leading) {
                 if let teamNumber = team?.teamNumber {
                     Text("Team: \(teamNumber)")
-                        .font(.custom("Lato-Bold", size: 20))
+                        .font(.custom("Lato-Bold", size: UIFont.preferredFont(forTextStyle: .body).pointSize))
                 } else {
                     Text("No Team Found")
-                        .font(.custom("Lato-Bold", size: 20))
+                        .font(.custom("Lato-Bold", size: UIFont.preferredFont(forTextStyle: .body).pointSize))
                 }
                 HStack {
                     Text("Balance: ")
-                        .font(.custom("Lato-Regular", size: 15))
+                        .font(.custom("Lato-Regular", size: UIFont.preferredFont(forTextStyle: .callout).pointSize))
                     Image("tokenCoin")
                         .resizable()
                         .scaledToFit()
                         .frame(height: 20)
                     if let tokens = team?.tokens {
                         Text("\(String(describing: tokens)) tokens")
-                            .font(.custom("Lato-Regular", size: 15))
+                            .font(.custom("Lato-Regular", size: UIFont.preferredFont(forTextStyle: .callout).pointSize))
                     } else {
                         Text("No tokens found")
-                            .font(.custom("Lato-Regular", size: 15))
+                            .font(.custom("Lato-Regular", size: UIFont.preferredFont(forTextStyle: .callout).pointSize))
                     }
                 }
             }
@@ -109,7 +109,7 @@ struct HostTeamDetailView: View {
                             .scaledToFit()
                             .frame(width: 30, height: 30)
                         Text("\(item.remainingStock)x")
-                            .font(.custom("Lato-Regular", size: 16))
+                            .font(.custom("Lato-Regular", size: UIFont.preferredFont(forTextStyle: .callout).pointSize))
                             .foregroundStyle(Color.gray)
                     }
                 }
@@ -121,10 +121,10 @@ struct HostTeamDetailView: View {
     private var transferView: some View {
         VStack(alignment: .leading) {
             Text("Transfer")
-                .font(.custom("Lato-Regular", size: 22))
+                .font(.custom("Lato-Regular", size: UIFont.preferredFont(forTextStyle: .body).pointSize))
                 .padding(.horizontal)
             Text("Tap image to transfer tokens")
-                .font(.custom("Poppins-Regular", size: 15))
+                .font(.custom("Poppins-Regular", size: UIFont.preferredFont(forTextStyle: .callout).pointSize))
                 .foregroundStyle(Color.gray.opacity(0.75))
                 .padding(.horizontal)
             ScrollView(.horizontal, showsIndicators: false) {
@@ -200,11 +200,11 @@ struct HostTeamDetailView: View {
     private var notificationView: some View {
         VStack(alignment: .leading) {
             Text("Notifications")
-                .font(.custom("Lato-Regular", size: 22))
+                .font(.custom("Lato-Regular", size: UIFont.preferredFont(forTextStyle: .body).pointSize))
             if transactions.isEmpty {
                 VStack {
                     Text("No transactions available")
-                        .font(.custom("Lato-Regular", size: 16))
+                        .font(.custom("Lato-Regular", size: UIFont.preferredFont(forTextStyle: .headline).pointSize))
                         .foregroundStyle(Color.gray.opacity(0.75))
                 }
             } else {
@@ -217,9 +217,9 @@ struct HostTeamDetailView: View {
                         
                         VStack(alignment: .leading) {
                             Text("\(transaction.productName)")
-                                .font(.custom("Lato-Bold", size: 18))
+                                .font(.custom("Lato-Bold", size: UIFont.preferredFont(forTextStyle: .body).pointSize))
                             Text("Quantity: \(transaction.quantity) - Total: \(transaction.total) tokens")
-                                .font(.custom("Lato-Regular", size: 14))
+                                .font(.custom("Lato-Regular", size: UIFont.preferredFont(forTextStyle: .callout).pointSize))
                                 .foregroundStyle(Color.gray)
                         }
                         Spacer()

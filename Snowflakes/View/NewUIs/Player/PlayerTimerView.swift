@@ -80,7 +80,7 @@ struct PlayerTimerView: View {
         HStack() {
             VStack(alignment: .leading) {
                 Text("Snowflake")
-                    .font(.custom("Montserrat-Medium", size: 32))
+                    .font(.custom("Montserrat-Medium", size: UIFont.preferredFont(forTextStyle: .title1).pointSize))
                     .foregroundStyle(Color.black)
                 
                 Text("Round (\(getGameStateViewModel.currentRoundNumber)/\(navigationManager.totalRound))")
@@ -94,9 +94,15 @@ struct PlayerTimerView: View {
     private var timer: some View {
         HStack {
             Spacer()
-            Text("\(webSocketManager.countdown)")
-                .font(.custom("Montserrat-Medium", size: 40))
-                .foregroundColor(.black)
+            if !webSocketManager.countdown.isEmpty {
+                Text("\(webSocketManager.countdown)")
+                    .font(.custom("Montserrat-Medium", size: UIFont.preferredFont(forTextStyle: .largeTitle).pointSize))
+                    .foregroundColor(.black)
+            } else {
+                Text("00:00")
+                    .font(.custom("Montserrat-Medium", size: UIFont.preferredFont(forTextStyle: .largeTitle).pointSize))
+                    .foregroundColor(.black)
+            }
             Spacer()
         }
     }
@@ -129,12 +135,12 @@ struct PlayerTimerView: View {
     private var hostMessage: some View {
         if !webSocketManager.messageFromHost.isEmpty {
             Text("\(webSocketManager.messageFromHost)")
-                .font(.custom("Roboto-Regular", size: 36))
-                .foregroundColor(.primary)
+                .font(.custom("Roboto-Regular", size: UIFont.preferredFont(forTextStyle: .title2).pointSize))
+                .foregroundColor(.black)
         } else {
-            Text("Host is not sending message for now.")
-                .font(.custom("Roboto-Regular", size: 36))
-                .foregroundColor(.primary)
+            Text("It's time to craft your Snowflakes!!")
+                .font(.custom("Roboto-Regular", size: UIFont.preferredFont(forTextStyle: .title2).pointSize))
+                .foregroundColor(.black)
         }
     }
 }

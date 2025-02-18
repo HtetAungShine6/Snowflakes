@@ -121,7 +121,7 @@ struct TimerViewHost: View {
         HStack() {
             VStack(alignment: .leading) {
                 Text("Snowflake")
-                    .font(.custom("Montserrat-Medium", size: 32))
+                    .font(.custom("Montserrat-Medium", size: UIFont.preferredFont(forTextStyle: .title1).pointSize))
                     .foregroundStyle(Color.black)
                 
                 Text("Round (\(getGameStateViewModel.currentRoundNumber)/\(navigationManager.totalRound))")
@@ -131,9 +131,9 @@ struct TimerViewHost: View {
             Menu {
                 HStack {
                     Text("Host Code: \(roomCode)")
-                        .font(.custom("Lato-Regular", size: 16))
+                        .font(.custom("Lato-Regular", size: UIFont.preferredFont(forTextStyle: .headline).pointSize))
                     Text("Player Code: \(playerRoomCode)")
-                        .font(.custom("Lato-Regular", size: 16))
+                        .font(.custom("Lato-Regular", size: UIFont.preferredFont(forTextStyle: .headline).pointSize))
                 }
             } label: {
                 Image(systemName: "questionmark.circle.dashed")
@@ -150,11 +150,11 @@ struct TimerViewHost: View {
             Spacer()
             if !webSocketManager.countdown.isEmpty {
                 Text("\(webSocketManager.countdown)")
-                    .font(.custom("Montserrat-Medium", size: 40))
+                    .font(.custom("Montserrat-Medium", size: UIFont.preferredFont(forTextStyle: .largeTitle).pointSize))
                     .foregroundColor(.black)
             } else {
-                Text("Timer has not started yet")
-                    .font(.custom("Montserrat-Medium", size: 40))
+                Text("00:00")
+                    .font(.custom("Montserrat-Medium", size: UIFont.preferredFont(forTextStyle: .largeTitle).pointSize))
                     .foregroundColor(.black)
             }
             Spacer()
@@ -201,7 +201,7 @@ struct TimerViewHost: View {
         VStack {
             HStack {
                 Text("Adjust Time")
-                    .font(.custom("Roboto-Regular", size: 24))
+                    .font(.custom("Roboto-Regular", size: UIFont.preferredFont(forTextStyle: .body).pointSize))
                     .foregroundStyle(Color.black)
                 Spacer()
             }
@@ -221,7 +221,7 @@ struct TimerViewHost: View {
         VStack {
             HStack {
                 Text("Send a message")
-                    .font(.custom("Roboto-Regular", size: 24))
+                    .font(.custom("Roboto-Regular", size: UIFont.preferredFont(forTextStyle: .headline).pointSize))
                     .foregroundStyle(Color.black)
                 Spacer()
             }

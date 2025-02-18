@@ -24,7 +24,8 @@ struct PlayerShopItemView: View {
                 .padding()
 
             Text(title)
-                .font(.custom("Lato-Regular", size: 12))
+                .font(.custom("Lato-Regular", size: UIFont.preferredFont(forTextStyle: .callout).pointSize))
+                .foregroundColor(.black)
         }
         .frame(maxWidth: width, maxHeight: height)
         .padding()

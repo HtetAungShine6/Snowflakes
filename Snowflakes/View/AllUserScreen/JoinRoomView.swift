@@ -54,7 +54,7 @@ struct JoinRoomView: View {
                                 .padding(.bottom, -20)
                             
                             Text("Snowflake")
-                                .font(Font.custom("Futura-Medium", size: 40).weight(.medium))
+                                .font(Font.custom("Futura-Medium", size: UIFont.preferredFont(forTextStyle: .extraLargeTitle).pointSize).weight(.medium))
                                 .foregroundColor(.black)
                                 .padding(.top, -10)
                         }
@@ -99,7 +99,7 @@ struct JoinRoomView: View {
                         navigationManager.pop()
                     }) {
                         Image(systemName: "chevron.left")
-                            .foregroundColor(.black)
+                            .foregroundColor(.secondary)
                     }
                 }
             }
@@ -204,11 +204,11 @@ struct JoinRoomView: View {
                 selectedRole = .host
             }) {
                 Text("Host")
-                    .font(Font.custom("Roboto-Regular", size: 18))
+                    .font(Font.custom("Roboto-Regular", size: UIFont.preferredFont(forTextStyle: .body).pointSize))
                     .frame(maxWidth: .infinity)
                     .padding()
                     .background(selectedRole == .host ? Color(red: 0.69, green: 0.89, blue: 0.96) : Color.gray.opacity(0.3))
-                    .foregroundColor(.black)
+                    .foregroundColor(.primary)
                     .cornerRadius(10)
             }
             
@@ -216,11 +216,11 @@ struct JoinRoomView: View {
                 selectedRole = .player
             }) {
                 Text("Player")
-                    .font(Font.custom("Roboto-Regular", size: 18))
+                    .font(Font.custom("Roboto-Regular", size: UIFont.preferredFont(forTextStyle: .body).pointSize))
                     .frame(maxWidth: .infinity)
                     .padding()
                     .background(selectedRole == .player ? Color(red: 0.69, green: 0.89, blue: 0.96) : Color.gray.opacity(0.3))
-                    .foregroundColor(.black)
+                    .foregroundColor(.primary)
                     .cornerRadius(10)
             }
         }
@@ -231,11 +231,11 @@ struct JoinRoomView: View {
         TextField("Enter Room Code", text: $roomCode)
             .focused($isRoomCodeFocused)
             .padding()
-            .background(Color.white)
+            .background(Color(UIColor.systemBackground))
             .cornerRadius(10)
             .shadow(radius: 5)
-            .font(.custom("Roboto-Regular", size: 18))
-            .foregroundColor(.black)
+            .font(.custom("Roboto-Regular", size: UIFont.preferredFont(forTextStyle: .body).pointSize))
+            .foregroundColor(.primary)
             .keyboardType(.alphabet)
             .autocapitalization(.none)
             .padding(.horizontal)
@@ -246,11 +246,11 @@ struct JoinRoomView: View {
         TextField("Enter Your Name", text: $userName)
             .focused($isUserNameFocused)
             .padding()
-            .background(Color.white)
+            .background(Color(UIColor.systemBackground))
             .cornerRadius(10)
             .shadow(radius: 5)
-            .font(.custom("Roboto-Regular", size: 18))
-            .foregroundColor(.black)
+            .font(.custom("Roboto-Regular", size: UIFont.preferredFont(forTextStyle: .body).pointSize))
+            .foregroundColor(.primary)
             .keyboardType(.default)
             .autocapitalization(.words)
             .padding(.horizontal)
@@ -316,7 +316,7 @@ struct JoinRoomView: View {
                     .padding(EdgeInsets(top: 6, leading: 9.5, bottom: 6, trailing: 9.5))
                 
                 Text("Join a room")
-                    .font(Font.custom("Lato-Regular", size: 24))
+                    .font(Font.custom("Lato-Regular", size: UIFont.preferredFont(forTextStyle: .title2).pointSize))
                     .foregroundColor(Color(red: 0.15, green: 0.15, blue: 0.15))
                 
                 Spacer()

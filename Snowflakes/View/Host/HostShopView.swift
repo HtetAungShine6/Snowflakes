@@ -34,12 +34,12 @@ struct HostShopView: View {
                     navigationManager.pop()
                 }) {
                     Image(systemName: "chevron.left")
-                        .foregroundColor(.black)
+                        .foregroundColor(.primary)
                 }
             }
             ToolbarItem(placement: .principal) {
                 Text("Shop")
-                    .font(.custom("Montserrat-SemiBold", size: 24))
+                    .font(.custom("Montserrat-SemiBold", size: UIFont.preferredFont(forTextStyle: .body).pointSize))
             }
         }
         .navigationBarBackButtonHidden()
@@ -101,14 +101,14 @@ struct HostShopView: View {
         VStack(alignment: .leading, spacing: 10) {
             HStack {
                 Text("Team: \(team.teamNumber)")
-                    .font(.custom("Lato-Regular", size: 20))
+                    .font(.custom("Lato-Regular", size: UIFont.preferredFont(forTextStyle: .body).pointSize))
                 Spacer()
                 if !team.members.isEmpty {
                     Text("Players: \(String(describing: team.members.count)) players")
-                        .font(.custom("Lato-Regular", size: 20))
+                        .font(.custom("Lato-Regular", size: UIFont.preferredFont(forTextStyle: .body).pointSize))
                 } else {
                     Text("No player found")
-                        .font(.custom("Lato-Regular", size: 20))
+                        .font(.custom("Lato-Regular", size: UIFont.preferredFont(forTextStyle: .body).pointSize))
                 }
             }
             
@@ -119,7 +119,7 @@ struct HostShopView: View {
                             .resizable()
                             .frame(width: 40, height: 40)
                         Text("\(itemName.remainingStock)")
-                            .font(.custom("Lato-Regular", size: 16))
+                            .font(.custom("Lato-Regular", size: UIFont.preferredFont(forTextStyle: .headline).pointSize))
                             .foregroundStyle(Color.gray)
                     }
                 }
@@ -130,12 +130,12 @@ struct HostShopView: View {
                         .scaledToFit()
                         .frame(height: 35)
                     Text("\(team.tokens) tokens")
-                        .font(.custom("Lato-Regular", size: 16))
+                        .font(.custom("Lato-Regular", size: UIFont.preferredFont(forTextStyle: .headline).pointSize))
                 }
             }
         }
         .padding()
-        .background(RoundedRectangle(cornerRadius: 8).stroke(Color.black))
+        .background(RoundedRectangle(cornerRadius: 8).stroke(Color.secondary))
     }
     
     private var totalPlayerCount: Int {
@@ -168,7 +168,7 @@ struct HostShopItemView: View {
 
             HStack {
                 Text("\(itemCount) x \(title) left")
-                    .font(.custom("Lato-Regular", size: 12))
+                    .font(.custom("Lato-Regular", size: UIFont.preferredFont(forTextStyle: .callout).pointSize))
             }
         }
         .frame(maxWidth: width, maxHeight: height)
