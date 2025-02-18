@@ -19,6 +19,8 @@ struct HostTeamDetailView: View {
     @State private var selectedImage: String?
     @State private var price: String = ""
     @State private var showImageBuyAlert: Bool = false
+    @State private var showDecisionAlert: Bool = false
+    @State private var showAlert: Bool = false
     
     var teamNumber: Int
     var hostRoomCode: String
@@ -50,6 +52,11 @@ struct HostTeamDetailView: View {
         }
         .onReceive(getTransactionVM.$transactions) { transactions in
             self.transactions = transactions
+        }
+        .onReceive(buyImageVM.$message) { message in
+            if !message.isEmpty {
+                showAlert = true
+            }
         }
     }
     
@@ -131,7 +138,7 @@ struct HostTeamDetailView: View {
                                 .clipShape(RoundedRectangle(cornerRadius: 10))
                                 .onTapGesture {
                                     selectedImage = imageUrl
-                                    showImageBuyAlert = true
+                                    showDecisionAlert = true
                                 }
                         }
                     } else {
@@ -140,6 +147,24 @@ struct HostTeamDetailView: View {
                             .foregroundStyle(Color.gray.opacity(0.75))
                             .padding(.horizontal)
                     }
+                }
+            }
+            .alert("Do you consider buying this Snowflake?", isPresented: $showDecisionAlert) {
+                Button("Buy", action: {
+                    showImageBuyAlert = true
+                })
+                Button("Reject", role: .destructive) {
+                    if let image = selectedImage, let price = Int(price) {
+                        buyImageVM.isBuyingConfirmed = false
+                        buyImageVM.hostRoomCode = hostRoomCode
+                        buyImageVM.playerRoomCode = team?.playerRoomCode ?? ""
+                        buyImageVM.roundNumber = roundNumber
+                        buyImageVM.teamNumber = teamNumber
+                        buyImageVM.imageUrl = image
+                        buyImageVM.price = price
+                        buyImageVM.buy()
+                    }
+                    showDecisionAlert = false
                 }
             }
             .alert("Do you want to buy this Snowflake?", isPresented: $showImageBuyAlert) {
@@ -161,6 +186,12 @@ struct HostTeamDetailView: View {
                     showImageBuyAlert = false
                 })
                 
+                Button("Cancel", role: .cancel) {}
+            }
+            .alert("\(buyImageVM.message)", isPresented: $showAlert) {
+                Button("OK") {
+                    showAlert = false
+                }
                 Button("Cancel", role: .cancel) {}
             }
         }

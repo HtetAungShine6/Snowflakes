@@ -116,9 +116,15 @@ struct TimerViewHost: View {
     private var timer: some View {
         HStack {
             Spacer()
-            Text("\(webSocketManager.countdown)")
-                .font(.custom("Montserrat-Medium", size: 40))
-                .foregroundColor(.black)
+            if !webSocketManager.countdown.isEmpty {
+                Text("\(webSocketManager.countdown)")
+                    .font(.custom("Montserrat-Medium", size: 40))
+                    .foregroundColor(.black)
+            } else {
+                Text("Timer has not started yet")
+                    .font(.custom("Montserrat-Medium", size: 40))
+                    .foregroundColor(.black)
+            }
             Spacer()
         }
     }
