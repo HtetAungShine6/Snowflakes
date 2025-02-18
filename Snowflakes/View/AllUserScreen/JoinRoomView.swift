@@ -62,15 +62,20 @@ struct JoinRoomView: View {
                         VStack(spacing: 20) {
                             roleSelectionView
                             if selectedRole != nil {
-                                roomCodeTextField
-                                if selectedRole == .player {
-                                    userNameTextField
+                                VStack(spacing: 10) {
+                                    roomCodeTextField
+                                    if selectedRole == .player {
+                                        userNameTextField
+                                    }
+                                    confirmButton
                                 }
-                                confirmButton
+                                .opacity(selectedRole != nil ? 1 : 0)
+                                .scaleEffect(selectedRole != nil ? 1 : 0.95)
+                                .animation(.easeInOut(duration: 0.7), value: selectedRole)
                             }
                         }
                         .padding(.top, 10)
-                        
+                        .animation(.easeInOut(duration: 0.7), value: keyboardIsVisible)
                         Spacer()
                     }
                     .padding(.horizontal, 30)
