@@ -80,6 +80,7 @@ struct TeamListView: View {
         .onAppear(perform: {
             getPlaygroundVM.fetchPlayground(hostRoomCode: hostRoomCode)
             getTeamsByRoomCodeVM.fetchTeams(hostRoomCode: hostRoomCode)
+            hasNavigated = false
         })
         .onReceive(webSocketManager.$currentGameState) {  currentGameState in
             if currentGameState == "SnowFlakeCreation" {

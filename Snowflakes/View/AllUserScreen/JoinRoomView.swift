@@ -28,7 +28,6 @@ struct JoinRoomView: View {
     
     @State private var shopPeriod: Bool = false
     @State private var isSuccess: Bool = false
-    
     @FocusState private var isRoomCodeFocused: Bool
     @FocusState private var isUserNameFocused: Bool
     
@@ -127,6 +126,7 @@ struct JoinRoomView: View {
                                    case .host:
                                        navigationManager.navigateTo(Destination.teamListView(hostRoomCode: hostRoomCode))
                                    case .player:
+                                       UserDefaults.standard.set(userName, forKey: "\(roomCode)")
                                        navigationManager.navigateTo(Destination.teamListPlayerView(playerRoomCode: playerRoomCode))
                                    }
                                }
@@ -136,7 +136,13 @@ struct JoinRoomView: View {
                                    case .host:
                                        navigationManager.navigateTo(Destination.hostTimerView(roomCode: hostRoomCode))
                                    case .player:
-                                       navigationManager.navigateTo(Destination.playerTimerView(hostRoomCode: hostRoomCode, playerRoomCode: playerRoomCode))
+                                       if UserDefaults.standard.string(forKey: "TeamDetail-\(playerRoomCode)") != nil {
+                                           navigationManager.navigateTo(Destination.playerTimerView(hostRoomCode: hostRoomCode, playerRoomCode: playerRoomCode))
+                                       } else {
+                                           showAlert = true
+                                           alertTitle = "Team Number cannot be found for this username and room code."
+                                           alertMessage = "Cannot join room. The game has already begun."
+                                       }
                                    }
                                }
                            case "ShopPeriod":
@@ -145,16 +151,28 @@ struct JoinRoomView: View {
                                    case .host:
                                        navigationManager.navigateTo(Destination.hostShopTimerView(roomCode: hostRoomCode))
                                    case .player:
-                                       navigationManager.navigateTo(Destination.playerShopTimerView(hostRoomCode: hostRoomCode, playerRoomCode: playerRoomCode))
+                                       if UserDefaults.standard.string(forKey: "TeamDetail-\(playerRoomCode)") != nil {
+                                           navigationManager.navigateTo(Destination.playerShopTimerView(hostRoomCode: hostRoomCode, playerRoomCode: playerRoomCode))
+                                       } else {
+                                           showAlert = true
+                                           alertTitle = "Team Number cannot be found for this username and room code."
+                                           alertMessage = "Cannot join room. The game has already begun."
+                                       }
                                    }
                                }
                            case "Leaderboard":
                                if let selectedRole = selectedRole{
                                    switch selectedRole {
                                    case .host:
-                                       navigationManager.navigateTo(Destination.leaderboard(roomCode: hostRoomCode))
+                                       navigationManager.navigateTo(Destination.leaderboard(roomCode: hostRoomCode, playerRoomCode: playerRoomCode))
                                    case .player:
-                                       navigationManager.navigateTo(Destination.leaderboard(roomCode: playerRoomCode))
+                                       if UserDefaults.standard.string(forKey: "TeamDetail-\(playerRoomCode)") != nil {
+                                           navigationManager.navigateTo(Destination.leaderboard(roomCode: hostRoomCode, playerRoomCode: playerRoomCode))
+                                       } else {
+                                           showAlert = true
+                                           alertTitle = "Team Number cannot be found for this username and room code."
+                                           alertMessage = "Cannot join room. The game has already finished."
+                                       }
                                    }
                                }
                            default:
@@ -298,7 +316,7 @@ struct JoinRoomView: View {
                     createPlayerVM.name = userName
                     createPlayerVM.playerRoomCode = roomCode
                     createPlayerVM.createPlayer()
-                    UserDefaults.standard.set(userName, forKey: "\(roomCode)")
+//                    UserDefaults.standard.set(userName, forKey: "\(roomCode)")
                     getGameStateVM.fetchGameState(playerRoomCode: roomCode)
                 }
             }

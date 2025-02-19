@@ -206,3 +206,7 @@ struct AddToCartView: View {
         .padding(.horizontal)
     }
 }
+
+#Preview {
+    AddToCartView(playerRoomCode: "ASDAD", teamNumber: 1, roundNumber: 2, hostRoomCode: "AFASDASD")
+}

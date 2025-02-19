@@ -122,11 +122,11 @@ struct HostTeamDetailView: View {
         VStack(alignment: .leading) {
             Text("Transfer")
                 .font(.custom("Lato-Regular", size: UIFont.preferredFont(forTextStyle: .body).pointSize))
-                .padding(.horizontal)
+                .padding(.horizontal, 10)
             Text("Tap image to transfer tokens")
                 .font(.custom("Poppins-Regular", size: UIFont.preferredFont(forTextStyle: .callout).pointSize))
                 .foregroundStyle(Color.gray.opacity(0.75))
-                .padding(.horizontal)
+                .padding(.horizontal, 10)
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack{
                     if let images = team?.images {
@@ -145,10 +145,11 @@ struct HostTeamDetailView: View {
                         Text("No Images yet to be found.")
                             .font(.custom("Poppins-Regular", size: 15))
                             .foregroundStyle(Color.gray.opacity(0.75))
-                            .padding(.horizontal)
+                            .padding(.horizontal, 10)
                     }
                 }
             }
+            .padding(.horizontal, 5)
             .alert("Do you consider buying this Snowflake?", isPresented: $showDecisionAlert) {
                 Button("Buy", action: {
                     showImageBuyAlert = true

@@ -14,6 +14,7 @@ struct LeaderboardView: View {
     @State private var leaderboard: [LeaderboardMessage] = []
     
     let roomCode: String
+    let playerRoomCode: String
     
     var body: some View {
         VStack(alignment: .leading) {
@@ -36,6 +37,7 @@ struct LeaderboardView: View {
             .refreshable {
                 getLeaderboardVM.fetchLeaderboard(hostRoomCode: roomCode)
             }
+            restartButton
         }
         .navigationBarBackButtonHidden()
         .onAppear {
@@ -101,7 +103,6 @@ struct LeaderboardView: View {
                 Text("Members: ")
                     .font(.footnote)
                     .bold()
-                    .foregroundStyle(.black)
                 Text("\(team.players.joined(separator: ", "))")
                     .font(.footnote)
                     .foregroundStyle(.gray)
@@ -109,6 +110,28 @@ struct LeaderboardView: View {
         }
         .padding()
         .background(RoundedRectangle(cornerRadius: 8).stroke(Color.secondary))
+    }
+    
+    private var restartButton: some View {
+        Button(action: {
+            navigationManager.reset()
+            if let roomCode = UserDefaults.standard.string(forKey: "\(playerRoomCode)") {
+                UserDefaults.standard.removeObject(forKey: roomCode)
+            }
+            if let teamNumber = UserDefaults.standard.string(forKey: "TeamDetail-\(playerRoomCode)") {
+                UserDefaults.standard.removeObject(forKey: teamNumber)
+            }
+        }) {
+            Text("Back to main menu")
+                .font(.headline)
+                .foregroundColor(.primary)
+                .frame(maxWidth: .infinity)
+                .padding()
+                .background(AppColors.frostBlue)
+                .cornerRadius(10)
+                .shadow(radius: 5)
+        }
+        .padding(.horizontal)
     }
     
     private static func rankOrder(_ rank: String) -> Int {
@@ -122,5 +145,5 @@ struct LeaderboardView: View {
 }
 
 //#Preview {
-//    LeaderboardView()
+//    LeaderboardView(roomCode: "ANBDA")
 //}

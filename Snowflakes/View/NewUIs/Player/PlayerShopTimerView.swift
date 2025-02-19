@@ -70,14 +70,14 @@ struct PlayerShopTimerView: View {
             }
         })
         .onReceive(webSocketManager.$currentGameState) { currentGameState in
-            if currentGameState == "SnowFlakeCreation" && !hasNavigated {
+            if currentGameState == "Leaderboard" && !hasNavigated {
                 if getGameStateViewModel.currentRoundNumber == navigationManager.totalRound {
-                    navigationManager.navigateTo(Destination.leaderboard(roomCode: hostRoomCode))
-                } else {
-                    getGameStateViewModel.currentRoundNumber += 1
-                    navigationManager.navigateTo(Destination.playerTimerView(hostRoomCode: hostRoomCode, playerRoomCode: playerRoomCode))
-                    hasNavigated = true
+                    navigationManager.navigateTo(Destination.leaderboard(roomCode: hostRoomCode, playerRoomCode: playerRoomCode))
                 }
+            } else if currentGameState == "SnowFlakeCreation" && !hasNavigated{
+                getGameStateViewModel.currentRoundNumber += 1
+                navigationManager.navigateTo(Destination.playerTimerView(hostRoomCode: hostRoomCode, playerRoomCode: playerRoomCode))
+                hasNavigated = true
             }
         }
     }

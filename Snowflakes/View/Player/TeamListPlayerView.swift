@@ -17,6 +17,7 @@ struct TeamListPlayerView: View {
     @StateObject private var getTeamsByRoomCodeVM = GetTeamsByRoomCode()
     @State private var teams: [Team] = []
     @State private var hasNavigated: Bool = false
+    @State private var showAlert: Bool = false
     
     let playerRoomCode: String
     
@@ -41,6 +42,17 @@ struct TeamListPlayerView: View {
             waitingForHostButton
                 .padding()
         }
+        .toolbar {
+            ToolbarItem(placement: .navigationBarLeading) {
+                Button(action: {
+                    navigationManager.pop()
+                }) {
+                    Image(systemName: "chevron.left")
+                        .foregroundColor(.primary)
+                }
+            }
+        }
+        .navigationBarBackButtonHidden()
         .onAppear {
             getTeamsByRoomCodeVM.fetchTeams(playerRoomCode: playerRoomCode)
         }
@@ -52,11 +64,18 @@ struct TeamListPlayerView: View {
         }
         .onReceive(webSocketManager.$currentGameState) {  currentGameState in
             if currentGameState == "SnowFlakeCreation" {
-                if !hasNavigated {
+                if !hasNavigated && UserDefaults.standard.string(forKey: "TeamDetail-\(playerRoomCode)") != nil {
                     navigationManager.navigateTo(Destination.playerTimerView(hostRoomCode: hostRoomCode, playerRoomCode: playerRoomCode))
                     hasNavigated = true
+                } else {
+                    showAlert = true
                 }
             }
+        }
+        .alert(isPresented: $showAlert) {
+            Alert(title: Text("Disconnected"), message: Text("You cannot play the game because you haven't joined any teams!"), dismissButton: .default(Text("OK"), action: {
+                navigationManager.pop()
+            }))
         }
     }
     
@@ -114,7 +133,7 @@ struct TeamListPlayerView: View {
                         .font(.custom("Lato-Regular", size: UIFont.preferredFont(forTextStyle: .callout).pointSize))
                         .padding(.horizontal)
                         .padding(.vertical, 4)
-                        .background(.white)
+//                        .background(.white)
                         .foregroundColor(isJoined ? .red : .green)
                         .overlay(
                             RoundedRectangle(cornerRadius: 15)

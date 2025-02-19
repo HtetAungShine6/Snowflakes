@@ -52,8 +52,8 @@ struct RootView: View {
                             members: ["Hein Thant", "Thu Yein", "Htet Aung Shine"] // Example members
                         )
                         .environmentObject(navigationManager)
-                    case .leaderboard(let roomCode):
-                        LeaderboardView(roomCode: roomCode)
+                    case .leaderboard(let roomCode, let playerRoomCode):
+                        LeaderboardView(roomCode: roomCode, playerRoomCode: playerRoomCode)
                             .environmentObject(navigationManager)
                     case .playerTimerView(let hostRoomCode, let playerRoomCode):
                         PlayerTimerView(playerRoomCode: playerRoomCode, hostRoomCode: hostRoomCode)
