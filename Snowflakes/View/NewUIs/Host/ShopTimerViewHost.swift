@@ -6,7 +6,7 @@
 //
 
 import SwiftUI
- 
+
 struct ShopTimerViewHost: View {
     
     @EnvironmentObject var navigationManager: NavigationManager
@@ -76,14 +76,16 @@ struct ShopTimerViewHost: View {
             hasNavigated = false
         }
         .onReceive(webSocketManager.$currentGameState) { currentGameState in
-            if currentGameState == "SnowFlakeCreation" && !hasNavigated {
+            if currentGameState == "Leaderboard" && !hasNavigated {
                 if getGameStateViewModel.currentRoundNumber == navigationManager.totalRound {
-                    navigationManager.navigateTo(Destination.leaderboard(roomCode: roomCode))
-                } else {
-                    navigationManager.navigateTo(Destination.hostTimerView(roomCode: roomCode))
-                    getGameStateViewModel.currentRoundNumber += 1
-                    hasNavigated = true
+                    if let playerRoomCode = getPlaygroundVM.playgroundInfo?.playerRoomCode {
+                        navigationManager.navigateTo(Destination.leaderboard(roomCode: roomCode, playerRoomCode: playerRoomCode))
+                    }
                 }
+            } else if currentGameState == "SnowFlakeCreation" && !hasNavigated {
+                navigationManager.navigateTo(Destination.hostTimerView(roomCode: roomCode))
+                getGameStateViewModel.currentRoundNumber += 1
+                hasNavigated = true
             }
         }
         .onChange(of: webSocketManager.timerPaused) { _, newValue in
@@ -219,10 +221,12 @@ struct ShopTimerViewHost: View {
             }
             .padding(.horizontal)
             HStack {
-                TextField("Create a snowflake", text: $sendMessageText)
+                TextField("", text: $sendMessageText, prompt: Text("Create a snowflake").foregroundColor(.black))
                     .padding(.leading, 10)
                     .frame(height: 80)
- 
+                    .background(Color.white)
+                    .foregroundColor(.black)
+                
                 Button(action: {
                     webSocketManager.messageSend(roomCode: roomCode, message: sendMessageText)
                 }) {
@@ -245,18 +249,18 @@ struct ShopTimerViewHost: View {
     
     private var nextRoundButton: some View {
         SwipeToConfirmButton {
-            if let rounds = getPlaygroundVM.playgroundInfo?.rounds.sorted(by: { $0.duration < $1.duration }),
-               getGameStateViewModel.currentRoundNumber < rounds.count + 1 {
-                
-                let adjustedRoundIndex = min(getGameStateViewModel.currentRoundNumber, rounds.count - 1)
-                
-                if adjustedRoundIndex > 0 {
-                    let currentRoundInfo = rounds[adjustedRoundIndex]
-                    let duration = currentRoundInfo.duration
+            if getGameStateViewModel.currentRoundNumber != navigationManager.totalRound {
+                if let rounds = getPlaygroundVM.playgroundInfo?.rounds.sorted(by: { $0.duration < $1.duration }),
+                   getGameStateViewModel.currentRoundNumber < rounds.count + 1 {
                     
-                    webSocketManager.stopCountdown(roomCode: roomCode)
+                    let adjustedRoundIndex = min(getGameStateViewModel.currentRoundNumber, rounds.count - 1)
                     
-                    if getGameStateViewModel.currentRoundNumber != navigationManager.totalRound {
+                    if adjustedRoundIndex > 0 {
+                        let currentRoundInfo = rounds[adjustedRoundIndex]
+                        let duration = currentRoundInfo.duration
+                        
+                        webSocketManager.stopCountdown(roomCode: roomCode)
+                        
                         webSocketManager.createTimer(roomCode: roomCode, socketMessage: duration, gameState: "SnowFlakeCreation")
                         DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
                             webSocketManager.startCountdown(roomCode: roomCode)
@@ -269,22 +273,24 @@ struct ShopTimerViewHost: View {
                             updateGameStateViewModel.currentRoundNumber = getGameStateViewModel.currentRoundNumber + 1
                             updateGameStateViewModel.updateGameState()
                         }
-                    } else {
-                        webSocketManager.createTimer(roomCode: roomCode, socketMessage: "01:00", gameState: "SnowFlakeCreation")
-                        DispatchQueue.main.async {
-                            updateGameStateViewModel.hostRoomCode = roomCode
-                            updateGameStateViewModel.currentGameState = GameState.Leaderboard
-                            updateGameStateViewModel.updateGameState()
-                            createLeaderboardVM.createLeaderboard(hostRoomCode: roomCode)
-                        }
                     }
+                }
+            } else {
+                webSocketManager.createTimer(roomCode: roomCode, socketMessage: "01:00", gameState: "Leaderboard")
+                DispatchQueue.main.async {
+                    updateGameStateViewModel.hostRoomCode = roomCode
+                    updateGameStateViewModel.currentGameState = GameState.Leaderboard
+                    updateGameStateViewModel.updateGameState()
+                    createLeaderboardVM.createLeaderboard(hostRoomCode: roomCode)
                 }
             }
         }
     }
 }
+
 extension UIApplication {
     func dismissKeyboard() {
         self.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
     }
 }
+

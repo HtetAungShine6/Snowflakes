@@ -227,9 +227,11 @@ struct TimerViewHost: View {
             }
             .padding(.horizontal)
             HStack {
-                TextField("Create a snowflake", text: $sendMessageText)
+                TextField("", text: $sendMessageText, prompt: Text("Create a snowflake").foregroundColor(.black))
                     .padding(.leading, 10)
                     .frame(height: 80)
+                    .background(Color.white)
+                    .foregroundColor(.black)
  
                 Button(action: {
                     webSocketManager.messageSend(roomCode: roomCode, message: sendMessageText)
