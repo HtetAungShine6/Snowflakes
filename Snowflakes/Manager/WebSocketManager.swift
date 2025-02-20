@@ -13,6 +13,8 @@ import UserNotifications
 class WebSocketManager: ObservableObject, WebSocketDelegate {
     
     private var socket: WebSocket!
+    private var pingTimer: Timer?
+    
     @Published var message: String = ""
     @Published var isConnected: Bool = false
     @Published var countdown: String = ""
@@ -45,7 +47,7 @@ class WebSocketManager: ObservableObject, WebSocketDelegate {
         
         // Ensure you use the correct URL for your SignalR hub
         var request = URLRequest(url: URL(string: "wss://snowflakeapi-bkd0aygebke4fscg.southeastasia-01.azurewebsites.net/timer-hub")!)
-        request.timeoutInterval = 5
+        request.timeoutInterval = 15
         socket = WebSocket(request: request)
         socket.delegate = self
         
@@ -64,7 +66,21 @@ class WebSocketManager: ObservableObject, WebSocketDelegate {
     
     // Disconnect from the WebSocket
     func disconnect() {
+        stopPingTimer()
         socket.disconnect()
+    }
+    
+    private func startPingTimer() {
+        stopPingTimer() // Ensure no duplicate timers
+        pingTimer = Timer.scheduledTimer(withTimeInterval: 15, repeats: true) { [weak self] _ in
+            self?.socket.write(ping: Data())
+            print("Ping sent to keep connection alive.")
+        }
+    }
+    
+    private func stopPingTimer() {
+        pingTimer?.invalidate()
+        pingTimer = nil
     }
     
     // Send a message through the WebSocket
@@ -90,10 +106,12 @@ class WebSocketManager: ObservableObject, WebSocketDelegate {
             
             // ** Send handshake message after connecting **
             sendHandshake()
+            startPingTimer()
             
         case .disconnected(let reason, let code):
             print("Disconnected from WebSocket: \(reason) with code: \(code)")
             isConnected = false
+            stopPingTimer()
             
         case .text(let text):
             handleWebSocketResponse(text: text)
@@ -122,6 +140,7 @@ class WebSocketManager: ObservableObject, WebSocketDelegate {
             
         case .error(let error):
             print("WebSocket encountered an error: \(error?.localizedDescription ?? "Unknown error")")
+            stopPingTimer()
             
         case .peerClosed:
             print("Peer closed due to an error.")

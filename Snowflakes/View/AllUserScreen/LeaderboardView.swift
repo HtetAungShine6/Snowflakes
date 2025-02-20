@@ -41,7 +41,9 @@ struct LeaderboardView: View {
         }
         .navigationBarBackButtonHidden()
         .onAppear {
-            getLeaderboardVM.fetchLeaderboard(hostRoomCode: roomCode)
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                getLeaderboardVM.fetchLeaderboard(hostRoomCode: roomCode)
+            }
         }
         .onReceive(getLeaderboardVM.$leaderboard) { leaderboard in
             self.leaderboard = leaderboard

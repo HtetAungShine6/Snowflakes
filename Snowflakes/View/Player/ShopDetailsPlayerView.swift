@@ -27,6 +27,7 @@ struct ShopDetailsPlayerView: View {
     @State private var showImageCropper = false
     @State private var selectedImages: [UIImage] = []
     @State private var showAddToCartAlert: Bool = false
+    @State private var showImageSendAlert: Bool = false
     let playerRoomCode: String
     var roundNumber: Int
     
@@ -322,23 +323,16 @@ struct ShopDetailsPlayerView: View {
                         .foregroundColor(.black)
                         .frame(maxWidth: .infinity)
                         .padding()
-                        .background(uploadImageVM.uploadSuccess ? Color.green : AppColors.frostBlue)
+                        .background(AppColors.frostBlue)
                         .cornerRadius(10)
                 }
                 .padding(.top, 10)
                 .disabled(uploadImageVM.isUploading)
             }
-            
-            // Show Upload Result
-            if let errorMessage = uploadImageVM.errorMessage {
-                Text(errorMessage)
-                    .foregroundColor(.red)
-                    .font(.caption)
-            }
-            if uploadImageVM.uploadSuccess {
-                Text("Upload Successful!")
-                    .foregroundColor(.green)
-                    .font(.caption)
+        }
+        .onReceive(uploadImageVM.$uploadSuccess){ success in
+            if success {
+                showImageSendAlert = true
             }
         }
         .sheet(isPresented: $showImagePicker) {
@@ -349,6 +343,11 @@ struct ShopDetailsPlayerView: View {
                 ImageCropper(image: imageToCrop, croppedImage: $croppedImage, isPresented: $showImageCropper)
             }
         }
+        .alert("Your Snowflake is successfully sent to the Shop.", isPresented: $showImageSendAlert, actions: {
+            Button("OK", action: {
+                showImageSendAlert = false
+            })
+        })
         .padding(.horizontal, 10)
     }
 }
@@ -368,11 +367,9 @@ struct ImagePicker: UIViewControllerRepresentable {
         
         func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey: Any]) {
             if let uiImage = info[.originalImage] as? UIImage {
-                print("Image picked: \(uiImage)") // Debugging log
-                
                 DispatchQueue.main.async {
                     self.parent.selectedImage = uiImage
-                    self.parent.showImageCropper = true // Trigger cropper after selecting image
+                    self.parent.showImageCropper = true
                 }
             }
             parent.showImagePicker = false

@@ -18,6 +18,7 @@ struct TeamListPlayerView: View {
     @State private var teams: [Team] = []
     @State private var hasNavigated: Bool = false
     @State private var showAlert: Bool = false
+    @State private var tempTeamNumber: Int = 0
     
     let playerRoomCode: String
     
@@ -55,6 +56,7 @@ struct TeamListPlayerView: View {
         .navigationBarBackButtonHidden()
         .onAppear {
             getTeamsByRoomCodeVM.fetchTeams(playerRoomCode: playerRoomCode)
+            hasNavigated = false
         }
         .onReceive(getTeamsByRoomCodeVM.$teams) { newTeams in
             if !newTeams.isEmpty {
@@ -63,13 +65,13 @@ struct TeamListPlayerView: View {
             }
         }
         .onReceive(webSocketManager.$currentGameState) {  currentGameState in
-            if currentGameState == "SnowFlakeCreation" {
-                if !hasNavigated && UserDefaults.standard.string(forKey: "TeamDetail-\(playerRoomCode)") != nil {
+            if currentGameState == "SnowFlakeCreation" && tempTeamNumber != 0{
+                if !hasNavigated  {
                     navigationManager.navigateTo(Destination.playerTimerView(hostRoomCode: hostRoomCode, playerRoomCode: playerRoomCode))
                     hasNavigated = true
-                } else {
-                    showAlert = true
                 }
+            } else if currentGameState == "SnowFlakeCreation" && tempTeamNumber == 0 {
+                showAlert = true
             }
         }
         .alert(isPresented: $showAlert) {
@@ -219,6 +221,7 @@ struct TeamListPlayerView: View {
             joinTeamVM.playerName = playerName
             joinTeamVM.join()
             UserDefaults.standard.removeObject(forKey: "TeamDetail-\(team.playerRoomCode)")
+            self.tempTeamNumber = 0
         } else {
             joinedTeams.keys.forEach { joinedTeams[$0] = false }
             joinedTeams[team.teamNumber] = true
@@ -230,6 +233,7 @@ struct TeamListPlayerView: View {
             joinTeamVM.playerName = playerName
             joinTeamVM.join()
             UserDefaults.standard.set(team.teamNumber, forKey: "TeamDetail-\(team.playerRoomCode)")
+            self.tempTeamNumber = team.teamNumber
         }
     }
 }

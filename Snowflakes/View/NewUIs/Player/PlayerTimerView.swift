@@ -87,6 +87,17 @@ struct PlayerTimerView: View {
                     .foregroundStyle(Color.gray)
             }
             Spacer()
+            Menu {
+                HStack {
+                    Text("Player Code: \(playerRoomCode)")
+                        .font(.custom("Lato-Regular", size: UIFont.preferredFont(forTextStyle: .headline).pointSize))
+                }
+            } label: {
+                Image(systemName: "questionmark.circle.dashed")
+                    .resizable()
+                    .frame(width: 30, height: 30)
+                    .foregroundColor(.blue)
+            }
         }
         .padding(.horizontal)
     }

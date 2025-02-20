@@ -33,6 +33,7 @@ class UpdateGameStateViewModel: ObservableObject {
         
         let updateGameStateManager = UpdateGameStateUseCase()
         errorMessage = nil
+        isSuccess = false
         isLoading = true
         
         updateGameStateManager.execute(data: newGameState, getMethod: "PUT", token: nil) { [weak self] result in
