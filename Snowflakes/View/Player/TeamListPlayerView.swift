@@ -77,6 +77,7 @@ struct TeamListPlayerView: View {
         .alert(isPresented: $showAlert) {
             Alert(title: Text("Disconnected"), message: Text("You cannot play the game because you haven't joined any teams!"), dismissButton: .default(Text("OK"), action: {
                 navigationManager.pop()
+                showAlert = false
             }))
         }
     }

@@ -42,7 +42,7 @@ class JoinTeamViewModel: ObservableObject {
             DispatchQueue.main.async {
                 self?.isLoading = false
                 switch result {
-                case .success(let joinedTeam):
+                case .success( _):
 //                    print("New Team Joined: \(joinedTeam.message)")
                     self?.isSuccess = true
                 case .failure(let error):

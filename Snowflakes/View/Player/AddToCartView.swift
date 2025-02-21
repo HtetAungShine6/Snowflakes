@@ -115,40 +115,43 @@ struct AddToCartView: View {
     }
     
     private var cartList: some View {
-        // Cart List (Hide items after checkout)
         VStack {
             if !hasCheckedOut {
-                List {
-                    ForEach(cartItems, id: \.id) { item in
-                        HStack {
-                            Text("\(item.productName)")
-                                .font(.headline)
-                                .foregroundColor(.primary)
-                            
-                            Spacer()
-                            
-                            Text("$\(item.price) x \(item.quantity)")
-                                .font(.subheadline)
-                                .foregroundColor(.secondary)
-                            
-                            // Trash Icon for item removal
-                            Image(systemName: "trash")
-                                .foregroundColor(.red)
-                                .onTapGesture {
-                                    selectedItemId = item.id
-                                    selectedItem = item.productName
-                                    showDeleteAlert = true
-                                }
+                ScrollView {
+                    LazyVStack(spacing: 8) {
+                        ForEach(cartItems, id: \.id) { item in
+                            HStack {
+                                Text("\(item.productName)")
+                                    .font(.headline)
+                                    .foregroundColor(.primary)
+                                
+                                Spacer()
+                                
+                                Text("$\(item.price) x \(item.quantity)")
+                                    .font(.subheadline)
+                                    .foregroundColor(.secondary)
+                                
+                                // Trash Icon for item removal
+                                Image(systemName: "trash")
+                                    .foregroundColor(.red)
+                                    .onTapGesture {
+                                        selectedItemId = item.id
+                                        selectedItem = item.productName
+                                        showDeleteAlert = true
+                                    }
+                            }
+                            .padding()
+                            .background(RoundedRectangle(cornerRadius: 10)
+                                .fill(Color(UIColor.systemBackground))
+                                .shadow(radius: 5))
+                            .padding(.horizontal)
                         }
-                        .padding()
-                        .background(RoundedRectangle(cornerRadius: 10).fill(Color(UIColor.systemBackground)).shadow(radius: 5))
-                        .padding(.vertical, 4)
                     }
+                    .padding(.vertical)
                 }
                 .refreshable {
                     getAddToCartItems.fetchItems(playerRoomCode: playerRoomCode, teamNumber: teamNumber)
                 }
-                .padding()
             } else {
                 Color.clear
                     .frame(height: CGFloat(cartItems.count * 60))

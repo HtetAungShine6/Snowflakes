@@ -139,7 +139,7 @@ struct TimerViewHost: View {
                 Image(systemName: "questionmark.circle.dashed")
                     .resizable()
                     .frame(width: 30, height: 30)
-                    .foregroundColor(.blue)
+                    .foregroundColor(.black)
             }
         }
         .padding(.horizontal)
@@ -207,6 +207,7 @@ struct TimerViewHost: View {
             }
             .padding(.horizontal)
             AdjustTimeComponent(
+                countdown: webSocketManager.countdown,
                 onDecrease: { time in
                     webSocketManager.minusCountdown(roomCode: roomCode, socketMessage: "01:00")
                 },

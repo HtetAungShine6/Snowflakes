@@ -96,7 +96,7 @@ struct PlayerTimerView: View {
                 Image(systemName: "questionmark.circle.dashed")
                     .resizable()
                     .frame(width: 30, height: 30)
-                    .foregroundColor(.blue)
+                    .foregroundColor(.black)
             }
         }
         .padding(.horizontal)

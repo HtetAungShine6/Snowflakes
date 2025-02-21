@@ -40,7 +40,7 @@ class UpdateGameStateViewModel: ObservableObject {
             DispatchQueue.main.async {
                 self?.isLoading = false
                 switch result {
-                case .success(let gameState):
+                case .success( _):
 //                    print("\(gameState.message)")
                     self?.isSuccess = true
                 case .failure(let error):

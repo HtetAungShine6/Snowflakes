@@ -104,9 +104,9 @@ struct TeamListView: View {
                 .foregroundStyle(AppColors.polarBlue)
             Spacer()
             VStack(alignment: .leading) {
-                Text("Host Room Code: \(hostRoomCode)")
+                Text("Host Code: \(hostRoomCode)")
                     .font(.custom("Lato-Regular", size: UIFont.preferredFont(forTextStyle: .headline).pointSize))
-                Text("Player Room Code: \(playerRoomCode)")
+                Text("Player Code: \(playerRoomCode)")
                     .font(.custom("Lato-Regular", size: UIFont.preferredFont(forTextStyle: .headline).pointSize))
             }
         }

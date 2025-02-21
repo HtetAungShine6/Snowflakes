@@ -206,6 +206,7 @@ struct ShopTimerViewHost: View {
             }
             .padding(.horizontal)
             AdjustTimeComponent(
+                countdown: webSocketManager.countdown,
                 onDecrease: { time in
                     webSocketManager.minusCountdown(roomCode: roomCode, socketMessage: "01:00")
                 },

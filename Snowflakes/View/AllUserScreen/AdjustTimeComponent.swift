@@ -10,11 +10,14 @@ import SwiftUI
 struct AdjustTimeComponent: View {
     @State private var time: String = "01:00"
     
+    var countdown: String
     var onDecrease: (String) -> Void = { _ in }
     var onIncrease: (String) -> Void = { _ in }
-
+    
     var body: some View {
         HStack {
+            let isMinusDisabled = countdownToSeconds(countdown) < 60
+            
             // Decrease Button
             Button(action: {
                 onDecrease(time)
@@ -34,6 +37,7 @@ struct AdjustTimeComponent: View {
                 Circle()
                     .stroke(Color.black, lineWidth: 2)
             )
+            .disabled(isMinusDisabled)
             
             // Display Time (MM:SS)
             Text(time)
@@ -61,5 +65,13 @@ struct AdjustTimeComponent: View {
                     .stroke(Color.black, lineWidth: 2)
             )
         }
+    }
+    
+    private func countdownToSeconds(_ timeString: String) -> Int {
+        let components = timeString.split(separator: ":").compactMap { Int($0) }
+        if components.count == 2 {
+            return components[0] * 60 + components[1]
+        }
+        return 0 
     }
 }
