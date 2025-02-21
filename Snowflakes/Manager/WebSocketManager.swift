@@ -13,6 +13,11 @@ import UserNotifications
 class WebSocketManager: ObservableObject, WebSocketDelegate {
     
     private var socket: WebSocket!
+    private var pingTimer: Timer?
+    private var reconnectAttempts = 0
+    private let maxReconnectAttempts = 5
+    private let reconnectDelay: TimeInterval = 5
+    
     @Published var message: String = ""
     @Published var isConnected: Bool = false
     @Published var countdown: String = ""
@@ -29,6 +34,7 @@ class WebSocketManager: ObservableObject, WebSocketDelegate {
     @Published var roomCode: String = ""
     @Published var currentGameState: String = ""
     
+    private var lastJoinedRoomCode: String?
     var countdownTimer: Timer?
     var audioPlayer: AVAudioPlayer?
     
@@ -45,7 +51,7 @@ class WebSocketManager: ObservableObject, WebSocketDelegate {
         
         // Ensure you use the correct URL for your SignalR hub
         var request = URLRequest(url: URL(string: "wss://snowflakeapi-bkd0aygebke4fscg.southeastasia-01.azurewebsites.net/timer-hub")!)
-        request.timeoutInterval = 5
+        request.timeoutInterval = 15
         socket = WebSocket(request: request)
         socket.delegate = self
         
@@ -59,12 +65,49 @@ class WebSocketManager: ObservableObject, WebSocketDelegate {
     
     // Connect to the WebSocket and send the handshake request
     func connect() {
-        socket.connect()
+        if !isConnected {
+            print("🔌 Connecting to WebSocket...")
+            socket.connect()
+        } else {
+            print("⚠️ Already connected, skipping connection request.")
+        }
     }
     
     // Disconnect from the WebSocket
     func disconnect() {
+        print("🔌 Disconnecting WebSocket...")
+        stopPingTimer()
         socket.disconnect()
+        isConnected = false
+    }
+    
+    private func startPingTimer() {
+        stopPingTimer()
+        pingTimer = Timer.scheduledTimer(withTimeInterval: 15, repeats: true) { [weak self] _ in
+            self?.socket.write(ping: Data())
+            print("📡 Ping sent to keep connection alive: \(Data())")
+        }
+    }
+    
+    private func stopPingTimer() {
+        pingTimer?.invalidate()
+        pingTimer = nil
+    }
+    
+    private func attemptReconnect() {
+        guard reconnectAttempts < maxReconnectAttempts else {
+            print("❌ Max reconnect attempts reached. Giving up.")
+            return
+        }
+        
+        let delay = reconnectDelay * pow(2, Double(reconnectAttempts))
+        print("🔄 Attempting to reconnect in \(delay) seconds... (Attempt \(reconnectAttempts + 1))")
+        
+        DispatchQueue.main.asyncAfter(deadline: .now() + delay) { [weak self] in
+            self?.connect()
+        }
+        
+        reconnectAttempts += 1
     }
     
     // Send a message through the WebSocket
@@ -77,7 +120,7 @@ class WebSocketManager: ObservableObject, WebSocketDelegate {
                 print("Sent message: \(jsonString)")
             }
         } catch {
-            print("Failed to convert message to JSON: \(error.localizedDescription)")
+            print("❌ Failed to convert message to JSON: \(error.localizedDescription)")
         }
     }
     
@@ -85,15 +128,21 @@ class WebSocketManager: ObservableObject, WebSocketDelegate {
     func didReceive(event: WebSocketEvent, client: any WebSocketClient) {
         switch event {
         case .connected(let headers):
-            print("Connected to WebSocket with headers: \(headers)")
+            print("✅ Connected to WebSocket with headers: \(headers)")
             isConnected = true
-            
-            // ** Send handshake message after connecting **
+            reconnectAttempts = 0
             sendHandshake()
+            startPingTimer()
+            if let roomCode = lastJoinedRoomCode {
+                print("🔄 Rejoining group: \(roomCode)")
+                joinGroup(roomCode: roomCode)
+            }
             
         case .disconnected(let reason, let code):
-            print("Disconnected from WebSocket: \(reason) with code: \(code)")
+            print("❌ Disconnected: \(reason) (Code \(code))")
             isConnected = false
+            stopPingTimer()
+            attemptReconnect()
             
         case .text(let text):
             handleWebSocketResponse(text: text)
@@ -104,8 +153,8 @@ class WebSocketManager: ObservableObject, WebSocketDelegate {
         case .ping(_):
             print("Ping received from server")
             
-        case .pong(_):
-            print("Pong received in response to ping")
+        case .pong(let data):
+            print("Pong received in response to ping: \(String(describing: data))")
             
         case .viabilityChanged(let isViable):
             print("Viability changed. Is connection viable? \(isViable)")
@@ -121,15 +170,20 @@ class WebSocketManager: ObservableObject, WebSocketDelegate {
             isConnected = false
             
         case .error(let error):
-            print("WebSocket encountered an error: \(error?.localizedDescription ?? "Unknown error")")
+            print("❌ WebSocket encountered an error: \(error?.localizedDescription ?? "Unknown error")")
+            stopPingTimer()
+            attemptReconnect()
             
         case .peerClosed:
-            print("Peer closed due to an error.")
+            print("❌ Peer closed due to an error.")
+            stopPingTimer()
+            attemptReconnect()
         }
     }
     
     // Join a group
     func joinGroup(roomCode: String) {
+        lastJoinedRoomCode = roomCode
         let messageToSocket: [String: Any] = [
             "arguments": [roomCode],
             "target": "JoinGroup",
@@ -243,7 +297,7 @@ class WebSocketManager: ObservableObject, WebSocketDelegate {
                             print("ReceivedMessage passed✅")
                         case "JoinUserGroup":
                             self.userJoined = true
-                            print("JoinUser   Group passed✅")
+                            print("JoinUser Group passed✅")
                         case "ReceiveMessage":
                             if let arguments = response.arguments?.first {
                                 DispatchQueue.main.async {
@@ -278,6 +332,12 @@ class WebSocketManager: ObservableObject, WebSocketDelegate {
                             self.timerResumed = false
                         case "TimerModify":
                             print("TimerModify passed✅")
+                            if let countdownValue = response.arguments?.first {
+                                DispatchQueue.main.async {
+                                    self.countdown = countdownValue
+                                    print("Countdown updated to: \(self.countdown)")
+                                }
+                            }
                         case "TimerResume":
                             print("TimerResume passed✅")
                             self.timerResumed = true
@@ -293,7 +353,7 @@ class WebSocketManager: ObservableObject, WebSocketDelegate {
                         }
                     }
                 } catch {
-                    print("Failed to parse WebSocket response: \(error.localizedDescription)")
+                    print("❌ Failed to parse WebSocket response: \(error.localizedDescription)")
                 }
             }
         }

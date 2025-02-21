@@ -24,6 +24,7 @@ class CreateLeaderboardViewModel: ObservableObject {
         
         errorMessage = nil
         isLoading = true
+        isSuccess = false
         
         createLeaderboardManager.execute(getMethod: "POST", token: nil) { [weak self] result in
             DispatchQueue.main.async {

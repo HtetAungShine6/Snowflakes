@@ -20,6 +20,7 @@ struct HostTeamDetailView: View {
     @State private var price: String = ""
     @State private var showImageBuyAlert: Bool = false
     @State private var showDecisionAlert: Bool = false
+    @State private var showRejectAlert: Bool = false
     @State private var showAlert: Bool = false
     
     var teamNumber: Int
@@ -38,11 +39,18 @@ struct HostTeamDetailView: View {
         .refreshable {
             getTeamDetailVM.fetchTeams(hostRoomCode: hostRoomCode, teamNumber: teamNumber)
         }
-        .safeAreaInset(edge: .top) {
-            customToolbar
-                .background(Color.white)
+        .toolbar {
+            ToolbarItem(placement: .navigationBarLeading) {
+                Button(action: {
+                    navigationManager.pop()
+                }) {
+                    Image(systemName: "chevron.left")
+                        .foregroundColor(.primary)
+                }
+            }
         }
-        .navigationBarBackButtonHidden(true)
+        .navigationBarBackButtonHidden()
+        .navigationBarTitleDisplayMode(.inline)
         .onAppear {
             getTeamDetailVM.fetchTeams(hostRoomCode: hostRoomCode, teamNumber: teamNumber)
             getTransactionVM.fetchTransactions(hostRoomCode: hostRoomCode, roundNumber: roundNumber, teamNumber: teamNumber)
@@ -60,19 +68,19 @@ struct HostTeamDetailView: View {
         }
     }
     
-    private var customToolbar: some View {
-        HStack {
-            Button(action: {
-                navigationManager.pop()
-            }) {
-                Image(systemName: "chevron.left")
-                    .foregroundColor(.black)
-            }
-            Spacer()
-        }
-        .padding()
-        .frame(height: 50)
-    }
+//    private var customToolbar: some View {
+//        HStack {
+//            Button(action: {
+//                navigationManager.pop()
+//            }) {
+//                Image(systemName: "chevron.left")
+//                    .foregroundColor(.black)
+//            }
+//            Spacer()
+//        }
+//        .padding()
+//        .frame(height: 50)
+//    }
     
     private var teamLabel: some View {
         HStack {
@@ -155,17 +163,7 @@ struct HostTeamDetailView: View {
                     showImageBuyAlert = true
                 })
                 Button("Reject", role: .destructive) {
-                    if let image = selectedImage, let price = Int(price) {
-                        buyImageVM.isBuyingConfirmed = false
-                        buyImageVM.hostRoomCode = hostRoomCode
-                        buyImageVM.playerRoomCode = team?.playerRoomCode ?? ""
-                        buyImageVM.roundNumber = roundNumber
-                        buyImageVM.teamNumber = teamNumber
-                        buyImageVM.imageUrl = image
-                        buyImageVM.price = price
-                        buyImageVM.buy()
-                    }
-                    showDecisionAlert = false
+                    showRejectAlert = true
                 }
             }
             .alert("Do you want to buy this Snowflake?", isPresented: $showImageBuyAlert) {
@@ -185,6 +183,23 @@ struct HostTeamDetailView: View {
                         buyImageVM.buy()
                     }
                     showImageBuyAlert = false
+                })
+                
+                Button("Cancel", role: .cancel) {}
+            }
+            .alert("Do you like to reject buying this Snowflake?", isPresented: $showRejectAlert) {
+                Button("Confirm", action: {
+                    if let image = selectedImage {
+                        buyImageVM.isBuyingConfirmed = false
+                        buyImageVM.hostRoomCode = hostRoomCode
+                        buyImageVM.playerRoomCode = team?.playerRoomCode ?? ""
+                        buyImageVM.roundNumber = roundNumber
+                        buyImageVM.teamNumber = teamNumber
+                        buyImageVM.imageUrl = image
+                        buyImageVM.price = 0
+                        buyImageVM.buy()
+                    }
+                    showRejectAlert = false
                 })
                 
                 Button("Cancel", role: .cancel) {}

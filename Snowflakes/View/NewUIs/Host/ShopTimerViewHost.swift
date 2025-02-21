@@ -105,6 +105,11 @@ struct ShopTimerViewHost: View {
                 keyboardIsVisible = false
             }
         }
+        .onReceive(createLeaderboardVM.$isSuccess) { success in
+            if success {
+                webSocketManager.createTimer(roomCode: roomCode, socketMessage: "01:00", gameState: "Leaderboard")
+            }
+        }
         .onTapGesture {
             hideKeyboard()
         }
@@ -201,6 +206,7 @@ struct ShopTimerViewHost: View {
             }
             .padding(.horizontal)
             AdjustTimeComponent(
+                countdown: webSocketManager.countdown,
                 onDecrease: { time in
                     webSocketManager.minusCountdown(roomCode: roomCode, socketMessage: "01:00")
                 },
@@ -276,7 +282,7 @@ struct ShopTimerViewHost: View {
                     }
                 }
             } else {
-                webSocketManager.createTimer(roomCode: roomCode, socketMessage: "01:00", gameState: "Leaderboard")
+//                webSocketManager.createTimer(roomCode: roomCode, socketMessage: "01:00", gameState: "Leaderboard")
                 DispatchQueue.main.async {
                     updateGameStateViewModel.hostRoomCode = roomCode
                     updateGameStateViewModel.currentGameState = GameState.Leaderboard

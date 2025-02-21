@@ -33,13 +33,14 @@ class UpdateGameStateViewModel: ObservableObject {
         
         let updateGameStateManager = UpdateGameStateUseCase()
         errorMessage = nil
+        isSuccess = false
         isLoading = true
         
         updateGameStateManager.execute(data: newGameState, getMethod: "PUT", token: nil) { [weak self] result in
             DispatchQueue.main.async {
                 self?.isLoading = false
                 switch result {
-                case .success(let gameState):
+                case .success( _):
 //                    print("\(gameState.message)")
                     self?.isSuccess = true
                 case .failure(let error):

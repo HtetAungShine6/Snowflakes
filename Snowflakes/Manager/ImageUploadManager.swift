@@ -68,7 +68,6 @@ class UploadImageViewModel: ObservableObject {
             
             DispatchQueue.main.async {
                 self.uploadSuccess = true
-                print("Upload successful!")
             }
         }.resume()
     }
