@@ -51,13 +51,11 @@ You can download the Snowflake Playground app from the App Store:
 [Download Snowflake Playground on the App Store](https://apps.apple.com/th/app/snowflake-playground/id6742320071)
 
 ### UI Preview:
-![Host Timer Screen](![image](https://github.com/user-attachments/assets/63a017fd-9d5b-40dd-b3b6-b6560219bd27)
-)
-![Player Timer Screen](![image](https://github.com/user-attachments/assets/3d81cb5a-41e4-4558-9f63-2f479a006944)
-)
-![Leaderboard]![image](https://github.com/user-attachments/assets/e4384e57-f9bf-438a-bf7c-bbe749f36602)
-)
-
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/63a017fd-9d5b-40dd-b3b6-b6560219bd27" alt="Host Timer Screen" width="300"/>
+  <img src="https://github.com/user-attachments/assets/3d81cb5a-41e4-4558-9f63-2f479a006944" alt="Player Timer Screen" width="300"/>
+  <img src="https://github.com/user-attachments/assets/e4384e57-f9bf-438a-bf7c-bbe749f36602" alt="Leaderboard" width="300"/>
+</p>
 
 ## 🌟 Features
 
@@ -75,6 +73,9 @@ You can download the Snowflake Playground app from the App Store:
 ### Shared Features
 - Use session codes: Host Room Code for managing, Player Room Code for joining.
 - Enjoy real-time interaction and a gamified, visually engaging experience.
+
+### 🌐 Live API
+Swagger API: https://snowflakeapi-bkd0aygebke4fscg.southeastasia-01.azurewebsites.net/swagger/index.html
 
 ## Requirements
 
