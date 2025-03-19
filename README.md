@@ -7,7 +7,7 @@
 
 <p align="center">
   <div style="display: flex; align-items: center;">
-    <span style="font-size: 80px; margin-right: 10px;">❄️</span>
+    <span style="font-size: 80px; margin-right: 10px;"></span>
     <span style="vertical-align: middle;">
       This is the Snowflake Agile Project Mobile App, a tool built for iOS to help manage Agile workflows while integrating Snowflake's powerful cloud-based data handling. It’s designed to make project collaboration more interactive and engaging for both hosts and players.
     </span>
