@@ -6,10 +6,10 @@
 # ❄️ Snowflake Agile Project Mobile App (iOS)
 
 <p align="center">
-  <a href="https://github.com/alexanderritik/Best-README-Template">
-    <img src="![image](https://github.com/user-attachments/assets/06c24a4e-ade3-482f-9c49-176de9ea830c)" alt="Logo" width="80" height="80">
-  </a>
-  <p align="center">
+  <img src="https://github.com/user-attachments/assets/06c24a4e-ade3-482f-9c49-176de9ea830c" alt="Logo" width="80" height="80">
+</p>
+
+<p align="center">
     This is the Snowflake Agile Project Mobile App, a tool built for iOS to help manage Agile workflows while integrating Snowflake's powerful cloud-based data handling. It’s designed to make project collaboration more interactive and engaging for both hosts and players.
   </p>
 </p>
