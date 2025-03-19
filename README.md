@@ -1,6 +1,3 @@
-[![Swift Version][swift-image]][swift-url]
-[![Build Status][travis-image]][travis-url]
-[![License][license-image]][license-url]
 [![Carthage compatible](https://img.shields.io/badge/Carthage-compatible-4BC51D.svg?style=flat)](https://github.com/Carthage/Carthage)
 [![CocoaPods Compatible](https://img.shields.io/cocoapods/v/EZSwiftExtensions.svg)](https://img.shields.io/cocoapods/v/LFAlertController.svg)
 [![Platform](https://img.shields.io/cocoapods/p/LFAlertController.svg?style=flat)](http://cocoapods.org/pods/LFAlertController)
@@ -50,19 +47,12 @@
 You can download the Snowflake Playground app from the App Store:
 [Download Snowflake Playground on the App Store](https://apps.apple.com/th/app/snowflake-playground/id6742320071)
 
-### UI Preview:
-<p align="center">
-  <img src="https://github.com/user-attachments/assets/63a017fd-9d5b-40dd-b3b6-b6560219bd27" alt="Host Timer Screen" width="300"/>
-  <img src="https://github.com/user-attachments/assets/3d81cb5a-41e4-4558-9f63-2f479a006944" alt="Player Timer Screen" width="300"/>
-  <img src="https://github.com/user-attachments/assets/e4384e57-f9bf-438a-bf7c-bbe749f36602" alt="Leaderboard" width="300"/>
-</p>
-
 ## 🌟 Features
 
 ### For Hosts
 - Set up games with rounds, timers, teams, tokens, and shop items.
 - Manage teams, resources, and transactions in real-time.
-- Control timers, send updates, and enable/disable shop items.
+- Control timers, send updates, and buy/reject snowflake.
 - View post-game highlights in the Snowflake Gallery and Leaderboard.
 
 ### For Players
@@ -76,6 +66,27 @@ You can download the Snowflake Playground app from the App Store:
 
 ### 🌐 Live API
 Swagger API: https://snowflakeapi-bkd0aygebke4fscg.southeastasia-01.azurewebsites.net/swagger/index.html
+
+### UI Preview [Host]:
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/9d74a6d8-12f3-474e-9e66-d02f458d46d2" alt="Host Screen" width="300"/>
+  <img src="https://github.com/user-attachments/assets/869aa220-31fd-48aa-a44b-7dbc55cdf6fc" alt="Setting" width="300"/>
+  <img src="https://github.com/user-attachments/assets/96ffb4ba-3add-417f-ad3f-a852ef8f3531" alt="Host Timer Screen" width="300"/>
+  <img src="https://github.com/user-attachments/assets/63a017fd-9d5b-40dd-b3b6-b6560219bd27" alt="Shop Timer Screen" width="300"/>
+  <img src="https://github.com/user-attachments/assets/92cb75b8-db41-4abf-8b17-4cf1a5ee2099" alt="Shop" width="300"/>
+  <img src="https://github.com/user-attachments/assets/09d5d303-06e2-45e8-be2f-c07a1ff50178" alt="Shop Team Details" width="300"/>
+  <img src="https://github.com/user-attachments/assets/e4384e57-f9bf-438a-bf7c-bbe749f36602" alt="Leaderboard" width="300"/>
+</p>
+
+### UI Preview [Player]:
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/96c2aec3-2052-47a3-8a57-93f84dca5bdc" alt="Join a room" width="300"/>
+  <img src="https://github.com/user-attachments/assets/d008e554-01df-4553-9d02-7b897b854951" alt="Team List Joining" width="300"/>
+  <img src="https://github.com/user-attachments/assets/3d81cb5a-41e4-4558-9f63-2f479a006944" alt="Player Timer Screen" width="300"/>
+  <img src="https://github.com/user-attachments/assets/36598f0e-d568-4abe-9bbb-d9bddc06e09c" alt="Shop Timer Screen" width="300"/>
+  <img src="https://github.com/user-attachments/assets/cec1b08c-b926-4283-9a57-4aaa60f3d2db" alt="Shop" width="300"/>
+  <img src="https://github.com/user-attachments/assets/e4384e57-f9bf-438a-bf7c-bbe749f36602" alt="Leaderboard" width="300"/>
+</p>
 
 ## Requirements
 
