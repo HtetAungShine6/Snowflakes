@@ -23,6 +23,7 @@ struct TimerViewHost: View {
     @State private var hasNavigated: Bool = false
     @State private var hasStartedCountdown: Bool = false
     @State private var keyboardIsVisible: Bool = false
+    @State private var showExitAlert: Bool = false
     
     let roomCode: String
     
@@ -108,6 +109,15 @@ struct TimerViewHost: View {
                 keyboardIsVisible = false
             }
         }
+        .alert("Are you sure you want to exit the game?", isPresented: $showExitAlert) {
+            Button("Exit", action: {
+                navigationManager.reset()
+                resetData()
+                showExitAlert = false
+            })
+            
+            Button("Cancel", role: .cancel) {}
+        }
         .onTapGesture {
             hideKeyboard()
         }
@@ -134,6 +144,19 @@ struct TimerViewHost: View {
                         .font(.custom("Lato-Regular", size: UIFont.preferredFont(forTextStyle: .headline).pointSize))
                     Text("Player Code: \(playerRoomCode)")
                         .font(.custom("Lato-Regular", size: UIFont.preferredFont(forTextStyle: .headline).pointSize))
+                    Button(action: {
+                        showExitAlert = true
+                    }){
+                        HStack {
+#warning("Need to change exit button")
+                            Image(systemName: "door.left.hand.open")
+                                .resizable()
+                                .frame(width: 30, height: 30)
+                                .foregroundColor(.black)
+                            Text("Leave Game")
+                                .font(.custom("Lato-Regular", size: UIFont.preferredFont(forTextStyle: .headline).pointSize))
+                        }
+                    }
                 }
             } label: {
                 Image(systemName: "questionmark.circle.dashed")
@@ -228,7 +251,7 @@ struct TimerViewHost: View {
             }
             .padding(.horizontal)
             HStack {
-                TextField("", text: $sendMessageText, prompt: Text("Create a snowflake").foregroundColor(.black))
+                TextField("", text: $sendMessageText, prompt: Text("Reach out to teams").foregroundColor(.black))
                     .padding(.leading, 10)
                     .frame(height: 80)
                     .background(Color.white)
@@ -237,7 +260,7 @@ struct TimerViewHost: View {
                 Button(action: {
                     webSocketManager.messageSend(roomCode: roomCode, message: sendMessageText)
                 }) {
-                    Image(systemName: "chevron.right")
+                    Image(systemName: "paperplane.fill")
                         .resizable()
                         .scaledToFit()
                         .frame(width: 15, height: 15)
@@ -268,6 +291,15 @@ struct TimerViewHost: View {
                 updateGameStateViewModel.currentRoundNumber = getGameStateViewModel.currentRoundNumber
                 updateGameStateViewModel.updateGameState()
             }
+        }
+    }
+    
+    private func resetData() {
+        if let roomCode = UserDefaults.standard.string(forKey: "\(playerRoomCode)") {
+            UserDefaults.standard.removeObject(forKey: roomCode)
+        }
+        if let teamNumber = UserDefaults.standard.string(forKey: "TeamDetail-\(playerRoomCode)") {
+            UserDefaults.standard.removeObject(forKey: teamNumber)
         }
     }
 }

@@ -246,12 +246,12 @@ struct JoinRoomView: View {
     }
     
     private var roomCodeTextField: some View {
-        TextField("Enter Room Code", text: $roomCode)
+        TextField(selectedRole == .host ? "Enter Host Code" : "Enter Player Code", text: $roomCode)
             .focused($isRoomCodeFocused)
             .padding()
             .background(Color(UIColor.systemBackground))
             .cornerRadius(10)
-            .shadow(radius: 5)
+            .shadow(radius: 2)
             .font(.custom("Roboto-Regular", size: UIFont.preferredFont(forTextStyle: .body).pointSize))
             .foregroundColor(.primary)
             .keyboardType(.alphabet)
@@ -261,12 +261,12 @@ struct JoinRoomView: View {
     }
     
     private var userNameTextField: some View {
-        TextField("Enter Your Name", text: $userName)
+        TextField("Enter Player Name", text: $userName)
             .focused($isUserNameFocused)
             .padding()
             .background(Color(UIColor.systemBackground))
             .cornerRadius(10)
-            .shadow(radius: 5)
+            .shadow(radius: 2)
             .font(.custom("Roboto-Regular", size: UIFont.preferredFont(forTextStyle: .body).pointSize))
             .foregroundColor(.primary)
             .keyboardType(.default)
@@ -339,10 +339,10 @@ struct JoinRoomView: View {
                 
                 Spacer()
             }
-            .frame(width: 246, height: 74)
+            .frame(width: 246, height: 70)
             .background(Color(red: 0.69, green: 0.89, blue: 0.96))
             .cornerRadius(20)
-            .shadow(color: Color.black.opacity(0.1), radius: 5, x: 0, y: 5)
+            .shadow(color: Color.black.opacity(0.1), radius: 2, x: 0, y: 2)
         }
     }
 

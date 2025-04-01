@@ -30,8 +30,8 @@ struct SwipeToConfirmButton: View {
             // Draggable rounded rectangle
             RoundedRectangle(cornerRadius: height / 2)
                 .fill(Color.white)
-                .frame(width: handleWidth, height: height - 10) // Handle size
-                .shadow(radius: 3)
+                .frame(width: handleWidth, height: height - 5) // Handle size
+                .shadow(radius: 2)
                 .overlay(
                     Text("Next Round")
                         .font(.custom("Roboto-Regular", size: UIFont.preferredFont(forTextStyle: .headline).pointSize))

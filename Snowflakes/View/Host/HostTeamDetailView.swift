@@ -16,6 +16,8 @@ struct HostTeamDetailView: View {
     @StateObject private var buyImageVM = BuyImageViewModel()
     @State private var team: Team? = nil
     @State private var transactions: [TransactionMessage] = []
+    @State private var itemTransactions: [ItemTransitionMessage] = []
+    @State private var images: [ImageTransitionMessage] = []
     @State private var selectedImage: String?
     @State private var price: String = ""
     @State private var showImageBuyAlert: Bool = false
@@ -37,7 +39,7 @@ struct HostTeamDetailView: View {
             }
         }
         .refreshable {
-            getTeamDetailVM.fetchTeams(hostRoomCode: hostRoomCode, teamNumber: teamNumber)
+            networkCalls()
         }
         .toolbar {
             ToolbarItem(placement: .navigationBarLeading) {
@@ -52,8 +54,7 @@ struct HostTeamDetailView: View {
         .navigationBarBackButtonHidden()
         .navigationBarTitleDisplayMode(.inline)
         .onAppear {
-            getTeamDetailVM.fetchTeams(hostRoomCode: hostRoomCode, teamNumber: teamNumber)
-            getTransactionVM.fetchTransactions(hostRoomCode: hostRoomCode, roundNumber: roundNumber, teamNumber: teamNumber)
+            networkCalls()
         }
         .onReceive(getTeamDetailVM.$team) { team in
             self.team = team
@@ -61,26 +62,18 @@ struct HostTeamDetailView: View {
         .onReceive(getTransactionVM.$transactions) { transactions in
             self.transactions = transactions
         }
+        .onReceive(getTransactionVM.$itemTransactions) { items in
+            self.itemTransactions = items
+        }
+        .onReceive(getTransactionVM.$imageTransactions) { images in
+            self.images = images
+        }
         .onReceive(buyImageVM.$message) { message in
             if !message.isEmpty {
                 showAlert = true
             }
         }
     }
-    
-//    private var customToolbar: some View {
-//        HStack {
-//            Button(action: {
-//                navigationManager.pop()
-//            }) {
-//                Image(systemName: "chevron.left")
-//                    .foregroundColor(.black)
-//            }
-//            Spacer()
-//        }
-//        .padding()
-//        .frame(height: 50)
-//    }
     
     private var teamLabel: some View {
         HStack {
@@ -217,34 +210,85 @@ struct HostTeamDetailView: View {
         VStack(alignment: .leading) {
             Text("Notifications")
                 .font(.custom("Lato-Regular", size: UIFont.preferredFont(forTextStyle: .body).pointSize))
-            if transactions.isEmpty {
+            Text("Sold Images")
+                .font(.custom("Lato-Regular", size: UIFont.preferredFont(forTextStyle: .callout).pointSize))
+            if images.isEmpty {
                 VStack {
-                    Text("No transactions available")
+                    Text("No images sold out yet.")
                         .font(.custom("Lato-Regular", size: UIFont.preferredFont(forTextStyle: .headline).pointSize))
                         .foregroundStyle(Color.gray.opacity(0.75))
                 }
             } else {
-                ForEach(transactions, id: \.productId) { transaction in
-                    HStack {
-                        Image(transaction.productName)
-                            .resizable()
-                            .scaledToFit()
-                            .frame(width: 30, height: 30)
-                        
-                        VStack(alignment: .leading) {
-                            Text("\(transaction.productName)")
-                                .font(.custom("Lato-Bold", size: UIFont.preferredFont(forTextStyle: .body).pointSize))
-                            Text("Quantity: \(transaction.quantity) - Total: \(transaction.total) tokens")
-                                .font(.custom("Lato-Regular", size: UIFont.preferredFont(forTextStyle: .callout).pointSize))
-                                .foregroundStyle(Color.gray)
+                ScrollView(.horizontal, showsIndicators: false) {
+                    HStack(spacing: 15) {
+                        ForEach(images, id: \.imageId) { transaction in
+                            VStack {
+                                Image(transaction.imageName)
+                                    .resizable()
+                                    .scaledToFit()
+                                    .frame(width: 80, height: 80)
+                                    .clipShape(RoundedRectangle(cornerRadius: 10))
+                            }
+                            .padding(10)
+                            .background(Color.gray.opacity(0.1))
+                            .clipShape(RoundedRectangle(cornerRadius: 10))
                         }
-                        Spacer()
                     }
-                    .padding(.vertical, 5)
+                    .padding(.horizontal, 10)
+                }
+            }
+            Text("Purchased Items")
+                .font(.custom("Lato-Regular", size: UIFont.preferredFont(forTextStyle: .callout).pointSize))
+            if images.isEmpty {
+                VStack {
+                    Text("No items sold out yet.")
+                        .font(.custom("Lato-Regular", size: UIFont.preferredFont(forTextStyle: .headline).pointSize))
+                        .foregroundStyle(Color.gray.opacity(0.75))
+                }
+            } else {
+                ScrollView(.horizontal, showsIndicators: false) {
+                    HStack(spacing: 15) {
+                        ForEach(itemTransactions, id: \.itemId) { transaction in
+                            VStack {
+                                Image(transaction.itemName)
+                                    .resizable()
+                                    .scaledToFit()
+                                    .frame(width: 80, height: 80)
+                                    .clipShape(RoundedRectangle(cornerRadius: 10))
+                                
+                                VStack(alignment: .leading) {
+                                    Text(transaction.itemName)
+                                        .font(.custom("Lato-Bold", size: UIFont.preferredFont(forTextStyle: .body).pointSize))
+                                        .lineLimit(1)
+                                    
+                                    Text("Quantity: \(transaction.quantity)")
+                                        .font(.custom("Lato-Regular", size: UIFont.preferredFont(forTextStyle: .callout).pointSize))
+                                        .foregroundStyle(Color.gray)
+                                        .lineLimit(1)
+                                    
+                                    Text("Total: \(transaction.total) tokens")
+                                        .font(.custom("Lato-Regular", size: UIFont.preferredFont(forTextStyle: .callout).pointSize))
+                                        .foregroundStyle(Color.gray)
+                                        .lineLimit(1)
+                                }
+                            }
+                            .padding(10)
+                            .background(Color.gray.opacity(0.1))
+                            .clipShape(RoundedRectangle(cornerRadius: 10))
+                        }
+                    }
+                    .padding(.horizontal, 10)
                 }
             }
         }
         .padding(.horizontal, 10)
+    }
+    
+    private func networkCalls() {
+        getTeamDetailVM.fetchTeams(hostRoomCode: hostRoomCode, teamNumber: teamNumber)
+        getTransactionVM.fetchTransactions(hostRoomCode: hostRoomCode, roundNumber: roundNumber, teamNumber: teamNumber)
+        getTransactionVM.fetchItemTransactions(hostRoomCode: hostRoomCode, roundNumber: roundNumber, teamNumber: teamNumber)
+        getTransactionVM.fetchImageTransactions(hostRoomCode: hostRoomCode, roundNumber: roundNumber, teamNumber: teamNumber)
     }
 }
 
