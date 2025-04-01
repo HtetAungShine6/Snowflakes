@@ -16,6 +16,10 @@ struct GalleryView: View {
     var teamNumber: Int
     var roomCode: String
     
+    var selectedTeam: LeaderboardMessage? {
+        leaderboard.first { $0.teamNumber == teamNumber }
+    }
+    
     var body: some View {
         VStack {
  
@@ -30,7 +34,7 @@ struct GalleryView: View {
 
             ScrollView {
                 VStack(spacing: 10) {
-                    if let images = leaderboard.first?.soldImages {
+                    if let images = selectedTeam?.soldImages, !images.isEmpty {
                         ForEach(images, id: \.self) { imageUrl in
                             KFImage(URL(string: imageUrl))
                                 .resizable()
@@ -39,6 +43,10 @@ struct GalleryView: View {
                                 .clipShape(RoundedRectangle(cornerRadius: 10))
                                 .padding(.bottom, 10)
                         }
+                    } else {
+                        Text("No images available for this team")
+                            .foregroundColor(.gray)
+                            .padding()
                     }
                 }
             }

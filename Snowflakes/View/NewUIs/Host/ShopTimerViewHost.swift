@@ -25,6 +25,7 @@ struct ShopTimerViewHost: View {
     
     @State private var gameState: String = ""
     @State private var keyboardIsVisible: Bool = false
+    @State private var showExitAlert: Bool = false
     
     let roomCode: String
     
@@ -110,6 +111,15 @@ struct ShopTimerViewHost: View {
                 webSocketManager.createTimer(roomCode: roomCode, socketMessage: "01:00", gameState: "Leaderboard")
             }
         }
+        .alert("Are you sure you want to exit the game?", isPresented: $showExitAlert) {
+            Button("Exit", action: {
+                navigationManager.reset()
+                resetData()
+                showExitAlert = false
+            })
+            
+            Button("Cancel", role: .cancel) {}
+        }
         .onTapGesture {
             hideKeyboard()
         }
@@ -132,13 +142,44 @@ struct ShopTimerViewHost: View {
                 }
             }
             Spacer()
-            Button {
-                navigationManager.navigateTo(Destination.hostShopView(hostRoomCode: roomCode, roundNumber: getGameStateViewModel.currentRoundNumber))
-            }label: {
-                Image("shop2")
+            Menu {
+                HStack {
+                    Text("Host Code: \(roomCode)")
+                        .font(.custom("Lato-Regular", size: UIFont.preferredFont(forTextStyle: .headline).pointSize))
+                    Text("Player Code: \(getGameStateViewModel.gameState?.playerRoomCode ?? "")")
+                        .font(.custom("Lato-Regular", size: UIFont.preferredFont(forTextStyle: .headline).pointSize))
+                    Button {
+                        navigationManager.navigateTo(Destination.hostShopView(hostRoomCode: roomCode, roundNumber: getGameStateViewModel.currentRoundNumber))
+                    }label: {
+                        HStack {
+                            Image("shop2")
+                                .resizable()
+                                .scaledToFit()
+                                .frame(width:30, height: 30)
+                            Text("Enter Shop")
+                                .font(.custom("Lato-Regular", size: UIFont.preferredFont(forTextStyle: .headline).pointSize))
+                        }
+                    }
+                    Button(action: {
+                        showExitAlert = true
+                    }){
+                        HStack {
+#warning("Need to customize exit logo")
+                            Image(systemName: "door.left.hand.open")
+                                .resizable()
+                                .renderingMode(.template)
+                                .frame(width: 30, height: 30)
+                                .foregroundColor(AppColors.frostBlue)
+                            Text("Leave Game")
+                                .font(.custom("Lato-Regular", size: UIFont.preferredFont(forTextStyle: .headline).pointSize))
+                        }
+                    }
+                }
+            } label: {
+                Image(systemName: "questionmark.circle.dashed")
                     .resizable()
-                    .scaledToFit()
-                    .frame(height: 30)
+                    .frame(width: 30, height: 30)
+                    .foregroundColor(.black)
             }
         }
         .padding(.horizontal)
@@ -227,7 +268,7 @@ struct ShopTimerViewHost: View {
             }
             .padding(.horizontal)
             HStack {
-                TextField("", text: $sendMessageText, prompt: Text("Create a snowflake").foregroundColor(.black))
+                TextField("", text: $sendMessageText, prompt: Text("Reach out to teams").foregroundColor(.black))
                     .padding(.leading, 10)
                     .frame(height: 80)
                     .background(Color.white)
@@ -236,7 +277,7 @@ struct ShopTimerViewHost: View {
                 Button(action: {
                     webSocketManager.messageSend(roomCode: roomCode, message: sendMessageText)
                 }) {
-                    Image(systemName: "chevron.right")
+                    Image(systemName: "paperplane.fill")
                         .resizable()
                         .scaledToFit()
                         .frame(width: 15, height: 15)
@@ -290,6 +331,12 @@ struct ShopTimerViewHost: View {
                     createLeaderboardVM.createLeaderboard(hostRoomCode: roomCode)
                 }
             }
+        }
+    }
+    
+    private func resetData() {
+        if let roomCode = UserDefaults.standard.string(forKey: "\(roomCode)") {
+            UserDefaults.standard.removeObject(forKey: roomCode)
         }
     }
 }

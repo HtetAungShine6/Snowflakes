@@ -22,6 +22,7 @@ struct PlayerShopTimerView: View {
     @State private var isButtonDisabled = false
     @State private var hasNavigated: Bool = false
     @State private var hasStartedCountdown: Bool = false
+    @State private var showExitAlert: Bool = false
     
     let playerRoomCode: String
     let hostRoomCode: String
@@ -62,13 +63,6 @@ struct PlayerShopTimerView: View {
             getGameStateViewModel.fetchGameState(playerRoomCode: playerRoomCode)
             hasNavigated = false
         }
-        .onChange(of: getPlaygroundVM.isLoading, { _, newValue in
-            if newValue {
-                // show alert
-            } else {
-                // hide alert
-            }
-        })
         .onReceive(webSocketManager.$currentGameState) { currentGameState in
             if currentGameState == "Leaderboard" && !hasNavigated {
                 if getGameStateViewModel.currentRoundNumber == navigationManager.totalRound {
@@ -93,13 +87,50 @@ struct PlayerShopTimerView: View {
                     .foregroundStyle(Color.gray)
             }
             Spacer()
-            Button {
-                navigationManager.navigateTo(Destination.shopDetailPlayerView(playerRoomCode: playerRoomCode, roundNumber: getGameStateViewModel.currentRoundNumber))
-            }label: {
-                Image("shop2")
+//            Button {
+//                navigationManager.navigateTo(Destination.shopDetailPlayerView(playerRoomCode: playerRoomCode, roundNumber: getGameStateViewModel.currentRoundNumber))
+//            }label: {
+//                Image("shop2")
+//                    .resizable()
+//                    .scaledToFit()
+//                    .frame(height: 30)
+//            }
+            Menu {
+                HStack {
+                    Text("Player Code: \(getGameStateViewModel.gameState?.playerRoomCode ?? "")")
+                        .font(.custom("Lato-Regular", size: UIFont.preferredFont(forTextStyle: .headline).pointSize))
+                    Button {
+                        navigationManager.navigateTo(Destination.shopDetailPlayerView(playerRoomCode: playerRoomCode, roundNumber: getGameStateViewModel.currentRoundNumber))
+                    }label: {
+                        HStack {
+                            Image("shop2")
+                                .resizable()
+                                .scaledToFit()
+                                .frame(width:30, height: 30)
+                            Text("Enter Shop")
+                                .font(.custom("Lato-Regular", size: UIFont.preferredFont(forTextStyle: .headline).pointSize))
+                        }
+                    }
+                    Button(action: {
+                        showExitAlert = true
+                    }){
+                        HStack {
+#warning("Need to customize exit logo")
+                            Image(systemName: "door.left.hand.open")
+                                .resizable()
+                                .renderingMode(.template)
+                                .frame(width: 30, height: 30)
+                                .foregroundColor(AppColors.frostBlue)
+                            Text("Leave Game")
+                                .font(.custom("Lato-Regular", size: UIFont.preferredFont(forTextStyle: .headline).pointSize))
+                        }
+                    }
+                }
+            } label: {
+                Image(systemName: "questionmark.circle.dashed")
                     .resizable()
-                    .scaledToFit()
-                    .frame(height: 30)
+                    .frame(width: 30, height: 30)
+                    .foregroundColor(.black)
             }
         }
         .padding(.horizontal)

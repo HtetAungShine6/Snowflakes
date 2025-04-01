@@ -126,12 +126,12 @@ struct LeaderboardView: View {
         }) {
             Text("Back to main menu")
                 .font(.headline)
-                .foregroundColor(.primary)
+                .foregroundColor(.black)
                 .frame(maxWidth: .infinity)
                 .padding()
                 .background(AppColors.frostBlue)
                 .cornerRadius(10)
-                .shadow(radius: 5)
+                .shadow(radius: 2)
         }
         .padding(.horizontal)
     }
@@ -146,6 +146,6 @@ struct LeaderboardView: View {
     }
 }
 
-//#Preview {
-//    LeaderboardView(roomCode: "ANBDA")
-//}
+#Preview {
+    LeaderboardView(roomCode: "ANBDA", playerRoomCode: "ABCDE")
+}

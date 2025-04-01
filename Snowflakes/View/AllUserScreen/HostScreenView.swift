@@ -74,13 +74,14 @@ struct HostScreenView: View {
             navigationManager.navigateTo(Destination.hostSettingView)
         }) {
             HStack {
+                Spacer().frame(width: 15)
                 Rectangle()
                     .foregroundColor(.clear)
-                    .frame(width: 36, height: 36)
+                    .frame(width: 30, height: 30)
                     .overlay(
                         Image(systemName: "snowflake")
                             .resizable()
-                            .frame(width: 36, height: 36)
+                            .frame(width: 30, height: 30)
                             .foregroundColor(.white)
                     )
                     .padding(EdgeInsets(top: 6, leading: 9.5, bottom: 6, trailing: 9.5))
@@ -91,10 +92,10 @@ struct HostScreenView: View {
                 
                 Spacer()
             }
-            .frame(width: 246, height: 74)
+            .frame(width: 246, height: 70)
             .background(Color(red: 0.69, green: 0.89, blue: 0.96))
             .cornerRadius(20)
-            .shadow(color: Color.black.opacity(0.1), radius: 5, x: 0, y: 5)
+            .shadow(color: Color.black.opacity(0.1), radius: 2, x: 0, y: 2)
         }
     }
     
@@ -105,13 +106,14 @@ struct HostScreenView: View {
             navigationManager.navigateTo(Destination.joinRoomView)
         }) {
             HStack {
+                Spacer().frame(width: 20)
                 Rectangle()
                     .foregroundColor(.clear)
-                    .frame(width: 36, height: 36)
+                    .frame(width: 30, height: 30)
                     .overlay(
                         Image(systemName: "arrow.right.circle.fill")
                             .resizable()
-                            .frame(width: 36, height: 36)
+                            .frame(width: 30, height: 30)
                             .foregroundColor(.white)
                     )
                     .padding(EdgeInsets(top: 6, leading: 9.5, bottom: 6, trailing: 9.5))
@@ -122,16 +124,15 @@ struct HostScreenView: View {
                 
                 Spacer()
             }
-            .frame(width: 246, height: 74)
+            .frame(width: 246, height: 70)
             .background(Color(red: 0.69, green: 0.89, blue: 0.96))
             .cornerRadius(20)
-            .shadow(color: Color.black.opacity(0.1), radius: 5, x: 0, y: 5)
+            .shadow(color: Color.black.opacity(0.1), radius: 5, x: 0, y: 2)
         }
     }
 }
+
 // MARK: - Preview
-struct HostScreenView_Previews: PreviewProvider {
-        static var previews: some View {
-            HostScreenView()
-        }
-}
+//#Preview {
+//    HostScreenView()
+//}
